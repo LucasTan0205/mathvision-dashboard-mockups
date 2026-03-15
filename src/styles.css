@@ -34,6 +34,7 @@
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.75), transparent 32%),
     linear-gradient(180deg, #f6f2ea 0%, #f3efe7 100%);
@@ -49,7 +50,7 @@ a {
 .app-shell {
   position: relative;
   min-height: 100vh;
-  overflow: visible;
+  overflow-x: clip;
   padding: 28px;
 }
 
@@ -745,9 +746,6 @@ a {
 .chart-card__canvas canvas {
   width: 100% !important;
   height: 100% !important;
-  transform-origin: center bottom;
-  animation: chart-grow 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--enter-delay, 0ms) + 120ms);
 }
 
 .chart-card__canvas--tall {
@@ -1222,18 +1220,6 @@ a {
   background: rgba(242, 214, 210, 0.96);
 }
 
-@keyframes chart-grow {
-  from {
-    opacity: 0;
-    transform: scaleY(0.82) translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: scaleY(1) translateY(0);
-  }
-}
-
 .app-shell.sidebar-collapsed .app-frame {
   grid-template-columns: 104px minmax(0, 1fr);
 }
@@ -1395,6 +1381,5 @@ a {
   }
 
   .chart-card__canvas canvas {
-    animation: none;
   }
 }

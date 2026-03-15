@@ -80,21 +80,36 @@ function attachSharedBindings() {
   mobileBreakpoint.addEventListener('change', syncSidebarState);
 }
 
-function animatePageEntrance() {
+function preparePageEntrance() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.querySelectorAll('[data-animate-in]').forEach((element) => {
       element.classList.add('is-entered');
     });
-    return;
+    return [];
   }
 
   const animatedSections = document.querySelectorAll(
-    '.topbar-panel, .page-meta, .page-content > *, .chart-card, .tutor-heatmap-card'
+    '.topbar-panel, .page-meta, .page-content > *, .tutor-heatmap-card'
   );
 
-  animatedSections.forEach((element, index) => {
+  const visibleSections = Array.from(animatedSections).filter((element) => !element.querySelector('canvas'));
+
+  visibleSections.forEach((element, index) => {
     element.setAttribute('data-animate-in', '');
+    element.classList.remove('is-entered');
     element.style.setProperty('--enter-delay', `${Math.min(index * 55, 360)}ms`);
+  });
+
+  return visibleSections;
+}
+
+function animatePageEntrance(animatedSections) {
+  if (!animatedSections.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    return;
+  }
+
+  animatedSections.forEach((element) => {
+    void element.offsetWidth;
   });
 
   window.requestAnimationFrame(() => {
@@ -102,6 +117,14 @@ function animatePageEntrance() {
       animatedSections.forEach((element) => {
         element.classList.add('is-entered');
       });
+    });
+  });
+}
+
+function runAfterNextPaint(callback) {
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      callback();
     });
   });
 }
@@ -116,12 +139,15 @@ export function mountPage({ route, title, breadcrumb, contentHtml, init }) {
   document.body.innerHTML = html;
   document.getElementById('page-content').innerHTML = contentHtml;
   attachSharedBindings();
+  const animatedSections = preparePageEntrance();
 
   if (typeof init === 'function') {
-    init();
+    runAfterNextPaint(() => {
+      init();
+    });
   }
 
-  animatePageEntrance();
+  animatePageEntrance(animatedSections);
 }
 
 window.MathVision = {

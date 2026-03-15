@@ -109,6 +109,10 @@ export function initMarketingInsightsCharts() {
     },
     options: {
       ...baseChartOptions,
+      animation: {
+        duration: 1200,
+        easing: 'easeOutQuart'
+      },
       cutout: '68%',
       plugins: {
         ...baseChartOptions.plugins,
