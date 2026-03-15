@@ -14,7 +14,17 @@ export const chartPalette = {
 export const baseChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  animation: false,
+  animation: {
+    duration: 1000,
+    easing: 'easeOutCubic'
+  },
+  transitions: {
+    active: {
+      animation: {
+        duration: 180
+      }
+    }
+  },
   plugins: {
     legend: {
       labels: {

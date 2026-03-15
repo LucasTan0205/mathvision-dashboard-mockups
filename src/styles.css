@@ -423,6 +423,21 @@ a {
   gap: 24px;
 }
 
+[data-animate-in] {
+  opacity: 0;
+  transform: translateY(18px) scale(0.985);
+  transition:
+    opacity 0.55s ease,
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--enter-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+[data-animate-in].is-entered {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
 .hero-panel,
 .shell-card,
 .shell-table,
@@ -654,7 +669,7 @@ a {
 
 .split-stat-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 14px;
 }
 
@@ -663,6 +678,8 @@ a {
   border-radius: var(--radius-lg);
   background: rgba(248, 244, 236, 0.9);
   border: 1px solid var(--line);
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 .split-stat strong {
@@ -670,6 +687,11 @@ a {
   font-size: 1.5rem;
   line-height: 1.1;
   margin-bottom: 8px;
+}
+
+.split-stat span {
+  display: block;
+  overflow-wrap: anywhere;
 }
 
 .action-row .btn {
@@ -723,6 +745,9 @@ a {
 .chart-card__canvas canvas {
   width: 100% !important;
   height: 100% !important;
+  transform-origin: center bottom;
+  animation: chart-grow 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--enter-delay, 0ms) + 120ms);
 }
 
 .chart-card__canvas--tall {
@@ -1197,6 +1222,18 @@ a {
   background: rgba(242, 214, 210, 0.96);
 }
 
+@keyframes chart-grow {
+  from {
+    opacity: 0;
+    transform: scaleY(0.82) translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+  }
+}
+
 .app-shell.sidebar-collapsed .app-frame {
   grid-template-columns: 104px minmax(0, 1fr);
 }
@@ -1347,5 +1384,17 @@ a {
 
   .page-meta {
     align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-animate-in] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .chart-card__canvas canvas {
+    animation: none;
   }
 }

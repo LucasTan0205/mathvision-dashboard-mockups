@@ -48,7 +48,7 @@ export function createCapacityUtilizationContent() {
     </section>
 
     <section class="row g-4">
-      <div class="col-xl-4">
+      <div class="col-lg-12 col-xl-4">
         <section class="shell-card h-100">
           <div class="shell-card__header">
             <div>

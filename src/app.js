@@ -80,6 +80,32 @@ function attachSharedBindings() {
   mobileBreakpoint.addEventListener('change', syncSidebarState);
 }
 
+function animatePageEntrance() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('[data-animate-in]').forEach((element) => {
+      element.classList.add('is-entered');
+    });
+    return;
+  }
+
+  const animatedSections = document.querySelectorAll(
+    '.topbar-panel, .page-meta, .page-content > *, .chart-card, .tutor-heatmap-card'
+  );
+
+  animatedSections.forEach((element, index) => {
+    element.setAttribute('data-animate-in', '');
+    element.style.setProperty('--enter-delay', `${Math.min(index * 55, 360)}ms`);
+  });
+
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      animatedSections.forEach((element) => {
+        element.classList.add('is-entered');
+      });
+    });
+  });
+}
+
 export function mountPage({ route, title, breadcrumb, contentHtml, init }) {
   const activeRoute = normalizeRoute(route);
   const html = baseTemplate
@@ -94,6 +120,8 @@ export function mountPage({ route, title, breadcrumb, contentHtml, init }) {
   if (typeof init === 'function') {
     init();
   }
+
+  animatePageEntrance();
 }
 
 window.MathVision = {
