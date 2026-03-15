@@ -31,6 +31,16 @@ npm run build
 npm run preview
 ```
 
+## GitHub Pages
+- Production builds use `base: '/mathvision-dashboard-mockups/'` by default so assets resolve correctly on GitHub Pages.
+- If your GitHub repo name is different, set `VITE_BASE_PATH` before building.
+
+Example:
+```bash
+$env:VITE_BASE_PATH='/your-repo-name/'
+npm run build
+```
+
 ## Notes
 - Shared shell + styles + branch selector remain consistent across all pages.
 - Side navigation links now point to concrete routes.
