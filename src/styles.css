@@ -90,7 +90,6 @@ a {
 
 .app-frame {
   position: relative;
-  z-index: 1;
   display: grid;
   grid-template-columns: 290px minmax(0, 1fr);
   gap: 24px;
