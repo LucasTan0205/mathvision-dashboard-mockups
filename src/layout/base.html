@@ -1,0 +1,98 @@
+<!doctype html>
+<div class="app-shell">
+  <div class="app-shell__bg app-shell__bg--one"></div>
+  <div class="app-shell__bg app-shell__bg--two"></div>
+  <button class="app-overlay" type="button" data-sidebar-toggle aria-label="Close navigation"></button>
+  <div class="app-frame">
+    <aside class="sidebar-panel">
+      <div class="sidebar-panel__topbar">
+        <button class="btn shell-icon-btn sidebar-panel__toggle" type="button" data-sidebar-toggle aria-label="Toggle navigation">
+          <i class="bi bi-layout-sidebar-inset"></i>
+        </button>
+      </div>
+      <a class="brand-mark" href="dashboard.html">
+        <span class="brand-mark__badge">M</span>
+        <span>
+          <span class="brand-mark__title">MathVision</span>
+          <span class="brand-mark__subtitle">Operations intelligence</span>
+        </span>
+      </a>
+
+      <section class="sidebar-profile">
+        <div class="avatar-dot">AC</div>
+        <div>
+          <p class="sidebar-profile__name">Alex Chen</p>
+          <p class="sidebar-profile__role">Operations Manager</p>
+        </div>
+      </section>
+
+      <div class="sidebar-panel__section">
+        <p class="sidebar-panel__eyebrow">Workspace</p>
+        <ul class="nav flex-column" id="sidebar-nav">
+          <!--NAV_LINKS-->
+        </ul>
+      </div>
+
+      <section class="sidebar-note">
+        <p class="sidebar-note__label">Forecast confidence</p>
+        <div class="sidebar-note__value-row">
+          <strong>94%</strong>
+          <span>Stable this week</span>
+        </div>
+        <div class="progress shell-progress" role="progressbar" aria-label="Forecast confidence" aria-valuenow="94" aria-valuemin="0" aria-valuemax="100">
+          <div class="progress-bar" style="width: 94%"></div>
+        </div>
+      </section>
+    </aside>
+
+    <div class="content-panel">
+      <header class="topbar-panel">
+        <div>
+          <p class="page-eyebrow">MathVision overview</p>
+          <h1 class="page-title">__TITLE__</h1>
+        </div>
+
+        <div class="topbar-panel__actions">
+          <button class="btn shell-icon-btn" type="button" data-sidebar-toggle aria-label="Toggle navigation">
+            <i class="bi bi-list"></i>
+          </button>
+          <div class="dropdown">
+            <button class="btn shell-btn shell-btn--soft dropdown-toggle" type="button" id="locationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-geo-alt"></i>
+              <span id="currentBranchLabel">East Campus</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shell-menu" aria-labelledby="locationDropdown">
+              <li><a class="dropdown-item branch-option" href="#" data-branch="West Campus">West Campus</a></li>
+              <li><a class="dropdown-item branch-option" href="#" data-branch="Central Office">Central Office</a></li>
+              <li><a class="dropdown-item branch-option" href="#" data-branch="South Branch">South Branch</a></li>
+              <li><a class="dropdown-item branch-option" href="#" data-branch="East Campus">East Campus</a></li>
+            </ul>
+          </div>
+          <button class="btn shell-btn shell-btn--ghost" type="button">
+            <i class="bi bi-bell"></i>
+            <span>3 updates</span>
+          </button>
+          <div class="topbar-user">
+            <span class="topbar-user__avatar">AC</span>
+            <div>
+              <p class="topbar-user__name">Alex Chen</p>
+              <p class="topbar-user__meta">Daily briefing ready</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="page-meta">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb shell-breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="dashboard.html">MathVision</a></li>
+            <li class="breadcrumb-item active" aria-current="page">__BREADCRUMB__</li>
+          </ol>
+        </nav>
+        <p class="page-meta__note">Updated moments ago from branch operations data.</p>
+      </div>
+
+      <main id="page-content" class="page-content"></main>
+    </div>
+  </div>
+</div>
