@@ -34,6 +34,8 @@ npm run preview
 ## GitHub Pages
 - Production builds use `base: '/mathvision-dashboard-mockups/'` by default so assets resolve correctly on GitHub Pages.
 - If your GitHub repo name is different, set `VITE_BASE_PATH` before building.
+- This repo now includes a GitHub Actions workflow at `.github/workflows/deploy-pages.yml` that builds and deploys `dist/` on pushes to `main`.
+- In GitHub repository settings, Pages should be set to `GitHub Actions` as the source.
 
 Example:
 ```bash
