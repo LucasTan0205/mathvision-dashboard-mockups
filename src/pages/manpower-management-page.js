@@ -1,103 +1,383 @@
 import { baseChartOptions, chartPalette, mountChart } from '/src/lib/charts.js';
+import { Chart } from 'chart.js';
+
+/* ── Data ───────────────────────────────────────────────── */
+
+const kpis = [
+  { id: 'sparkOpenReq',   label: 'Open requests',   value: '24',  meta: 'Up 12% this week',          badge: '+12%', tone: 'red',   data: [14, 16, 18, 20, 19, 22, 24] },
+  { id: 'sparkAutoMatch',  label: 'Auto-matched',    value: '86%', meta: 'Handled within SLA',        badge: '+3%',  tone: 'green', data: [78, 80, 82, 81, 84, 85, 86] },
+  { id: 'sparkFillRate',   label: 'Fill rate',       value: '98%', meta: 'Above 95% target',          badge: '+1%',  tone: 'green', data: [95, 96, 97, 96, 97, 98, 98] },
+  { id: 'sparkCritAlerts', label: 'Critical alerts',  value: '4',   meta: 'Needs immediate action',    badge: '+2',   tone: 'amber', data: [1, 2, 1, 3, 2, 3, 4] }
+];
+
+const actionQueue = [
+  { urgency: 'urgent', tag: 'Urgent',  title: '3 night slots unfilled — class in 4 hours',     detail: 'S3 E-Math (19:00), S4 A-Math (19:00), J1 H2 Math (20:00) · 2 relief tutors match',       cta: 'Assign',     icon: 'lightning-charge' },
+  { urgency: 'watch',  tag: 'Watch',   title: 'Mr Tan approaching capacity — 96% utilisation',  detail: '18 of 18.75 hrs filled this week · Suggest redistributing Sat PM S2 class to Ms Low',     cta: 'Rebalance',  icon: 'arrow-left-right' },
+  { urgency: 'watch',  tag: 'Watch',   title: 'SA1 exam-prep demand spike next week',           detail: 'Projected +12 additional S3-S4 slots vs 4 bench tutors available · Plan relief coverage', cta: 'Plan',       icon: 'calendar-event' },
+  { urgency: 'info',   tag: 'Info',    title: 'Saturday morning fully staffed — 16/16 confirmed', detail: 'All P3-P6 and S1-S2 morning slots covered · No action needed',                           cta: 'View',       icon: 'check-circle' }
+];
+
+/* ── Student-initials helper ────────────────────────────── */
+
+function getStudentInitials() {
+  try {
+    const students = JSON.parse(localStorage.getItem('mathvision-students')) || [];
+    return students.map(s => {
+      const parts = (s.name || '').trim().split(/\s+/);
+      return parts.map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    });
+  } catch { return []; }
+}
+
+/* Build shift data, mapping filled slots → student initials */
+function buildShifts() {
+  const initials = getStudentInitials();
+  let idx = 0;
+  const next = (filled) => filled && idx < initials.length ? initials[idx++] : '';
+
+  /* Fallback sample initials when no student records exist yet */
+  const fallback = [
+    'AL','BT','CT','DL','EW','FK','GR','HS','IC','JN','KP','LM','MO','NQ',
+    'OC','PH','QS','RA','SB','TD','UL','VK','WJ','XY','ZN','AT','BR','CK',
+    'DW','EH','FA','GQ','HB','IJ','JT','KM','LW','MR','NF','OL','PD','QW',
+    'RN','SL'
+  ];
+  let fi = 0;
+  const fb = (filled) => filled ? fallback[fi++ % fallback.length] : '';
+
+  const pick = initials.length > 0 ? next : fb;
+
+  return [
+    {
+      name: 'Morning', status: 'Full', statusTone: 'green', filled: 14, total: 14,
+      slots: [
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }, { code: pick(true), filled: true },
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }, { code: pick(true), filled: true },
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }, { code: pick(true), filled: true },
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }, { code: pick(true), filled: true },
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }
+      ]
+    },
+    {
+      name: 'Afternoon', status: 'Full', statusTone: 'green', filled: 16, total: 16,
+      slots: [
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }, { code: pick(true), filled: true },
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }, { code: pick(true), filled: true },
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }, { code: pick(true), filled: true },
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }, { code: pick(true), filled: true },
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }, { code: pick(true), filled: true },
+        { code: pick(true), filled: true }
+      ]
+    },
+    {
+      name: 'Evening', status: '3 gaps', statusTone: 'red', filled: 11, total: 14,
+      slots: [
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }, { code: pick(true), filled: true },
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }, { code: pick(true), filled: true },
+        { code: '', filled: false }, { code: pick(true), filled: true }, { code: pick(true), filled: true },
+        { code: '', filled: false }, { code: '', filled: false }, { code: pick(true), filled: true },
+        { code: pick(true), filled: true }, { code: pick(true), filled: true }
+      ]
+    }
+  ];
+}
+
+const heatmap = [
+  //         Mon  Tue  Wed  Thu  Fri  Sat  Sun
+  { label: 'AM',  cells: [
+    { v: 8, s: 'green' }, { v: 6, s: 'green' }, { v: 7, s: 'green' }, { v: 8, s: 'green' }, { v: 7, s: 'green' }, { v: 14, s: 'amber' }, { v: 4, s: 'green' }
+  ]},
+  { label: 'PM',  cells: [
+    { v: 10, s: 'green' }, { v: 9, s: 'green' }, { v: 10, s: 'green' }, { v: 11, s: 'amber' }, { v: 10, s: 'green' }, { v: 16, s: 'red' }, { v: 6, s: 'green' }
+  ]},
+  { label: 'Eve', cells: [
+    { v: 12, s: 'amber' }, { v: 11, s: 'amber' }, { v: 12, s: 'amber' }, { v: 13, s: 'red' }, { v: 12, s: 'amber' }, { v: 14, s: 'red' }, { v: 0, s: 'green' }
+  ]}
+];
+
+const reliefPool = [
+  { initials: 'JL', name: 'James Lim',    avail: 'Free tonight',  highlight: true },
+  { initials: 'SR', name: 'Sarah Rao',    avail: 'Free tonight',  highlight: true },
+  { initials: 'KT', name: 'Kevin Tan',    avail: 'Wed–Fri',       highlight: false },
+  { initials: 'ML', name: 'Michelle Low', avail: 'Weekends',      highlight: false },
+  { initials: 'AP', name: 'Arun Prasad',  avail: 'Thu–Sat',       highlight: false }
+];
+
+/* ── Helpers ────────────────────────────────────────────── */
+
+function sparklineColor(tone) {
+  if (tone === 'red') return '#E24B4A';
+  if (tone === 'green') return '#1D9E75';
+  return '#EF9F27';
+}
+
+function badgeClass(tone) {
+  if (tone === 'red') return 'mp-badge--red';
+  if (tone === 'green') return 'mp-badge--green';
+  return 'mp-badge--amber';
+}
+
+function shiftPct(filled, total) {
+  return Math.round((filled / total) * 100);
+}
+
+function progressTone(pct) {
+  if (pct > 90) return 'green';
+  if (pct >= 75) return 'amber';
+  return 'red';
+}
+
+/* ── Content builder ────────────────────────────────────── */
 
 export function createManpowerManagementContent() {
-  const roster = [
-    { team: 'Morning Shift', status: 'Ready', count: '12/14', short: '2 gap', tone: 'danger' },
-    { team: 'Afternoon Shift', status: 'Ready', count: '16/16', short: '0 gap', tone: 'success' },
-    { team: 'Night Shift', status: 'Needs help', count: '11/14', short: '3 gap', tone: 'danger' }
-  ];
 
-  const rows = roster
+  /* Section 1 – Actionable Insight Banner */
+  const banner = `
+    <section class="mp-alert-banner">
+      <div class="mp-alert-banner__icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+      <div class="mp-alert-banner__body">
+        <p class="mp-alert-banner__title">Evening classes have 3 unfilled slots — 2 relief tutors match</p>
+        <p class="mp-alert-banner__detail">S3 E-Math (19:00), S4 A-Math (19:00) &amp; J1 H2 Math (20:00) are uncovered. James Lim and Sarah Rao are available tonight and qualified for these levels.</p>
+      </div>
+      <div class="mp-alert-banner__actions">
+        <button class="btn mp-btn mp-btn--primary" type="button"><i class="bi bi-magic"></i> Auto-assign</button>
+        <button class="btn mp-btn mp-btn--secondary" type="button"><i class="bi bi-people"></i> View relief pool</button>
+      </div>
+    </section>`;
+
+  /* Section 2 – KPI Cards with Sparklines */
+  const kpiCards = kpis
+    .map(
+      (k) => `
+      <div class="mp-kpi">
+        <p class="mp-kpi__label">${k.label}</p>
+        <div class="mp-kpi__row">
+          <h3 class="mp-kpi__value">${k.value}</h3>
+          <span class="mp-badge ${badgeClass(k.tone)}">${k.badge}</span>
+        </div>
+        <div class="mp-kpi__spark"><canvas id="${k.id}" aria-label="${k.label} sparkline"></canvas></div>
+        <p class="mp-kpi__meta">${k.meta}</p>
+      </div>`
+    )
+    .join('');
+
+  /* Section 3 – Priority Action Queue */
+  const queueItems = actionQueue
+    .map(
+      (a) => `
+      <div class="mp-action mp-action--${a.urgency}">
+        <span class="mp-action__badge mp-action__badge--${a.urgency}">${a.tag}</span>
+        <div class="mp-action__body">
+          <p class="mp-action__title">${a.title}</p>
+          <p class="mp-action__detail">${a.detail}</p>
+        </div>
+        <button class="btn mp-btn mp-btn--outline" type="button"><i class="bi bi-${a.icon}"></i> ${a.cta}</button>
+      </div>`
+    )
+    .join('');
+
+  /* Section 4 – Enhanced Shift Coverage Cards */
+  const shifts = buildShifts();
+  const shiftCards = shifts
+    .map((s) => {
+      const pct = shiftPct(s.filled, s.total);
+      const tone = progressTone(pct);
+      const tiles = s.slots
+        .map(
+          (sl) =>
+            `<span class="mp-slot ${sl.filled ? 'mp-slot--filled' : 'mp-slot--empty'}">${sl.code}</span>`
+        )
+        .join('');
+      return `
+      <article class="mp-shift">
+        <div class="mp-shift__head">
+          <h4 class="mp-shift__name">${s.name} Shift</h4>
+          <span class="mp-shift__status mp-shift__status--${s.statusTone}">${s.status}</span>
+        </div>
+        <div class="mp-shift__bar-wrap">
+          <div class="mp-shift__bar mp-shift__bar--${tone}" style="width:${pct}%"></div>
+        </div>
+        <p class="mp-shift__fraction">${s.filled} / ${s.total} filled <span class="text-${s.statusTone === 'red' ? 'danger' : 'success'}">${s.total - s.filled === 0 ? '' : `· ${s.total - s.filled} gaps`}</span></p>
+        <div class="mp-shift__tiles">${tiles}</div>
+      </article>`;
+    })
+    .join('');
+
+  /* Section 5A – Demand Heatmap */
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const heatRows = heatmap
     .map(
       (row) => `
       <tr>
-        <td>${row.team}</td>
-        <td>${row.count}</td>
-        <td>${row.status}</td>
-        <td><span class="text-${row.tone}">${row.short}</span></td>
+        <th class="mp-heat__label">${row.label}</th>
+        ${row.cells.map((c) => `<td class="mp-heat__cell mp-heat__cell--${c.s}">${c.v}</td>`).join('')}
       </tr>`
     )
     .join('');
 
-  return `
-    <section class="hero-panel">
-      <div class="hero-panel__grid">
-        <div class="hero-panel__copy">
-          <p class="page-eyebrow">Coverage command</p>
-          <h2 class="hero-panel__title">Shift fill remains strong, with the night roster still the only material staffing risk.</h2>
-          <p class="hero-panel__text">Automation is handling most requests within SLA, allowing the operations team to concentrate on escalation windows and skill-sensitive placements.</p>
+  /* Section 5B – Relief Pool */
+  const reliefItems = reliefPool
+    .map(
+      (r) => `
+      <div class="mp-relief__item">
+        <span class="mp-relief__avatar">${r.initials}</span>
+        <div class="mp-relief__info">
+          <p class="mp-relief__name">${r.name}</p>
         </div>
-        <aside class="hero-panel__aside">
-          <p class="panel-label">Fill rate</p>
-          <div class="metric-lead">
-            <span class="metric-lead__value">98%</span>
-            <span class="metric-lead__delta positive-text">Above 95% target</span>
-          </div>
-          <p class="metric-copy">Only four alerts need immediate intervention, and all are concentrated in overnight demand.</p>
-        </aside>
-      </div>
-    </section>
+        <span class="mp-relief__avail ${r.highlight ? 'mp-relief__avail--now' : ''}">${r.avail}</span>
+      </div>`
+    )
+    .join('');
 
-    <section class="row g-4">
-      <div class="col-lg-3 col-md-6"><article class="shell-kpi h-100"><p class="kpi-card__label">Open requests</p><h3 class="kpi-card__value">24</h3><p class="kpi-card__meta">Up 12% this week</p></article></div>
-      <div class="col-lg-3 col-md-6"><article class="shell-kpi h-100"><p class="kpi-card__label">Auto-matched</p><h3 class="kpi-card__value">86%</h3><p class="kpi-card__meta">Handled within SLA</p></article></div>
-      <div class="col-lg-3 col-md-6"><article class="shell-kpi h-100"><p class="kpi-card__label">Average fill rate</p><h3 class="kpi-card__value">98%</h3><p class="kpi-card__meta">Above target service level</p></article></div>
-      <div class="col-lg-3 col-md-6"><article class="shell-kpi h-100"><p class="kpi-card__label">Critical alerts</p><h3 class="kpi-card__value">4</h3><p class="kpi-card__meta">Needs immediate action</p></article></div>
-    </section>
-
-    <section class="shell-table">
-      <div class="shell-table__header">
-        <div>
-          <p class="panel-label">Live operations</p>
-          <h3 class="panel-title">Shift rosters</h3>
-        </div>
-        <span class="feature-pill"><i class="bi bi-people"></i> Updated in real time</span>
-      </div>
-      <div class="table-responsive">
-        <table class="table align-middle">
-          <thead><tr><th>Shift</th><th>Coverage</th><th>Status</th><th>Gap</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    </section>
-
+  /* Section 6 – Tutor-to-Student Mapping Quality */
+  const mappingChart = `
     <section class="shell-card">
       <div class="shell-card__header">
         <div>
           <p class="panel-label">Capability planning</p>
-          <h3 class="panel-title">Skill mapping</h3>
+          <h3 class="panel-title">Tutor-to-student mapping quality</h3>
         </div>
-        <span class="feature-pill"><i class="bi bi-diagram-3"></i> Allocation ready</span>
+        <span class="feature-pill"><i class="bi bi-diagram-3"></i> Past 7 days</span>
+      </div>
+      <div class="mp-chart-legend">
+        <span class="mp-chart-legend__item mp-chart-legend__item--green"><i></i> Mapping quality</span>
+        <span class="mp-chart-legend__item mp-chart-legend__item--amber"><i></i> 90% target</span>
       </div>
       <div class="chart-card">
-        <div class="chart-card__canvas">
-          <div class="chart-card__overlay">
-            <span class="chart-card__tag">Tutor-to-student mapping quality (%) by day</span>
-          </div>
-          <canvas id="skillMappingChart" aria-label="Skill mapping chart"></canvas>
+        <div class="chart-card__canvas chart-card__canvas--tall">
+          <canvas id="skillMappingChart" aria-label="Mapping quality chart"></canvas>
         </div>
       </div>
+    </section>`;
+
+  /* ── Assemble ─────────────────────────────────────────── */
+
+  return `
+    ${banner}
+
+    <section class="mp-kpi-grid">${kpiCards}</section>
+
+    <section class="mp-queue">
+      <div class="mp-queue__header">
+        <div>
+          <p class="panel-label">Operations</p>
+          <h3 class="panel-title">Priority action queue</h3>
+        </div>
+        <span class="feature-pill"><i class="bi bi-sort-down"></i> Sorted by urgency</span>
+      </div>
+      ${queueItems}
     </section>
+
+    <section class="mp-shifts-section">
+      <div class="mp-shifts-section__header">
+        <div>
+          <p class="panel-label">Live coverage</p>
+          <h3 class="panel-title">Shift coverage</h3>
+        </div>
+        <span class="feature-pill"><i class="bi bi-clock-history"></i> Real-time</span>
+      </div>
+      <div class="mp-shifts-grid">${shiftCards}</div>
+    </section>
+
+    <section class="mp-dual">
+      <div class="mp-dual__left">
+        <div class="mp-dual__header">
+          <div>
+            <p class="panel-label">Forward planning</p>
+            <h3 class="panel-title">7-day demand heatmap</h3>
+          </div>
+        </div>
+        <div class="mp-heat-wrap">
+          <table class="mp-heat">
+            <thead>
+              <tr><th></th>${days.map((d) => `<th class="mp-heat__day">${d}</th>`).join('')}</tr>
+            </thead>
+            <tbody>${heatRows}</tbody>
+          </table>
+        </div>
+        <div class="mp-heat-legend">
+          <span class="mp-heat-legend__item mp-heat-legend__item--green">Covered</span>
+          <span class="mp-heat-legend__item mp-heat-legend__item--amber">Tight</span>
+          <span class="mp-heat-legend__item mp-heat-legend__item--red">At risk</span>
+        </div>
+      </div>
+      <div class="mp-dual__right">
+        <div class="mp-dual__header">
+          <div>
+            <p class="panel-label">Available bench</p>
+            <h3 class="panel-title">Relief pool</h3>
+          </div>
+          <span class="mp-badge mp-badge--green">${reliefPool.length} on standby</span>
+        </div>
+        ${reliefItems}
+      </div>
+    </section>
+
+    ${mappingChart}
   `;
 }
 
+/* ── Chart initialisation ───────────────────────────────── */
+
+function mountSparkline(id, data, tone) {
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  const color = sparklineColor(tone);
+  new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: data.map((_, i) => i),
+      datasets: [{
+        data,
+        borderColor: color,
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHitRadius: 0,
+        tension: 0.4,
+        fill: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeOutQuart' },
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false } }
+    }
+  });
+}
+
 export function initManpowerManagementCharts() {
+  /* Sparklines */
+  kpis.forEach((k) => mountSparkline(k.id, k.data, k.tone));
+
+  /* Section 6 – Mapping quality line chart */
   mountChart('skillMappingChart', {
     type: 'line',
     data: {
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       datasets: [
         {
-          label: 'Tutor-student mapping quality',
-          data: [68, 71, 66, 69, 72],
-          borderColor: chartPalette.accent,
-          backgroundColor: chartPalette.accentSoft,
-          pointBackgroundColor: chartPalette.accent,
+          label: 'Mapping quality',
+          data: [91, 89, 93, 90, 92, 94, 93],
+          borderColor: '#1D9E75',
+          backgroundColor: 'rgba(29, 158, 117, 0.10)',
+          pointBackgroundColor: '#1D9E75',
           pointBorderColor: '#ffffff',
           pointBorderWidth: 2,
-          pointRadius: 4,
-          pointHoverRadius: 5,
+          pointRadius: 5,
+          pointHoverRadius: 7,
           tension: 0.32,
+          fill: true
+        },
+        {
+          label: '90% target',
+          data: [90, 90, 90, 90, 90, 90, 90],
+          borderColor: '#EF9F27',
+          borderDash: [6, 4],
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHitRadius: 0,
           fill: false
         }
       ]
@@ -106,22 +386,28 @@ export function initManpowerManagementCharts() {
       ...baseChartOptions,
       plugins: {
         ...baseChartOptions.plugins,
-        legend: {
-          display: false
-        }
+        legend: { display: false }
       },
       scales: {
         x: { ...baseChartOptions.scales.x },
         y: {
           ...baseChartOptions.scales.y,
-          min: 0,
-          max: 90,
+          min: 80,
+          max: 100,
           ticks: {
             ...baseChartOptions.scales.y.ticks,
-            callback: (value) => `${value}%`
+            callback: (v) => `${v}%`
           }
         }
       }
     }
+  });
+
+  /* Expand / collapse action items */
+  document.querySelectorAll('.mp-action').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      el.classList.toggle('mp-action--expanded');
+    });
   });
 }

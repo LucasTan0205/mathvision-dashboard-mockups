@@ -15,7 +15,8 @@ export default defineConfig(({ mode }) => {
           retentionAnalytics: 'retention-analytics.html',
           capacityUtilization: 'capacity-utilization.html',
           marketingInsights: 'marketing-insights.html',
-          payrollAnalytics: 'payroll-analytics.html'
+          payrollAnalytics: 'payroll-analytics.html',
+          records: 'records.html'
         }
       }
     }

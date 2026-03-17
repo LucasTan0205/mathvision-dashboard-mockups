@@ -4,7 +4,8 @@
   { label: 'Retention Analytics', path: '/retention-analytics.html', icon: 'graph-up' },
   { label: 'Tutor Capacity', path: '/capacity-utilization.html', icon: 'bar-chart-line' },
   { label: 'Marketing Insights', path: '/marketing-insights.html', icon: 'clipboard-data' },
-  { label: 'Payroll Analytics', path: '/payroll-analytics.html', icon: 'wallet' }
+  { label: 'Payroll Analytics', path: '/payroll-analytics.html', icon: 'wallet' },
+  { label: 'Records', path: '/records.html', icon: 'folder2-open' }
 ];
 
 export function normalizeRoute(pathname) {
