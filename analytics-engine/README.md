@@ -58,7 +58,7 @@ Current notebooks:
 
 ---
 
-## Class-Level Assignment (Whole Class, Not One Student)
+## Class-Level Assignment (Whole Class, Not One Student) [Not Implemented yet]
 Pairwise ranking is not the final class allocation by itself. For a class/session, generate all feasible student-tutor pair scores, then assign globally with constraints.
 
 ### Choices for class-level assignation
