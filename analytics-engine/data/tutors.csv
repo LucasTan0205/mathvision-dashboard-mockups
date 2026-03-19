@@ -1,0 +1,26 @@
+tutor_id,tutor_name,tutor_type,primary_curriculum,specialty_topic,years_experience,rating,available_slots,preferred_min_grade,preferred_max_grade,branch
+T001,Mr Aaron Koh,part-time,IB,Fractions,4,3.6,Wed_18;Tue_16;Sat_10,7,10,West
+T002,Mr Hannah Ho,instructor,IGCSE,Algebra,7,4.22,Tue_16;Sat_10;Mon_19,8,10,West
+T003,Mr Valerie Goh,full-time,IB,Calculus,1,4.08,Wed_18;Mon_19;Sat_10,9,12,Central
+T004,Mr Darren Tan,part-time,IGCSE,Calculus,3,4.8,Mon_19;Mon_17;Sat_10,9,12,West
+T005,Ms Adrian Yeo,full-time,IB,Calculus,5,4.75,Wed_18;Mon_17;Tue_16,7,9,East
+T006,Mr Daniel Lim,part-time,Local,Fractions,1,4.43,Mon_19;Sat_10;Wed_18,5,8,East
+T007,Mr Jeremy Ong,full-time,Local,Statistics,2,4.67,Mon_19;Tue_16;Mon_17,5,9,East
+T008,Ms Darren Ng,part-time,IGCSE,Fractions,2,4.55,Tue_16;Mon_17;Sat_10,5,8,Central
+T009,Ms Cheryl Wong,instructor,IGCSE,Geometry,1,4.77,Wed_18;Mon_17;Mon_19,7,11,West
+T010,Mr Hannah Lee,instructor,IGCSE,Geometry,8,4.2,Sat_10;Tue_16;Mon_19,8,12,Central
+T011,Ms Jasmine Loh,instructor,IGCSE,Calculus,6,3.54,Tue_16;Mon_19;Wed_18,5,8,Central
+T012,Ms Marcus Ong,instructor,Local,Statistics,4,3.63,Wed_18;Sat_10;Tue_16,7,10,Central
+T013,Ms Jeremy Tan,part-time,IB,Fractions,7,4.54,Tue_16;Sat_10;Mon_19,8,12,East
+T014,Ms Alicia Yeo,full-time,IGCSE,Calculus,5,3.96,Mon_19;Mon_17;Tue_16,9,12,Central
+T015,Mr Kelvin Ng,instructor,IB,Geometry,5,4.97,Mon_19;Tue_16;Mon_17,7,9,West
+T016,Mr Alicia Koh,full-time,Local,Algebra,5,4.55,Mon_19;Wed_18;Mon_17,6,9,Central
+T017,Ms Valerie Loh,full-time,Local,Algebra,5,4.91,Wed_18;Mon_17;Sat_10,9,12,West
+T018,Mr Aaron Koh,instructor,IB,Algebra,4,3.68,Wed_18;Mon_19;Tue_16,8,10,West
+T019,Ms Hannah Teo,instructor,IGCSE,Algebra,2,4.92,Mon_19;Sat_10;Wed_18,8,11,East
+T020,Mr Rachel Wong,part-time,Local,Calculus,8,4.53,Wed_18;Tue_16;Mon_17,5,7,Central
+T021,Ms Jeremy Wong,instructor,Local,Geometry,4,4.14,Sat_10;Mon_19;Tue_16,7,11,Central
+T022,Mr Shu Ying Lee,full-time,IGCSE,Statistics,5,4.16,Wed_18;Tue_16;Sat_10,7,9,West
+T023,Ms Jeremy Wong,instructor,Local,Calculus,6,4.41,Mon_17;Sat_10;Wed_18,7,11,East
+T024,Mr Marcus Lim,part-time,IB,Statistics,8,4.87,Mon_19;Wed_18;Tue_16,9,12,West
+T025,Ms Hannah Yeo,full-time,IGCSE,Algebra,3,3.99,Wed_18;Tue_16;Sat_10,5,8,West

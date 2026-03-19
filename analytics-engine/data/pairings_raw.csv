@@ -1,0 +1,401 @@
+pairing_id,student_id,student_name,tutor_id,tutor_name,session_date,topic_covered,duration_hours,tutor_feedback_text
+P0001,S031,Samuel Goh,T004,Mr Darren Tan,2025-01-10,Statistics,1.5,Student struggled with Statistics.
+P0002,S050,Evelyn Teo,T011,Ms Jasmine Loh,2025-03-06,Geometry,1.5,Worked on Geometry. Student partially understood.
+P0003,S034,Emma Chua,T004,Mr Darren Tan,2025-05-12,Calculus,1.0,Student confidently solved Calculus questions.
+P0004,S010,Olivia Ho,T016,Mr Alicia Koh,2025-01-14,Calculus,1.0,Student confused by Calculus.
+P0005,S015,Benjamin Ng,T016,Mr Alicia Koh,2025-05-08,Geometry,2.0,Student did not understand Geometry.
+P0006,S056,Charlotte Koh,T020,Mr Rachel Wong,2025-02-22,Algebra,1.5,Student confused by Algebra.
+P0007,S066,Amelia Tan,T004,Mr Darren Tan,2025-03-15,Fractions,1.5,Student confidently solved Fractions questions.
+P0008,S055,Amelia Tan,T013,Ms Jeremy Tan,2025-01-08,Algebra,2.0,Student understood Algebra well today.
+P0009,S068,Amelia Yeo,T020,Mr Rachel Wong,2025-03-21,Fractions,2.0,Worked on Fractions. Student partially understood.
+P0010,S042,Harper Lee,T015,Mr Kelvin Ng,2025-04-15,Statistics,1.0,Student struggled with Statistics.
+P0011,S074,Aiden Tan,T002,Mr Hannah Ho,2025-04-29,Algebra,1.0,Student understood Algebra well today.
+P0012,S031,Samuel Goh,T014,Ms Alicia Yeo,2025-03-16,Calculus,2.0,Student confused by Calculus.
+P0013,S021,Amelia Lee,T024,Mr Marcus Lim,2025-04-17,Geometry,1.5,Student did not understand Geometry.
+P0014,S071,Ella Yeo,T016,Mr Alicia Koh,2025-04-27,Fractions,2.0,Student struggled with Fractions.
+P0015,S056,Charlotte Koh,T018,Mr Aaron Koh,2025-02-18,Calculus,2.0,Covered Calculus. More practice needed.
+P0016,S043,Noah Goh,T003,Mr Valerie Goh,2025-01-18,Fractions,1.5,Student did not understand Fractions.
+P0017,S044,Ella Lim,T021,Ms Jeremy Wong,2025-05-10,Geometry,1.5,Student struggled with Geometry.
+P0018,S001,Olivia Tan,T004,Mr Darren Tan,2025-03-18,Geometry,2.0,Student confidently solved Geometry questions.
+P0019,S047,Liam Loh,T003,Mr Valerie Goh,2025-04-25,Fractions,2.0,Student did not understand Fractions.
+P0020,S061,Charlotte Teo,T025,Ms Hannah Yeo,2025-03-27,Geometry,2.0,Student confidently solved Geometry questions.
+P0021,S053,Emma Wong,T004,Mr Darren Tan,2025-03-24,Calculus,1.0,Covered Calculus. More practice needed.
+P0022,S051,Olivia Koh,T023,Ms Jeremy Wong,2025-05-27,Fractions,1.5,Student understood Fractions well today.
+P0023,S031,Samuel Goh,T023,Ms Jeremy Wong,2025-01-12,Calculus,1.5,Student confused by Calculus.
+P0024,S019,Daniel Ho,T022,Mr Shu Ying Lee,2025-04-08,Calculus,1.5,Student understood Calculus well today.
+P0025,S006,Olivia Wong,T025,Ms Hannah Yeo,2025-01-10,Calculus,1.0,Good progress in Calculus.
+P0026,S065,Ella Chua,T019,Ms Hannah Teo,2025-04-23,Algebra,1.0,Student confused by Algebra.
+P0027,S049,Mia Lee,T025,Ms Hannah Yeo,2025-01-04,Calculus,2.0,Student struggled with Calculus.
+P0028,S070,Daniel Tan,T007,Mr Jeremy Ong,2025-02-09,Calculus,1.0,Student did not understand Calculus.
+P0029,S017,Daniel Toh,T022,Mr Shu Ying Lee,2025-03-28,Geometry,2.0,Student confidently solved Geometry questions.
+P0030,S029,Noah Yeo,T010,Mr Hannah Lee,2025-03-26,Algebra,2.0,Student confused by Algebra.
+P0031,S034,Emma Chua,T002,Mr Hannah Ho,2025-03-23,Calculus,2.0,Student confused by Calculus.
+P0032,S034,Emma Chua,T014,Ms Alicia Yeo,2025-05-19,Calculus,1.0,Student confused by Calculus.
+P0033,S067,Benjamin Yeo,T025,Ms Hannah Yeo,2025-03-02,Algebra,2.0,Student confused by Algebra.
+P0034,S048,Samuel Ong,T011,Ms Jasmine Loh,2025-02-28,Geometry,2.0,Worked on Geometry. Student partially understood.
+P0035,S078,Matthew Yeo,T005,Ms Adrian Yeo,2025-01-26,Calculus,2.0,Student confused by Calculus.
+P0036,S045,Samuel Yeo,T023,Ms Jeremy Wong,2025-04-24,Algebra,1.0,Good progress in Algebra.
+P0037,S068,Amelia Yeo,T021,Ms Jeremy Wong,2025-01-12,Algebra,1.5,Student showed improvement in Algebra.
+P0038,S042,Harper Lee,T019,Ms Hannah Teo,2025-04-02,Geometry,1.5,Student required some guidance for Geometry.
+P0039,S050,Evelyn Teo,T011,Ms Jasmine Loh,2025-03-04,Fractions,2.0,Student required some guidance for Fractions.
+P0040,S045,Samuel Yeo,T012,Ms Marcus Ong,2025-02-16,Statistics,1.0,Student understood Statistics well today.
+P0041,S026,Aiden Neo,T025,Ms Hannah Yeo,2025-04-08,Algebra,2.0,Student confused by Algebra.
+P0042,S061,Charlotte Teo,T023,Ms Jeremy Wong,2025-05-08,Fractions,2.0,Student struggled with Fractions.
+P0043,S061,Charlotte Teo,T012,Ms Marcus Ong,2025-04-29,Fractions,2.0,Student required some guidance for Fractions.
+P0044,S018,Emma Chua,T017,Ms Valerie Loh,2025-03-07,Calculus,2.0,Student showed improvement in Calculus.
+P0045,S027,Amelia Ng,T024,Mr Marcus Lim,2025-03-15,Calculus,2.0,Student confused by Calculus.
+P0046,S041,Evelyn Lim,T023,Ms Jeremy Wong,2025-01-19,Fractions,1.5,Good progress in Fractions.
+P0047,S055,Amelia Tan,T019,Ms Hannah Teo,2025-03-18,Statistics,2.0,Student did not understand Statistics.
+P0048,S076,Isabella Koh,T016,Mr Alicia Koh,2025-04-27,Geometry,1.5,Student struggled with Geometry.
+P0049,S001,Olivia Tan,T016,Mr Alicia Koh,2025-05-04,Calculus,1.0,Student struggled with Calculus.
+P0050,S037,Emma Tan,T009,Ms Cheryl Wong,2025-05-27,Calculus,1.5,Student confused by Calculus.
+P0051,S039,Daniel Ong,T015,Mr Kelvin Ng,2025-03-17,Geometry,1.0,Covered Geometry. More practice needed.
+P0052,S046,Daniel Koh,T014,Ms Alicia Yeo,2025-03-12,Calculus,1.0,Covered Calculus. More practice needed.
+P0053,S070,Daniel Tan,T015,Mr Kelvin Ng,2025-05-08,Algebra,1.5,Student struggled with Algebra.
+P0054,S061,Charlotte Teo,T001,Mr Aaron Koh,2025-04-01,Statistics,1.0,Covered Statistics. More practice needed.
+P0055,S023,Aiden Toh,T003,Mr Valerie Goh,2025-03-06,Fractions,2.0,Covered Fractions. More practice needed.
+P0056,S047,Liam Loh,T013,Ms Jeremy Tan,2025-01-25,Fractions,2.0,Student confused by Fractions.
+P0057,S014,Benjamin Ho,T002,Mr Hannah Ho,2025-03-21,Algebra,1.5,Student struggled with Algebra.
+P0058,S037,Emma Tan,T013,Ms Jeremy Tan,2025-04-04,Statistics,2.0,Student understood Statistics well today.
+P0059,S001,Olivia Tan,T002,Mr Hannah Ho,2025-03-17,Algebra,1.5,Student confidently solved Algebra questions.
+P0060,S048,Samuel Ong,T021,Ms Jeremy Wong,2025-02-21,Fractions,1.0,Good progress in Fractions.
+P0061,S068,Amelia Yeo,T013,Ms Jeremy Tan,2025-05-09,Statistics,1.5,Student understood Statistics well today.
+P0062,S001,Olivia Tan,T025,Ms Hannah Yeo,2025-05-04,Geometry,1.5,Good progress in Geometry.
+P0063,S002,Olivia Wong,T017,Ms Valerie Loh,2025-04-30,Algebra,1.0,Student struggled with Algebra.
+P0064,S048,Samuel Ong,T005,Ms Adrian Yeo,2025-04-12,Fractions,2.0,Student did not understand Fractions.
+P0065,S050,Evelyn Teo,T024,Mr Marcus Lim,2025-04-12,Algebra,1.0,Student did not understand Algebra.
+P0066,S024,Liam Chua,T003,Mr Valerie Goh,2025-02-01,Statistics,1.5,Good progress in Statistics.
+P0067,S062,Benjamin Ong,T005,Ms Adrian Yeo,2025-05-30,Geometry,1.5,Student confused by Geometry.
+P0068,S016,Lucas Koh,T017,Ms Valerie Loh,2025-01-28,Geometry,2.0,Student struggled with Geometry.
+P0069,S015,Benjamin Ng,T023,Ms Jeremy Wong,2025-01-07,Calculus,2.0,Covered Calculus. More practice needed.
+P0070,S019,Daniel Ho,T016,Mr Alicia Koh,2025-02-26,Geometry,2.0,Worked on Geometry. Student partially understood.
+P0071,S010,Olivia Ho,T011,Ms Jasmine Loh,2025-03-19,Calculus,2.0,Student did not understand Calculus.
+P0072,S070,Daniel Tan,T013,Ms Jeremy Tan,2025-02-05,Algebra,1.0,Student showed improvement in Algebra.
+P0073,S053,Emma Wong,T011,Ms Jasmine Loh,2025-05-07,Geometry,1.0,Student struggled with Geometry.
+P0074,S016,Lucas Koh,T009,Ms Cheryl Wong,2025-05-18,Fractions,1.0,Student did not understand Fractions.
+P0075,S004,Evelyn Chew,T010,Mr Hannah Lee,2025-04-05,Calculus,2.0,Covered Calculus. More practice needed.
+P0076,S058,Amelia Koh,T015,Mr Kelvin Ng,2025-04-18,Statistics,2.0,Student understood Statistics well today.
+P0077,S023,Aiden Toh,T024,Mr Marcus Lim,2025-01-26,Calculus,1.5,Student confused by Calculus.
+P0078,S032,Ryan Neo,T023,Ms Jeremy Wong,2025-03-13,Calculus,1.0,Good progress in Calculus.
+P0079,S019,Daniel Ho,T006,Mr Daniel Lim,2025-04-24,Fractions,1.5,Student understood Fractions well today.
+P0080,S051,Olivia Koh,T008,Ms Darren Ng,2025-01-26,Geometry,2.0,Student did not understand Geometry.
+P0081,S057,Emma Toh,T021,Ms Jeremy Wong,2025-04-02,Statistics,1.0,Student confidently solved Statistics questions.
+P0082,S061,Charlotte Teo,T021,Ms Jeremy Wong,2025-02-18,Geometry,1.0,Student did not understand Geometry.
+P0083,S077,Sophia Loh,T010,Mr Hannah Lee,2025-02-24,Algebra,2.0,Student showed improvement in Algebra.
+P0084,S057,Emma Toh,T007,Mr Jeremy Ong,2025-03-27,Algebra,1.0,Student understood Algebra well today.
+P0085,S032,Ryan Neo,T020,Mr Rachel Wong,2025-02-22,Statistics,1.0,Student understood Statistics well today.
+P0086,S060,Olivia Ho,T005,Ms Adrian Yeo,2025-02-25,Statistics,1.0,Student did not understand Statistics.
+P0087,S040,Harper Koh,T014,Ms Alicia Yeo,2025-01-01,Fractions,1.5,Student struggled with Fractions.
+P0088,S047,Liam Loh,T006,Mr Daniel Lim,2025-05-19,Fractions,1.5,Student struggled with Fractions.
+P0089,S020,Liam Chua,T003,Mr Valerie Goh,2025-01-07,Algebra,1.0,Worked on Algebra. Student partially understood.
+P0090,S009,Noah Lim,T012,Ms Marcus Ong,2025-03-02,Geometry,2.0,Student did not understand Geometry.
+P0091,S006,Olivia Wong,T021,Ms Jeremy Wong,2025-02-14,Algebra,1.5,Worked on Algebra. Student partially understood.
+P0092,S053,Emma Wong,T008,Ms Darren Ng,2025-04-18,Fractions,2.0,Student showed improvement in Fractions.
+P0093,S074,Aiden Tan,T006,Mr Daniel Lim,2025-05-02,Algebra,1.5,Student did not understand Algebra.
+P0094,S064,Lucas Lim,T014,Ms Alicia Yeo,2025-01-28,Statistics,1.5,Student confused by Statistics.
+P0095,S039,Daniel Ong,T011,Ms Jasmine Loh,2025-01-12,Fractions,2.0,Covered Fractions. More practice needed.
+P0096,S004,Evelyn Chew,T012,Ms Marcus Ong,2025-03-19,Statistics,1.5,Covered Statistics. More practice needed.
+P0097,S045,Samuel Yeo,T024,Mr Marcus Lim,2025-01-16,Algebra,1.5,Student required some guidance for Algebra.
+P0098,S074,Aiden Tan,T021,Ms Jeremy Wong,2025-01-28,Calculus,1.5,Student confidently solved Calculus questions.
+P0099,S069,Amelia Ho,T024,Mr Marcus Lim,2025-01-21,Algebra,1.5,Student confused by Algebra.
+P0100,S069,Amelia Ho,T017,Ms Valerie Loh,2025-01-17,Fractions,1.0,Good progress in Fractions.
+P0101,S016,Lucas Koh,T002,Mr Hannah Ho,2025-05-30,Statistics,2.0,Student confused by Statistics.
+P0102,S006,Olivia Wong,T023,Ms Jeremy Wong,2025-04-08,Geometry,2.0,Covered Geometry. More practice needed.
+P0103,S047,Liam Loh,T002,Mr Hannah Ho,2025-04-27,Geometry,2.0,Student confidently solved Geometry questions.
+P0104,S059,Sophia Yeo,T002,Mr Hannah Ho,2025-01-30,Algebra,2.0,Student confused by Algebra.
+P0105,S030,Noah Lim,T017,Ms Valerie Loh,2025-02-25,Statistics,1.5,Student confidently solved Statistics questions.
+P0106,S015,Benjamin Ng,T010,Mr Hannah Lee,2025-04-16,Fractions,1.5,Student required some guidance for Fractions.
+P0107,S058,Amelia Koh,T002,Mr Hannah Ho,2025-04-17,Calculus,2.0,Student showed improvement in Calculus.
+P0108,S061,Charlotte Teo,T005,Ms Adrian Yeo,2025-04-20,Geometry,1.5,Good progress in Geometry.
+P0109,S055,Amelia Tan,T006,Mr Daniel Lim,2025-02-09,Geometry,2.0,Student confidently solved Geometry questions.
+P0110,S027,Amelia Ng,T014,Ms Alicia Yeo,2025-01-24,Algebra,1.0,Student showed improvement in Algebra.
+P0111,S009,Noah Lim,T017,Ms Valerie Loh,2025-01-25,Calculus,2.0,Good progress in Calculus.
+P0112,S053,Emma Wong,T004,Mr Darren Tan,2025-05-23,Fractions,1.0,Good progress in Fractions.
+P0113,S032,Ryan Neo,T015,Mr Kelvin Ng,2025-04-16,Algebra,1.5,Student confidently solved Algebra questions.
+P0114,S067,Benjamin Yeo,T009,Ms Cheryl Wong,2025-03-15,Algebra,2.0,Good progress in Algebra.
+P0115,S014,Benjamin Ho,T010,Mr Hannah Lee,2025-01-27,Geometry,2.0,Student understood Geometry well today.
+P0116,S062,Benjamin Ong,T023,Ms Jeremy Wong,2025-05-04,Fractions,1.0,Student showed improvement in Fractions.
+P0117,S009,Noah Lim,T016,Mr Alicia Koh,2025-05-23,Geometry,1.5,Student struggled with Geometry.
+P0118,S042,Harper Lee,T013,Ms Jeremy Tan,2025-05-27,Geometry,1.0,Student confidently solved Geometry questions.
+P0119,S046,Daniel Koh,T024,Mr Marcus Lim,2025-05-23,Statistics,1.0,Student confused by Statistics.
+P0120,S037,Emma Tan,T019,Ms Hannah Teo,2025-01-08,Geometry,1.0,Student did not understand Geometry.
+P0121,S075,Matthew Chew,T021,Ms Jeremy Wong,2025-03-28,Geometry,1.5,Student struggled with Geometry.
+P0122,S029,Noah Yeo,T022,Mr Shu Ying Lee,2025-02-06,Fractions,2.0,Covered Fractions. More practice needed.
+P0123,S025,Ryan Wong,T003,Mr Valerie Goh,2025-01-18,Calculus,1.0,Student showed improvement in Calculus.
+P0124,S023,Aiden Toh,T023,Ms Jeremy Wong,2025-05-16,Algebra,1.0,Student confidently solved Algebra questions.
+P0125,S046,Daniel Koh,T002,Mr Hannah Ho,2025-04-27,Calculus,1.5,Student struggled with Calculus.
+P0126,S077,Sophia Loh,T001,Mr Aaron Koh,2025-03-21,Geometry,2.0,Student did not understand Geometry.
+P0127,S043,Noah Goh,T017,Ms Valerie Loh,2025-01-22,Statistics,1.0,Student struggled with Statistics.
+P0128,S008,Noah Teo,T018,Mr Aaron Koh,2025-01-13,Fractions,2.0,Student showed improvement in Fractions.
+P0129,S025,Ryan Wong,T024,Mr Marcus Lim,2025-04-24,Geometry,2.0,Student required some guidance for Geometry.
+P0130,S060,Olivia Ho,T008,Ms Darren Ng,2025-04-24,Calculus,1.5,Student required some guidance for Calculus.
+P0131,S046,Daniel Koh,T015,Mr Kelvin Ng,2025-05-12,Fractions,1.0,Student did not understand Fractions.
+P0132,S021,Amelia Lee,T001,Mr Aaron Koh,2025-01-29,Calculus,1.5,Student confused by Calculus.
+P0133,S079,Harper Loh,T008,Ms Darren Ng,2025-05-05,Statistics,2.0,Covered Statistics. More practice needed.
+P0134,S059,Sophia Yeo,T022,Mr Shu Ying Lee,2025-01-12,Geometry,1.0,Student did not understand Geometry.
+P0135,S015,Benjamin Ng,T015,Mr Kelvin Ng,2025-01-15,Statistics,1.0,Student understood Statistics well today.
+P0136,S041,Evelyn Lim,T005,Ms Adrian Yeo,2025-02-24,Geometry,1.0,Student required some guidance for Geometry.
+P0137,S043,Noah Goh,T018,Mr Aaron Koh,2025-03-25,Geometry,1.0,Worked on Geometry. Student partially understood.
+P0138,S046,Daniel Koh,T012,Ms Marcus Ong,2025-04-21,Calculus,1.0,Student struggled with Calculus.
+P0139,S004,Evelyn Chew,T025,Ms Hannah Yeo,2025-05-17,Calculus,2.0,Student understood Calculus well today.
+P0140,S032,Ryan Neo,T003,Mr Valerie Goh,2025-05-24,Statistics,2.0,Student required some guidance for Statistics.
+P0141,S051,Olivia Koh,T012,Ms Marcus Ong,2025-04-12,Algebra,2.0,Student showed improvement in Algebra.
+P0142,S010,Olivia Ho,T009,Ms Cheryl Wong,2025-01-05,Calculus,1.5,Student showed improvement in Calculus.
+P0143,S026,Aiden Neo,T018,Mr Aaron Koh,2025-05-28,Geometry,1.5,Student confused by Geometry.
+P0144,S004,Evelyn Chew,T015,Mr Kelvin Ng,2025-04-17,Calculus,1.5,Student struggled with Calculus.
+P0145,S049,Mia Lee,T021,Ms Jeremy Wong,2025-01-06,Calculus,1.5,Student struggled with Calculus.
+P0146,S027,Amelia Ng,T004,Mr Darren Tan,2025-04-28,Statistics,2.0,Good progress in Statistics.
+P0147,S032,Ryan Neo,T017,Ms Valerie Loh,2025-04-22,Algebra,1.0,Student understood Algebra well today.
+P0148,S041,Evelyn Lim,T011,Ms Jasmine Loh,2025-05-31,Calculus,1.5,Student confused by Calculus.
+P0149,S034,Emma Chua,T013,Ms Jeremy Tan,2025-04-12,Algebra,1.5,Student confused by Algebra.
+P0150,S027,Amelia Ng,T013,Ms Jeremy Tan,2025-02-26,Geometry,1.5,Student understood Geometry well today.
+P0151,S007,Lucas Lim,T004,Mr Darren Tan,2025-05-11,Algebra,2.0,Student showed improvement in Algebra.
+P0152,S022,Samuel Chua,T014,Ms Alicia Yeo,2025-05-11,Statistics,1.0,Student did not understand Statistics.
+P0153,S023,Aiden Toh,T009,Ms Cheryl Wong,2025-02-07,Geometry,1.0,Worked on Geometry. Student partially understood.
+P0154,S046,Daniel Koh,T021,Ms Jeremy Wong,2025-03-07,Fractions,1.0,Worked on Fractions. Student partially understood.
+P0155,S046,Daniel Koh,T008,Ms Darren Ng,2025-02-09,Statistics,2.0,Student showed improvement in Statistics.
+P0156,S067,Benjamin Yeo,T012,Ms Marcus Ong,2025-05-07,Fractions,1.5,Student confused by Fractions.
+P0157,S005,Sophia Chew,T001,Mr Aaron Koh,2025-04-25,Statistics,2.0,Good progress in Statistics.
+P0158,S053,Emma Wong,T021,Ms Jeremy Wong,2025-02-08,Geometry,1.5,Student showed improvement in Geometry.
+P0159,S055,Amelia Tan,T022,Mr Shu Ying Lee,2025-04-24,Calculus,2.0,Student did not understand Calculus.
+P0160,S011,Charlotte Ng,T018,Mr Aaron Koh,2025-01-15,Geometry,1.5,Student showed improvement in Geometry.
+P0161,S051,Olivia Koh,T023,Ms Jeremy Wong,2025-04-29,Geometry,1.5,Student struggled with Geometry.
+P0162,S079,Harper Loh,T001,Mr Aaron Koh,2025-04-05,Algebra,1.5,Worked on Algebra. Student partially understood.
+P0163,S068,Amelia Yeo,T021,Ms Jeremy Wong,2025-05-10,Algebra,1.5,Student required some guidance for Algebra.
+P0164,S028,Charlotte Loh,T001,Mr Aaron Koh,2025-05-22,Statistics,2.0,Worked on Statistics. Student partially understood.
+P0165,S018,Emma Chua,T007,Mr Jeremy Ong,2025-05-27,Calculus,2.0,Student understood Calculus well today.
+P0166,S019,Daniel Ho,T013,Ms Jeremy Tan,2025-05-02,Geometry,2.0,Student understood Geometry well today.
+P0167,S040,Harper Koh,T014,Ms Alicia Yeo,2025-04-26,Algebra,1.0,Student required some guidance for Algebra.
+P0168,S038,Harper Ng,T022,Mr Shu Ying Lee,2025-05-10,Algebra,2.0,Student understood Algebra well today.
+P0169,S032,Ryan Neo,T022,Mr Shu Ying Lee,2025-03-05,Algebra,2.0,Student did not understand Algebra.
+P0170,S080,Isabella Ong,T002,Mr Hannah Ho,2025-05-15,Calculus,2.0,Student confused by Calculus.
+P0171,S006,Olivia Wong,T014,Ms Alicia Yeo,2025-04-04,Fractions,1.5,Good progress in Fractions.
+P0172,S013,Evelyn Goh,T011,Ms Jasmine Loh,2025-04-15,Calculus,1.5,Student showed improvement in Calculus.
+P0173,S074,Aiden Tan,T005,Ms Adrian Yeo,2025-01-17,Geometry,1.5,Student showed improvement in Geometry.
+P0174,S054,Benjamin Koh,T017,Ms Valerie Loh,2025-04-09,Statistics,1.5,Student did not understand Statistics.
+P0175,S061,Charlotte Teo,T005,Ms Adrian Yeo,2025-02-08,Statistics,1.5,Student struggled with Statistics.
+P0176,S049,Mia Lee,T019,Ms Hannah Teo,2025-02-06,Statistics,1.5,Student did not understand Statistics.
+P0177,S016,Lucas Koh,T004,Mr Darren Tan,2025-02-03,Calculus,2.0,Student confused by Calculus.
+P0178,S016,Lucas Koh,T012,Ms Marcus Ong,2025-03-21,Algebra,2.0,Student confidently solved Algebra questions.
+P0179,S001,Olivia Tan,T021,Ms Jeremy Wong,2025-02-02,Geometry,2.0,Student showed improvement in Geometry.
+P0180,S033,Olivia Chew,T003,Mr Valerie Goh,2025-05-11,Calculus,1.5,Student showed improvement in Calculus.
+P0181,S022,Samuel Chua,T018,Mr Aaron Koh,2025-03-21,Geometry,1.0,Student struggled with Geometry.
+P0182,S080,Isabella Ong,T001,Mr Aaron Koh,2025-05-05,Geometry,1.0,Student understood Geometry well today.
+P0183,S040,Harper Koh,T018,Mr Aaron Koh,2025-02-09,Fractions,1.0,Student did not understand Fractions.
+P0184,S029,Noah Yeo,T014,Ms Alicia Yeo,2025-05-10,Algebra,2.0,Student confused by Algebra.
+P0185,S079,Harper Loh,T015,Mr Kelvin Ng,2025-01-10,Statistics,2.0,Good progress in Statistics.
+P0186,S037,Emma Tan,T011,Ms Jasmine Loh,2025-02-03,Statistics,2.0,Student did not understand Statistics.
+P0187,S006,Olivia Wong,T016,Mr Alicia Koh,2025-02-11,Fractions,1.0,Student understood Fractions well today.
+P0188,S013,Evelyn Goh,T002,Mr Hannah Ho,2025-01-12,Calculus,1.5,Good progress in Calculus.
+P0189,S011,Charlotte Ng,T024,Mr Marcus Lim,2025-04-24,Fractions,2.0,Good progress in Fractions.
+P0190,S013,Evelyn Goh,T005,Ms Adrian Yeo,2025-03-01,Calculus,2.0,Student struggled with Calculus.
+P0191,S020,Liam Chua,T011,Ms Jasmine Loh,2025-05-01,Geometry,1.0,Student did not understand Geometry.
+P0192,S005,Sophia Chew,T001,Mr Aaron Koh,2025-04-23,Statistics,1.5,Good progress in Statistics.
+P0193,S030,Noah Lim,T024,Mr Marcus Lim,2025-05-09,Calculus,2.0,Student did not understand Calculus.
+P0194,S051,Olivia Koh,T002,Mr Hannah Ho,2025-02-21,Fractions,2.0,Student struggled with Fractions.
+P0195,S020,Liam Chua,T010,Mr Hannah Lee,2025-01-14,Geometry,2.0,Student confidently solved Geometry questions.
+P0196,S080,Isabella Ong,T020,Mr Rachel Wong,2025-05-22,Geometry,1.0,Student confused by Geometry.
+P0197,S073,Ella Yeo,T011,Ms Jasmine Loh,2025-02-01,Statistics,1.5,Student showed improvement in Statistics.
+P0198,S076,Isabella Koh,T011,Ms Jasmine Loh,2025-03-11,Fractions,1.5,Covered Fractions. More practice needed.
+P0199,S057,Emma Toh,T007,Mr Jeremy Ong,2025-04-22,Fractions,1.0,Student understood Fractions well today.
+P0200,S062,Benjamin Ong,T010,Mr Hannah Lee,2025-03-31,Calculus,1.0,Student required some guidance for Calculus.
+P0201,S027,Amelia Ng,T023,Ms Jeremy Wong,2025-04-12,Algebra,2.0,Student did not understand Algebra.
+P0202,S030,Noah Lim,T017,Ms Valerie Loh,2025-04-09,Fractions,1.0,Good progress in Fractions.
+P0203,S045,Samuel Yeo,T006,Mr Daniel Lim,2025-01-08,Fractions,1.5,Student showed improvement in Fractions.
+P0204,S065,Ella Chua,T003,Mr Valerie Goh,2025-02-07,Geometry,1.0,Worked on Geometry. Student partially understood.
+P0205,S037,Emma Tan,T002,Mr Hannah Ho,2025-05-01,Geometry,2.0,Worked on Geometry. Student partially understood.
+P0206,S049,Mia Lee,T003,Mr Valerie Goh,2025-04-25,Calculus,2.0,Student struggled with Calculus.
+P0207,S005,Sophia Chew,T010,Mr Hannah Lee,2025-01-05,Algebra,1.5,Student understood Algebra well today.
+P0208,S066,Amelia Tan,T015,Mr Kelvin Ng,2025-05-21,Fractions,2.0,Student confidently solved Fractions questions.
+P0209,S022,Samuel Chua,T024,Mr Marcus Lim,2025-03-15,Algebra,1.0,Good progress in Algebra.
+P0210,S045,Samuel Yeo,T025,Ms Hannah Yeo,2025-01-13,Algebra,1.0,Student did not understand Algebra.
+P0211,S034,Emma Chua,T022,Mr Shu Ying Lee,2025-04-28,Statistics,1.0,Student struggled with Statistics.
+P0212,S026,Aiden Neo,T013,Ms Jeremy Tan,2025-05-18,Calculus,1.0,Student confused by Calculus.
+P0213,S071,Ella Yeo,T022,Mr Shu Ying Lee,2025-05-28,Statistics,1.0,Covered Statistics. More practice needed.
+P0214,S045,Samuel Yeo,T023,Ms Jeremy Wong,2025-03-16,Fractions,1.5,Worked on Fractions. Student partially understood.
+P0215,S052,Benjamin Ng,T017,Ms Valerie Loh,2025-04-01,Statistics,1.0,Student confused by Statistics.
+P0216,S029,Noah Yeo,T025,Ms Hannah Yeo,2025-02-17,Calculus,2.0,Student showed improvement in Calculus.
+P0217,S007,Lucas Lim,T014,Ms Alicia Yeo,2025-04-03,Statistics,1.0,Student confused by Statistics.
+P0218,S050,Evelyn Teo,T011,Ms Jasmine Loh,2025-05-10,Statistics,2.0,Student showed improvement in Statistics.
+P0219,S056,Charlotte Koh,T011,Ms Jasmine Loh,2025-05-01,Calculus,1.0,Student confused by Calculus.
+P0220,S027,Amelia Ng,T015,Mr Kelvin Ng,2025-04-06,Calculus,1.5,Student showed improvement in Calculus.
+P0221,S014,Benjamin Ho,T022,Mr Shu Ying Lee,2025-01-18,Geometry,1.5,Student struggled with Geometry.
+P0222,S018,Emma Chua,T010,Mr Hannah Lee,2025-05-29,Algebra,2.0,Student did not understand Algebra.
+P0223,S060,Olivia Ho,T011,Ms Jasmine Loh,2025-01-12,Fractions,1.5,Covered Fractions. More practice needed.
+P0224,S012,Sophia Goh,T023,Ms Jeremy Wong,2025-02-14,Geometry,2.0,Student required some guidance for Geometry.
+P0225,S005,Sophia Chew,T009,Ms Cheryl Wong,2025-02-16,Calculus,1.0,Student struggled with Calculus.
+P0226,S040,Harper Koh,T011,Ms Jasmine Loh,2025-01-10,Calculus,1.5,Student struggled with Calculus.
+P0227,S013,Evelyn Goh,T001,Mr Aaron Koh,2025-02-21,Algebra,1.0,Student did not understand Algebra.
+P0228,S009,Noah Lim,T009,Ms Cheryl Wong,2025-05-12,Geometry,1.5,Student confidently solved Geometry questions.
+P0229,S062,Benjamin Ong,T012,Ms Marcus Ong,2025-01-10,Geometry,2.0,Worked on Geometry. Student partially understood.
+P0230,S073,Ella Yeo,T022,Mr Shu Ying Lee,2025-04-02,Geometry,1.0,Student confused by Geometry.
+P0231,S025,Ryan Wong,T002,Mr Hannah Ho,2025-03-11,Geometry,1.0,Good progress in Geometry.
+P0232,S069,Amelia Ho,T022,Mr Shu Ying Lee,2025-04-13,Calculus,2.0,Student confidently solved Calculus questions.
+P0233,S064,Lucas Lim,T003,Mr Valerie Goh,2025-03-28,Calculus,1.0,Student required some guidance for Calculus.
+P0234,S017,Daniel Toh,T016,Mr Alicia Koh,2025-04-05,Calculus,2.0,Student did not understand Calculus.
+P0235,S029,Noah Yeo,T003,Mr Valerie Goh,2025-04-19,Algebra,1.0,Student did not understand Algebra.
+P0236,S032,Ryan Neo,T009,Ms Cheryl Wong,2025-02-16,Statistics,2.0,Good progress in Statistics.
+P0237,S029,Noah Yeo,T003,Mr Valerie Goh,2025-01-27,Geometry,1.0,Student required some guidance for Geometry.
+P0238,S024,Liam Chua,T019,Ms Hannah Teo,2025-03-20,Geometry,1.5,Student confused by Geometry.
+P0239,S075,Matthew Chew,T016,Mr Alicia Koh,2025-02-12,Calculus,2.0,Student did not understand Calculus.
+P0240,S002,Olivia Wong,T023,Ms Jeremy Wong,2025-04-25,Geometry,1.0,Good progress in Geometry.
+P0241,S043,Noah Goh,T007,Mr Jeremy Ong,2025-04-22,Statistics,1.5,Student showed improvement in Statistics.
+P0242,S056,Charlotte Koh,T006,Mr Daniel Lim,2025-04-14,Algebra,1.5,Student confused by Algebra.
+P0243,S017,Daniel Toh,T018,Mr Aaron Koh,2025-01-08,Fractions,1.0,Student confidently solved Fractions questions.
+P0244,S032,Ryan Neo,T010,Mr Hannah Lee,2025-02-02,Algebra,1.0,Student understood Algebra well today.
+P0245,S014,Benjamin Ho,T005,Ms Adrian Yeo,2025-04-03,Geometry,1.5,Covered Geometry. More practice needed.
+P0246,S074,Aiden Tan,T015,Mr Kelvin Ng,2025-02-09,Algebra,2.0,Student did not understand Algebra.
+P0247,S047,Liam Loh,T010,Mr Hannah Lee,2025-04-06,Geometry,1.5,Student struggled with Geometry.
+P0248,S016,Lucas Koh,T007,Mr Jeremy Ong,2025-02-05,Statistics,2.0,Good progress in Statistics.
+P0249,S035,Ethan Ng,T005,Ms Adrian Yeo,2025-03-22,Calculus,2.0,Student did not understand Calculus.
+P0250,S077,Sophia Loh,T006,Mr Daniel Lim,2025-01-30,Fractions,1.0,Student understood Fractions well today.
+P0251,S035,Ethan Ng,T018,Mr Aaron Koh,2025-05-13,Calculus,1.5,Student confused by Calculus.
+P0252,S006,Olivia Wong,T025,Ms Hannah Yeo,2025-03-09,Algebra,1.5,Covered Algebra. More practice needed.
+P0253,S038,Harper Ng,T010,Mr Hannah Lee,2025-02-24,Calculus,2.0,Student did not understand Calculus.
+P0254,S006,Olivia Wong,T023,Ms Jeremy Wong,2025-02-21,Calculus,1.0,Student understood Calculus well today.
+P0255,S061,Charlotte Teo,T005,Ms Adrian Yeo,2025-04-26,Algebra,1.0,Covered Algebra. More practice needed.
+P0256,S031,Samuel Goh,T021,Ms Jeremy Wong,2025-01-23,Calculus,2.0,Good progress in Calculus.
+P0257,S062,Benjamin Ong,T008,Ms Darren Ng,2025-01-17,Geometry,2.0,Student confused by Geometry.
+P0258,S038,Harper Ng,T025,Ms Hannah Yeo,2025-03-18,Geometry,1.0,Student confused by Geometry.
+P0259,S069,Amelia Ho,T001,Mr Aaron Koh,2025-04-03,Fractions,2.0,Student struggled with Fractions.
+P0260,S017,Daniel Toh,T025,Ms Hannah Yeo,2025-02-21,Algebra,1.0,Student struggled with Algebra.
+P0261,S053,Emma Wong,T003,Mr Valerie Goh,2025-01-07,Calculus,1.5,Covered Calculus. More practice needed.
+P0262,S054,Benjamin Koh,T019,Ms Hannah Teo,2025-04-05,Statistics,1.5,Student confused by Statistics.
+P0263,S067,Benjamin Yeo,T020,Mr Rachel Wong,2025-01-23,Fractions,1.0,Good progress in Fractions.
+P0264,S014,Benjamin Ho,T013,Ms Jeremy Tan,2025-05-03,Calculus,2.0,Student confidently solved Calculus questions.
+P0265,S079,Harper Loh,T009,Ms Cheryl Wong,2025-05-28,Calculus,1.0,Student understood Calculus well today.
+P0266,S059,Sophia Yeo,T002,Mr Hannah Ho,2025-01-19,Geometry,1.5,Student did not understand Geometry.
+P0267,S019,Daniel Ho,T004,Mr Darren Tan,2025-03-30,Statistics,1.0,Covered Statistics. More practice needed.
+P0268,S020,Liam Chua,T023,Ms Jeremy Wong,2025-02-16,Statistics,1.0,Student confidently solved Statistics questions.
+P0269,S047,Liam Loh,T019,Ms Hannah Teo,2025-01-15,Statistics,1.0,Covered Statistics. More practice needed.
+P0270,S030,Noah Lim,T016,Mr Alicia Koh,2025-03-19,Fractions,1.0,Student understood Fractions well today.
+P0271,S037,Emma Tan,T024,Mr Marcus Lim,2025-02-27,Geometry,1.5,Student confused by Geometry.
+P0272,S060,Olivia Ho,T025,Ms Hannah Yeo,2025-01-21,Geometry,1.5,Student understood Geometry well today.
+P0273,S009,Noah Lim,T010,Mr Hannah Lee,2025-03-12,Statistics,1.0,Covered Statistics. More practice needed.
+P0274,S047,Liam Loh,T009,Ms Cheryl Wong,2025-05-17,Geometry,1.0,Student understood Geometry well today.
+P0275,S051,Olivia Koh,T021,Ms Jeremy Wong,2025-05-29,Statistics,1.0,Worked on Statistics. Student partially understood.
+P0276,S009,Noah Lim,T011,Ms Jasmine Loh,2025-03-28,Statistics,2.0,Student struggled with Statistics.
+P0277,S015,Benjamin Ng,T019,Ms Hannah Teo,2025-01-21,Algebra,1.0,Good progress in Algebra.
+P0278,S047,Liam Loh,T010,Mr Hannah Lee,2025-05-27,Fractions,1.5,Student showed improvement in Fractions.
+P0279,S049,Mia Lee,T003,Mr Valerie Goh,2025-05-20,Calculus,1.5,Good progress in Calculus.
+P0280,S071,Ella Yeo,T016,Mr Alicia Koh,2025-03-04,Calculus,2.0,Student required some guidance for Calculus.
+P0281,S075,Matthew Chew,T007,Mr Jeremy Ong,2025-04-27,Geometry,1.0,Student confused by Geometry.
+P0282,S076,Isabella Koh,T016,Mr Alicia Koh,2025-02-10,Algebra,1.5,Student confidently solved Algebra questions.
+P0283,S061,Charlotte Teo,T025,Ms Hannah Yeo,2025-04-29,Calculus,1.0,Student did not understand Calculus.
+P0284,S036,Lucas Loh,T022,Mr Shu Ying Lee,2025-02-06,Statistics,1.5,Student confused by Statistics.
+P0285,S054,Benjamin Koh,T017,Ms Valerie Loh,2025-03-30,Geometry,1.5,Student struggled with Geometry.
+P0286,S030,Noah Lim,T018,Mr Aaron Koh,2025-05-12,Geometry,2.0,Student struggled with Geometry.
+P0287,S060,Olivia Ho,T006,Mr Daniel Lim,2025-03-03,Geometry,1.5,Student struggled with Geometry.
+P0288,S003,Ethan Goh,T023,Ms Jeremy Wong,2025-04-26,Geometry,1.0,Worked on Geometry. Student partially understood.
+P0289,S069,Amelia Ho,T001,Mr Aaron Koh,2025-01-13,Algebra,1.5,Student did not understand Algebra.
+P0290,S035,Ethan Ng,T025,Ms Hannah Yeo,2025-04-18,Statistics,1.0,Student struggled with Statistics.
+P0291,S073,Ella Yeo,T024,Mr Marcus Lim,2025-05-28,Geometry,2.0,Student did not understand Geometry.
+P0292,S071,Ella Yeo,T007,Mr Jeremy Ong,2025-02-10,Fractions,1.5,Student confidently solved Fractions questions.
+P0293,S031,Samuel Goh,T014,Ms Alicia Yeo,2025-03-20,Calculus,1.5,Student struggled with Calculus.
+P0294,S043,Noah Goh,T024,Mr Marcus Lim,2025-04-11,Algebra,2.0,Student confidently solved Algebra questions.
+P0295,S074,Aiden Tan,T002,Mr Hannah Ho,2025-02-25,Fractions,2.0,Student required some guidance for Fractions.
+P0296,S053,Emma Wong,T008,Ms Darren Ng,2025-01-13,Algebra,1.5,Student confidently solved Algebra questions.
+P0297,S033,Olivia Chew,T018,Mr Aaron Koh,2025-05-01,Statistics,1.5,Student confused by Statistics.
+P0298,S037,Emma Tan,T019,Ms Hannah Teo,2025-01-28,Algebra,1.5,Worked on Algebra. Student partially understood.
+P0299,S016,Lucas Koh,T006,Mr Daniel Lim,2025-04-04,Geometry,1.5,Good progress in Geometry.
+P0300,S076,Isabella Koh,T024,Mr Marcus Lim,2025-04-13,Algebra,1.0,Student understood Algebra well today.
+P0301,S074,Aiden Tan,T016,Mr Alicia Koh,2025-05-22,Geometry,1.5,Student struggled with Geometry.
+P0302,S002,Olivia Wong,T011,Ms Jasmine Loh,2025-05-10,Calculus,1.5,Student confused by Calculus.
+P0303,S046,Daniel Koh,T001,Mr Aaron Koh,2025-01-31,Geometry,1.0,Student showed improvement in Geometry.
+P0304,S068,Amelia Yeo,T007,Mr Jeremy Ong,2025-04-06,Calculus,1.5,Student confused by Calculus.
+P0305,S022,Samuel Chua,T002,Mr Hannah Ho,2025-02-06,Geometry,1.0,Student confused by Geometry.
+P0306,S063,Evelyn Yeo,T008,Ms Darren Ng,2025-04-13,Statistics,2.0,Student showed improvement in Statistics.
+P0307,S007,Lucas Lim,T002,Mr Hannah Ho,2025-01-10,Algebra,1.0,Covered Algebra. More practice needed.
+P0308,S062,Benjamin Ong,T013,Ms Jeremy Tan,2025-05-02,Geometry,2.0,Student required some guidance for Geometry.
+P0309,S019,Daniel Ho,T016,Mr Alicia Koh,2025-05-12,Fractions,1.0,Student did not understand Fractions.
+P0310,S026,Aiden Neo,T002,Mr Hannah Ho,2025-03-23,Statistics,1.0,Student confidently solved Statistics questions.
+P0311,S026,Aiden Neo,T011,Ms Jasmine Loh,2025-03-18,Statistics,2.0,Student did not understand Statistics.
+P0312,S010,Olivia Ho,T006,Mr Daniel Lim,2025-05-11,Statistics,2.0,Student required some guidance for Statistics.
+P0313,S035,Ethan Ng,T005,Ms Adrian Yeo,2025-03-18,Statistics,1.5,Student struggled with Statistics.
+P0314,S020,Liam Chua,T010,Mr Hannah Lee,2025-03-26,Geometry,2.0,Student showed improvement in Geometry.
+P0315,S046,Daniel Koh,T006,Mr Daniel Lim,2025-05-30,Calculus,1.5,Covered Calculus. More practice needed.
+P0316,S036,Lucas Loh,T008,Ms Darren Ng,2025-05-02,Algebra,1.5,Student confused by Algebra.
+P0317,S013,Evelyn Goh,T019,Ms Hannah Teo,2025-05-28,Statistics,1.0,Covered Statistics. More practice needed.
+P0318,S018,Emma Chua,T008,Ms Darren Ng,2025-05-30,Algebra,1.5,Student struggled with Algebra.
+P0319,S018,Emma Chua,T012,Ms Marcus Ong,2025-04-08,Statistics,1.0,Student understood Statistics well today.
+P0320,S050,Evelyn Teo,T015,Mr Kelvin Ng,2025-05-27,Algebra,2.0,Student struggled with Algebra.
+P0321,S048,Samuel Ong,T005,Ms Adrian Yeo,2025-01-05,Fractions,1.5,Good progress in Fractions.
+P0322,S045,Samuel Yeo,T012,Ms Marcus Ong,2025-02-08,Calculus,1.5,Covered Calculus. More practice needed.
+P0323,S004,Evelyn Chew,T006,Mr Daniel Lim,2025-04-16,Fractions,2.0,Student confused by Fractions.
+P0324,S056,Charlotte Koh,T019,Ms Hannah Teo,2025-01-16,Calculus,2.0,Student understood Calculus well today.
+P0325,S053,Emma Wong,T025,Ms Hannah Yeo,2025-02-23,Statistics,2.0,Student required some guidance for Statistics.
+P0326,S020,Liam Chua,T007,Mr Jeremy Ong,2025-05-15,Calculus,1.5,Student required some guidance for Calculus.
+P0327,S012,Sophia Goh,T012,Ms Marcus Ong,2025-04-28,Fractions,2.0,Good progress in Fractions.
+P0328,S032,Ryan Neo,T014,Ms Alicia Yeo,2025-04-01,Statistics,2.0,Good progress in Statistics.
+P0329,S022,Samuel Chua,T021,Ms Jeremy Wong,2025-05-04,Statistics,1.0,Worked on Statistics. Student partially understood.
+P0330,S044,Ella Lim,T013,Ms Jeremy Tan,2025-05-23,Geometry,1.5,Student struggled with Geometry.
+P0331,S052,Benjamin Ng,T007,Mr Jeremy Ong,2025-03-15,Geometry,2.0,Student understood Geometry well today.
+P0332,S057,Emma Toh,T004,Mr Darren Tan,2025-03-23,Calculus,1.5,Good progress in Calculus.
+P0333,S043,Noah Goh,T017,Ms Valerie Loh,2025-03-12,Statistics,1.5,Student showed improvement in Statistics.
+P0334,S029,Noah Yeo,T025,Ms Hannah Yeo,2025-05-20,Statistics,1.5,Student did not understand Statistics.
+P0335,S078,Matthew Yeo,T001,Mr Aaron Koh,2025-02-07,Geometry,1.5,Worked on Geometry. Student partially understood.
+P0336,S033,Olivia Chew,T002,Mr Hannah Ho,2025-01-21,Geometry,1.5,Student required some guidance for Geometry.
+P0337,S016,Lucas Koh,T003,Mr Valerie Goh,2025-05-03,Geometry,1.0,Student struggled with Geometry.
+P0338,S060,Olivia Ho,T022,Mr Shu Ying Lee,2025-03-11,Statistics,2.0,Good progress in Statistics.
+P0339,S020,Liam Chua,T008,Ms Darren Ng,2025-01-28,Fractions,2.0,Covered Fractions. More practice needed.
+P0340,S042,Harper Lee,T016,Mr Alicia Koh,2025-03-03,Statistics,1.0,Worked on Statistics. Student partially understood.
+P0341,S034,Emma Chua,T019,Ms Hannah Teo,2025-02-27,Statistics,2.0,Student struggled with Statistics.
+P0342,S074,Aiden Tan,T019,Ms Hannah Teo,2025-01-26,Algebra,1.5,Student did not understand Algebra.
+P0343,S055,Amelia Tan,T021,Ms Jeremy Wong,2025-01-26,Calculus,2.0,Student struggled with Calculus.
+P0344,S076,Isabella Koh,T021,Ms Jeremy Wong,2025-05-21,Algebra,1.0,Student did not understand Algebra.
+P0345,S054,Benjamin Koh,T011,Ms Jasmine Loh,2025-05-03,Calculus,2.0,Student understood Calculus well today.
+P0346,S055,Amelia Tan,T016,Mr Alicia Koh,2025-03-24,Geometry,1.5,Student showed improvement in Geometry.
+P0347,S051,Olivia Koh,T017,Ms Valerie Loh,2025-05-27,Algebra,1.0,Student showed improvement in Algebra.
+P0348,S008,Noah Teo,T011,Ms Jasmine Loh,2025-04-17,Fractions,1.0,Worked on Fractions. Student partially understood.
+P0349,S004,Evelyn Chew,T008,Ms Darren Ng,2025-05-07,Calculus,1.0,Student confused by Calculus.
+P0350,S005,Sophia Chew,T025,Ms Hannah Yeo,2025-01-10,Geometry,1.0,Good progress in Geometry.
+P0351,S067,Benjamin Yeo,T023,Ms Jeremy Wong,2025-01-28,Statistics,1.5,Student required some guidance for Statistics.
+P0352,S051,Olivia Koh,T023,Ms Jeremy Wong,2025-05-20,Calculus,2.0,Student confidently solved Calculus questions.
+P0353,S029,Noah Yeo,T022,Mr Shu Ying Lee,2025-05-10,Fractions,1.5,Student required some guidance for Fractions.
+P0354,S063,Evelyn Yeo,T003,Mr Valerie Goh,2025-01-29,Fractions,1.5,Student struggled with Fractions.
+P0355,S047,Liam Loh,T022,Mr Shu Ying Lee,2025-03-07,Calculus,2.0,Student struggled with Calculus.
+P0356,S054,Benjamin Koh,T007,Mr Jeremy Ong,2025-03-28,Algebra,1.5,Student confused by Algebra.
+P0357,S021,Amelia Lee,T004,Mr Darren Tan,2025-02-14,Fractions,2.0,Student confused by Fractions.
+P0358,S056,Charlotte Koh,T014,Ms Alicia Yeo,2025-04-20,Calculus,2.0,Student did not understand Calculus.
+P0359,S042,Harper Lee,T015,Mr Kelvin Ng,2025-04-13,Algebra,2.0,Student showed improvement in Algebra.
+P0360,S033,Olivia Chew,T012,Ms Marcus Ong,2025-02-05,Fractions,1.5,Good progress in Fractions.
+P0361,S069,Amelia Ho,T017,Ms Valerie Loh,2025-01-02,Fractions,1.5,Student did not understand Fractions.
+P0362,S060,Olivia Ho,T023,Ms Jeremy Wong,2025-04-25,Fractions,1.5,Student did not understand Fractions.
+P0363,S013,Evelyn Goh,T017,Ms Valerie Loh,2025-05-30,Geometry,2.0,Covered Geometry. More practice needed.
+P0364,S067,Benjamin Yeo,T012,Ms Marcus Ong,2025-03-08,Algebra,2.0,Student did not understand Algebra.
+P0365,S004,Evelyn Chew,T015,Mr Kelvin Ng,2025-01-16,Fractions,2.0,Student struggled with Fractions.
+P0366,S049,Mia Lee,T021,Ms Jeremy Wong,2025-03-20,Calculus,1.0,Student confidently solved Calculus questions.
+P0367,S073,Ella Yeo,T019,Ms Hannah Teo,2025-03-21,Statistics,2.0,Worked on Statistics. Student partially understood.
+P0368,S046,Daniel Koh,T024,Mr Marcus Lim,2025-04-05,Geometry,2.0,Student understood Geometry well today.
+P0369,S049,Mia Lee,T023,Ms Jeremy Wong,2025-02-04,Fractions,1.5,Student struggled with Fractions.
+P0370,S076,Isabella Koh,T010,Mr Hannah Lee,2025-04-06,Calculus,1.5,Student confidently solved Calculus questions.
+P0371,S054,Benjamin Koh,T021,Ms Jeremy Wong,2025-02-25,Statistics,1.0,Covered Statistics. More practice needed.
+P0372,S013,Evelyn Goh,T018,Mr Aaron Koh,2025-01-21,Statistics,2.0,Student confidently solved Statistics questions.
+P0373,S076,Isabella Koh,T017,Ms Valerie Loh,2025-04-03,Statistics,1.0,Covered Statistics. More practice needed.
+P0374,S004,Evelyn Chew,T024,Mr Marcus Lim,2025-01-16,Algebra,2.0,Covered Algebra. More practice needed.
+P0375,S018,Emma Chua,T015,Mr Kelvin Ng,2025-05-27,Fractions,2.0,Student understood Fractions well today.
+P0376,S033,Olivia Chew,T017,Ms Valerie Loh,2025-03-25,Fractions,2.0,Student did not understand Fractions.
+P0377,S075,Matthew Chew,T014,Ms Alicia Yeo,2025-02-22,Algebra,2.0,Student confidently solved Algebra questions.
+P0378,S067,Benjamin Yeo,T018,Mr Aaron Koh,2025-05-11,Algebra,1.5,Student struggled with Algebra.
+P0379,S006,Olivia Wong,T022,Mr Shu Ying Lee,2025-02-03,Calculus,2.0,Student did not understand Calculus.
+P0380,S051,Olivia Koh,T019,Ms Hannah Teo,2025-05-25,Calculus,1.0,Student confused by Calculus.
+P0381,S006,Olivia Wong,T012,Ms Marcus Ong,2025-03-20,Calculus,2.0,Student struggled with Calculus.
+P0382,S038,Harper Ng,T001,Mr Aaron Koh,2025-03-07,Calculus,1.0,Covered Calculus. More practice needed.
+P0383,S043,Noah Goh,T021,Ms Jeremy Wong,2025-05-29,Fractions,1.0,Student struggled with Fractions.
+P0384,S041,Evelyn Lim,T005,Ms Adrian Yeo,2025-03-30,Calculus,2.0,Student showed improvement in Calculus.
+P0385,S068,Amelia Yeo,T008,Ms Darren Ng,2025-01-16,Statistics,1.0,Student did not understand Statistics.
+P0386,S073,Ella Yeo,T008,Ms Darren Ng,2025-03-15,Algebra,1.5,Worked on Algebra. Student partially understood.
+P0387,S044,Ella Lim,T025,Ms Hannah Yeo,2025-04-18,Fractions,1.5,Student confidently solved Fractions questions.
+P0388,S017,Daniel Toh,T006,Mr Daniel Lim,2025-04-07,Calculus,1.5,Student struggled with Calculus.
+P0389,S022,Samuel Chua,T019,Ms Hannah Teo,2025-02-04,Statistics,2.0,Good progress in Statistics.
+P0390,S066,Amelia Tan,T015,Mr Kelvin Ng,2025-02-15,Algebra,2.0,Student required some guidance for Algebra.
+P0391,S062,Benjamin Ong,T010,Mr Hannah Lee,2025-02-02,Statistics,2.0,Student understood Statistics well today.
+P0392,S022,Samuel Chua,T020,Mr Rachel Wong,2025-01-06,Algebra,1.5,Student did not understand Algebra.
+P0393,S008,Noah Teo,T024,Mr Marcus Lim,2025-04-19,Statistics,2.0,Student did not understand Statistics.
+P0394,S062,Benjamin Ong,T025,Ms Hannah Yeo,2025-03-05,Fractions,1.5,Student required some guidance for Fractions.
+P0395,S027,Amelia Ng,T007,Mr Jeremy Ong,2025-03-12,Fractions,1.0,Student confused by Fractions.
+P0396,S027,Amelia Ng,T014,Ms Alicia Yeo,2025-01-09,Algebra,2.0,Student did not understand Algebra.
+P0397,S020,Liam Chua,T022,Mr Shu Ying Lee,2025-01-05,Statistics,1.0,Student struggled with Statistics.
+P0398,S046,Daniel Koh,T003,Mr Valerie Goh,2025-01-26,Algebra,2.0,Worked on Algebra. Student partially understood.
+P0399,S042,Harper Lee,T010,Mr Hannah Lee,2025-01-13,Calculus,1.0,Student confused by Calculus.
+P0400,S065,Ella Chua,T005,Ms Adrian Yeo,2025-04-13,Algebra,1.5,Student understood Algebra well today.

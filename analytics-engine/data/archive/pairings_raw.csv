@@ -1,0 +1,401 @@
+pairing_id,student_id,student_name,tutor_id,tutor_name,session_date,topic_covered,duration_hours,tutor_feedback_text
+P0058,S037,Hannah Lim,T013,Ms Valerie Loh,2025-01-01,Fractions,1.5,Student was able to follow Fractions with guidance but still needs practice.
+P0172,S013,Noah Yeo,T011,Mr Chloe Lee,2025-01-02,Calculus,1.0,Covered Calculus. Student showed partial understanding and needs more reinforcement.
+P0392,S022,Mia Toh,T020,Ms Hannah Neo,2025-01-02,Algebra,2.0,Worked through Algebra. More repetition will be needed to build confidence.
+P0316,S036,Sophia Goh,T008,Ms Jasmine Loh,2025-01-02,Fractions,1.5,Student was distracted during Fractions and could not apply the concepts independently.
+P0307,S007,Noah Loh,T002,Mr Nicholas Tan,2025-01-03,Algebra,1.5,Covered Algebra. Student showed partial understanding and needs more reinforcement.
+P0393,S008,Ryan Toh,T024,Mr Brandon Koh,2025-01-05,Algebra,2.0,Progress in Algebra remains limited. More foundational work is needed.
+P0379,S006,Sophia Ho,T022,Mr Valerie Chua,2025-01-05,Fractions,1.5,Student was distracted during Fractions and could not apply the concepts independently.
+P0110,S027,Caleb Loh,T014,Mr Aaron Teo,2025-01-05,Calculus,1.5,Student still struggles with Calculus and needs more guided practice.
+P0280,S071,Joshua Neo,T016,Ms Jeremy Neo,2025-01-05,Fractions,1.5,Progress in Fractions remains limited. More foundational work is needed.
+P0334,S029,Aiden Lim,T025,Ms Alicia Ho,2025-01-06,Geometry,1.5,Session on Geometry was steady. Student grasped some parts but not yet fully consistent.
+P0344,S076,Harper Ong,T021,Ms Serene Loh,2025-01-06,Algebra,1.5,Worked through Algebra. More repetition will be needed to build confidence.
+P0060,S048,Isabella Chua,T021,Ms Serene Loh,2025-01-07,Algebra,1.0,Student showed improvement in Algebra and was more confident today.
+P0067,S062,Joshua Ng,T005,Mr Amanda Chua,2025-01-08,Calculus,1.0,Worked through Calculus. More repetition will be needed to build confidence.
+P0350,S005,Zoe Yeo,T025,Ms Alicia Ho,2025-01-09,Statistics,1.5,Student showed improvement in Statistics and was more confident today.
+P0387,S044,Nathan Wong,T025,Ms Alicia Ho,2025-01-09,Statistics,1.0,Covered Statistics. Student showed partial understanding and needs more reinforcement.
+P0192,S005,Zoe Yeo,T001,Ms Joanna Goh,2025-01-10,Geometry,2.0,Student did not fully understand Geometry today and showed some confusion.
+P0267,S019,Liam Chua,T004,Mr Aaron Goh,2025-01-11,Statistics,1.0,Student still struggles with Statistics and needs more guided practice.
+P0190,S013,Noah Yeo,T005,Mr Amanda Chua,2025-01-11,Fractions,1.5,Progress in Fractions remains limited. More foundational work is needed.
+P0378,S067,Sarah Loh,T018,Ms Melissa Lim,2025-01-12,Calculus,2.0,Student did not fully understand Calculus today and showed some confusion.
+P0186,S037,Hannah Lim,T011,Mr Chloe Lee,2025-01-12,Fractions,1.5,Progress in Fractions remains limited. More foundational work is needed.
+P0351,S067,Sarah Loh,T023,Ms Terence Koh,2025-01-12,Fractions,1.5,Clear improvement in Fractions; can move towards more advanced questions next lesson.
+P0066,S024,Sophia Wong,T003,Ms Marcus Wong,2025-01-12,Statistics,2.0,Student was engaged and demonstrated stronger understanding of Statistics.
+P0012,S031,Jonathan Goh,T014,Mr Aaron Teo,2025-01-12,Algebra,1.5,Student still struggles with Algebra and needs more guided practice.
+P0154,S046,Harper Toh,T021,Ms Serene Loh,2025-01-12,Calculus,1.5,Progress in Calculus remains limited. More foundational work is needed.
+P0250,S077,Grace Yeo,T006,Ms Sabrina Lim,2025-01-13,Algebra,1.5,Clear improvement in Algebra; can move towards more advanced questions next lesson.
+P0298,S037,Hannah Lim,T019,Ms Terence Loh,2025-01-13,Fractions,2.0,Student did not fully understand Fractions today and showed some confusion.
+P0257,S062,Joshua Ng,T008,Ms Jasmine Loh,2025-01-13,Algebra,1.5,Student was distracted during Algebra and could not apply the concepts independently.
+P0097,S045,Aiden Ng,T024,Mr Brandon Koh,2025-01-13,Fractions,2.0,Student still struggles with Fractions and needs more guided practice.
+P0026,S065,Ryan Koh,T019,Ms Terence Loh,2025-01-13,Statistics,2.0,Worked through Statistics. More repetition will be needed to build confidence.
+P0175,S061,Noah Chua,T005,Mr Amanda Chua,2025-01-13,Algebra,1.0,Student was distracted during Algebra and could not apply the concepts independently.
+P0261,S053,Caleb Koh,T003,Ms Marcus Wong,2025-01-14,Calculus,2.0,Student was able to follow Calculus with guidance but still needs practice.
+P0299,S016,Hannah Toh,T006,Ms Sabrina Lim,2025-01-14,Fractions,1.0,Student was distracted during Fractions and could not apply the concepts independently.
+P0161,S051,Grace Koh,T023,Ms Terence Koh,2025-01-14,Geometry,2.0,Student was distracted during Geometry and could not apply the concepts independently.
+P0363,S013,Noah Yeo,T017,Mr Aaron Ong,2025-01-15,Calculus,2.0,Student was distracted during Calculus and could not apply the concepts independently.
+P0103,S047,Ella Tan,T002,Mr Nicholas Tan,2025-01-15,Calculus,1.0,Student did not fully understand Calculus today and showed some confusion.
+P0204,S065,Ryan Koh,T003,Ms Marcus Wong,2025-01-15,Geometry,1.0,Student was distracted during Geometry and could not apply the concepts independently.
+P0337,S016,Hannah Toh,T003,Ms Marcus Wong,2025-01-16,Statistics,1.0,Student was distracted during Statistics and could not apply the concepts independently.
+P0140,S032,Zoe Toh,T003,Ms Marcus Wong,2025-01-17,Geometry,1.5,Student still struggles with Geometry and needs more guided practice.
+P0184,S029,Aiden Lim,T014,Mr Aaron Teo,2025-01-18,Geometry,1.5,Student did not fully understand Geometry today and showed some confusion.
+P0150,S027,Caleb Loh,T013,Ms Valerie Loh,2025-01-20,Fractions,1.5,Student still struggles with Fractions and needs more guided practice.
+P0116,S062,Joshua Ng,T023,Ms Terence Koh,2025-01-21,Statistics,1.5,Progress in Statistics remains limited. More foundational work is needed.
+P0239,S075,Jonathan Loh,T016,Ms Jeremy Neo,2025-01-21,Algebra,1.0,Student was engaged and demonstrated stronger understanding of Algebra.
+P0366,S049,Amelia Yeo,T021,Ms Serene Loh,2025-01-21,Geometry,1.5,Progress in Geometry remains limited. More foundational work is needed.
+P0294,S043,Nathan Goh,T024,Mr Brandon Koh,2025-01-21,Geometry,1.5,Worked through Geometry. More repetition will be needed to build confidence.
+P0198,S076,Harper Ong,T011,Mr Chloe Lee,2025-01-21,Calculus,1.5,Good progress in Calculus. Student understood the practice questions better.
+P0163,S068,Benjamin Wong,T021,Ms Serene Loh,2025-01-22,Geometry,1.0,Progress in Geometry remains limited. More foundational work is needed.
+P0096,S004,David Goh,T012,Ms Alicia Koh,2025-01-22,Statistics,1.0,Student did not fully understand Statistics today and showed some confusion.
+P0180,S033,Ethan Lim,T003,Ms Marcus Wong,2025-01-22,Fractions,2.0,Session on Fractions was steady. Student grasped some parts but not yet fully consistent.
+P0114,S067,Sarah Loh,T009,Mr Wei Ming Ng,2025-01-23,Geometry,1.5,Covered Geometry. Student showed partial understanding and needs more reinforcement.
+P0079,S019,Liam Chua,T006,Ms Sabrina Lim,2025-01-24,Algebra,1.0,Student showed improvement in Algebra and was more confident today.
+P0400,S065,Ryan Koh,T005,Mr Amanda Chua,2025-01-24,Algebra,1.5,Worked through Algebra. More repetition will be needed to build confidence.
+P0031,S034,Daniel Loh,T002,Mr Nicholas Tan,2025-01-24,Fractions,1.5,Session on Fractions was steady. Student grasped some parts but not yet fully consistent.
+P0029,S017,Olivia Chua,T022,Mr Valerie Chua,2025-01-25,Fractions,2.0,Student still struggles with Fractions and needs more guided practice.
+P0080,S051,Grace Koh,T008,Ms Jasmine Loh,2025-01-25,Calculus,2.0,Progress in Calculus remains limited. More foundational work is needed.
+P0169,S032,Zoe Toh,T022,Mr Valerie Chua,2025-01-26,Geometry,2.0,Progress in Geometry remains limited. More foundational work is needed.
+P0376,S033,Ethan Lim,T017,Mr Aaron Ong,2025-01-26,Calculus,2.0,Student was distracted during Calculus and could not apply the concepts independently.
+P0010,S042,Noah Wong,T015,Mr Nicholas Lim,2025-01-26,Calculus,2.0,Student still struggles with Calculus and needs more guided practice.
+P0084,S057,Ethan Ho,T007,Mr Aaron Chew,2025-01-27,Geometry,2.0,Student was able to follow Geometry with guidance but still needs practice.
+P0065,S050,Olivia Wong,T024,Mr Brandon Koh,2025-01-28,Statistics,1.5,Student was able to follow Statistics with guidance but still needs practice.
+P0297,S033,Ethan Lim,T018,Ms Melissa Lim,2025-01-28,Fractions,2.0,Student did not fully understand Fractions today and showed some confusion.
+P0395,S027,Caleb Loh,T007,Mr Aaron Chew,2025-01-28,Fractions,1.0,Student was able to follow Fractions with guidance but still needs practice.
+P0310,S026,Zoe Ng,T002,Mr Nicholas Tan,2025-01-29,Fractions,1.5,Student did not fully understand Fractions today and showed some confusion.
+P0101,S016,Hannah Toh,T002,Mr Nicholas Tan,2025-01-29,Calculus,1.5,Student was distracted during Calculus and could not apply the concepts independently.
+P0044,S018,Joshua Ho,T017,Mr Aaron Ong,2025-01-30,Calculus,1.0,Student still struggles with Calculus and needs more guided practice.
+P0035,S078,Joshua Koh,T005,Mr Amanda Chua,2025-01-30,Geometry,1.5,Student still struggles with Geometry and needs more guided practice.
+P0213,S071,Joshua Neo,T022,Mr Valerie Chua,2025-01-30,Fractions,1.0,Student was able to follow Fractions with guidance but still needs practice.
+P0264,S014,Nathan Ng,T013,Ms Valerie Loh,2025-01-31,Statistics,1.0,Student still struggles with Statistics and needs more guided practice.
+P0320,S050,Olivia Wong,T015,Mr Nicholas Lim,2025-01-31,Algebra,1.5,Progress in Algebra remains limited. More foundational work is needed.
+P0194,S051,Grace Koh,T002,Mr Nicholas Tan,2025-02-01,Geometry,1.5,Student was distracted during Geometry and could not apply the concepts independently.
+P0217,S007,Noah Loh,T014,Mr Aaron Teo,2025-02-01,Fractions,1.0,Student still struggles with Fractions and needs more guided practice.
+P0207,S005,Zoe Yeo,T010,Ms Serene Toh,2025-02-02,Algebra,1.0,Student was able to follow Algebra with guidance but still needs practice.
+P0343,S055,David Koh,T021,Ms Serene Loh,2025-02-02,Statistics,2.0,Student did not fully understand Statistics today and showed some confusion.
+P0332,S057,Ethan Ho,T004,Mr Aaron Goh,2025-02-03,Calculus,2.0,Clear improvement in Calculus; can move towards more advanced questions next lesson.
+P0152,S022,Mia Toh,T014,Mr Aaron Teo,2025-02-03,Geometry,2.0,Clear improvement in Geometry; can move towards more advanced questions next lesson.
+P0144,S004,David Goh,T015,Mr Nicholas Lim,2025-02-03,Calculus,2.0,Student still struggles with Calculus and needs more guided practice.
+P0247,S047,Ella Tan,T010,Ms Serene Toh,2025-02-03,Calculus,1.5,Student still struggles with Calculus and needs more guided practice.
+P0341,S034,Daniel Loh,T019,Ms Terence Loh,2025-02-04,Statistics,2.0,Progress in Statistics remains limited. More foundational work is needed.
+P0323,S004,David Goh,T006,Ms Sabrina Lim,2025-02-04,Fractions,1.5,Student did not fully understand Fractions today and showed some confusion.
+P0188,S013,Noah Yeo,T002,Mr Nicholas Tan,2025-02-04,Fractions,1.0,Student was distracted during Fractions and could not apply the concepts independently.
+P0223,S060,Grace Tan,T011,Mr Chloe Lee,2025-02-05,Fractions,1.0,Student was distracted during Fractions and could not apply the concepts independently.
+P0211,S034,Daniel Loh,T022,Mr Valerie Chua,2025-02-05,Statistics,2.0,Progress in Statistics remains limited. More foundational work is needed.
+P0385,S068,Benjamin Wong,T008,Ms Jasmine Loh,2025-02-05,Fractions,2.0,Worked through Fractions. More repetition will be needed to build confidence.
+P0170,S080,Emma Ho,T002,Mr Nicholas Tan,2025-02-05,Fractions,1.0,Progress in Fractions remains limited. More foundational work is needed.
+P0283,S061,Noah Chua,T025,Ms Alicia Ho,2025-02-05,Algebra,2.0,Student did not fully understand Algebra today and showed some confusion.
+P0171,S006,Sophia Ho,T014,Mr Aaron Teo,2025-02-05,Calculus,2.0,Worked through Calculus. More repetition will be needed to build confidence.
+P0315,S046,Harper Toh,T006,Ms Sabrina Lim,2025-02-05,Fractions,1.5,Progress in Fractions remains limited. More foundational work is needed.
+P0143,S026,Zoe Ng,T018,Ms Melissa Lim,2025-02-06,Statistics,1.5,Student was engaged and demonstrated stronger understanding of Statistics.
+P0092,S053,Caleb Koh,T008,Ms Jasmine Loh,2025-02-06,Algebra,2.0,Student showed improvement in Algebra and was more confident today.
+P0004,S010,Sarah Toh,T016,Ms Jeremy Neo,2025-02-06,Algebra,1.5,Student was able to follow Algebra with guidance but still needs practice.
+P0206,S049,Amelia Yeo,T003,Ms Marcus Wong,2025-02-06,Algebra,2.0,Student was distracted during Algebra and could not apply the concepts independently.
+P0120,S037,Hannah Lim,T019,Ms Terence Loh,2025-02-07,Geometry,1.0,Student still struggles with Geometry and needs more guided practice.
+P0070,S019,Liam Chua,T016,Ms Jeremy Neo,2025-02-07,Geometry,1.0,Student was able to follow Geometry with guidance but still needs practice.
+P0293,S031,Jonathan Goh,T014,Mr Aaron Teo,2025-02-07,Geometry,1.5,Student still struggles with Geometry and needs more guided practice.
+P0281,S075,Jonathan Loh,T007,Mr Aaron Chew,2025-02-08,Calculus,1.5,Student was able to follow Calculus with guidance but still needs practice.
+P0360,S033,Ethan Lim,T012,Ms Alicia Koh,2025-02-08,Calculus,1.5,Student was distracted during Calculus and could not apply the concepts independently.
+P0389,S022,Mia Toh,T019,Ms Terence Loh,2025-02-08,Algebra,1.0,Student did not fully understand Algebra today and showed some confusion.
+P0142,S010,Sarah Toh,T009,Mr Wei Ming Ng,2025-02-08,Statistics,1.5,Student still struggles with Statistics and needs more guided practice.
+P0001,S031,Jonathan Goh,T004,Mr Aaron Goh,2025-02-08,Calculus,1.5,Student still struggles with Calculus and needs more guided practice.
+P0209,S022,Mia Toh,T024,Mr Brandon Koh,2025-02-09,Statistics,2.0,Student was distracted during Statistics and could not apply the concepts independently.
+P0380,S051,Grace Koh,T019,Ms Terence Loh,2025-02-09,Geometry,1.0,Session on Geometry was steady. Student grasped some parts but not yet fully consistent.
+P0122,S029,Aiden Lim,T022,Mr Valerie Chua,2025-02-09,Statistics,2.0,Student still struggles with Statistics and needs more guided practice.
+P0048,S076,Harper Ong,T016,Ms Jeremy Neo,2025-02-09,Statistics,1.5,Student showed improvement in Statistics and was more confident today.
+P0078,S032,Zoe Toh,T023,Ms Terence Koh,2025-02-09,Geometry,2.0,Student was distracted during Geometry and could not apply the concepts independently.
+P0253,S038,Sarah Teo,T010,Ms Serene Toh,2025-02-10,Fractions,1.5,Worked through Fractions. More repetition will be needed to build confidence.
+P0221,S014,Nathan Ng,T022,Mr Valerie Chua,2025-02-10,Geometry,2.0,Student was able to follow Geometry with guidance but still needs practice.
+P0153,S023,Emma Chua,T009,Mr Wei Ming Ng,2025-02-11,Fractions,1.0,Student was able to follow Fractions with guidance but still needs practice.
+P0233,S064,Isabella Teo,T003,Ms Marcus Wong,2025-02-11,Fractions,1.5,Student was able to follow Fractions with guidance but still needs practice.
+P0011,S074,Nathan Loh,T002,Mr Nicholas Tan,2025-02-12,Calculus,2.0,Progress in Calculus remains limited. More foundational work is needed.
+P0237,S029,Aiden Lim,T003,Ms Marcus Wong,2025-02-13,Statistics,2.0,Student was able to follow Statistics with guidance but still needs practice.
+P0384,S041,Aiden Goh,T005,Mr Amanda Chua,2025-02-13,Calculus,2.0,Progress in Calculus remains limited. More foundational work is needed.
+P0032,S034,Daniel Loh,T014,Mr Aaron Teo,2025-02-14,Calculus,1.0,Student was able to follow Calculus with guidance but still needs practice.
+P0357,S021,Isaac Chua,T004,Mr Aaron Goh,2025-02-14,Statistics,2.0,Worked through Statistics. More repetition will be needed to build confidence.
+P0062,S001,Isabella Tan,T025,Ms Alicia Ho,2025-02-14,Algebra,1.5,Covered Algebra. Student showed partial understanding and needs more reinforcement.
+P0218,S050,Olivia Wong,T011,Mr Chloe Lee,2025-02-14,Calculus,2.0,Worked through Calculus. More repetition will be needed to build confidence.
+P0342,S074,Nathan Loh,T019,Ms Terence Loh,2025-02-15,Algebra,2.0,Worked through Algebra. More repetition will be needed to build confidence.
+P0148,S041,Aiden Goh,T011,Mr Chloe Lee,2025-02-16,Geometry,1.0,Progress in Geometry remains limited. More foundational work is needed.
+P0015,S056,Charlotte Yeo,T018,Ms Melissa Lim,2025-02-16,Statistics,1.0,Student was able to follow Statistics with guidance but still needs practice.
+P0089,S020,Zoe Lee,T003,Ms Marcus Wong,2025-02-16,Algebra,1.5,Progress in Algebra remains limited. More foundational work is needed.
+P0028,S070,Jonathan Wong,T007,Mr Aaron Chew,2025-02-18,Fractions,2.0,Progress in Fractions remains limited. More foundational work is needed.
+P0369,S049,Amelia Yeo,T023,Ms Terence Koh,2025-02-18,Algebra,2.0,Student was able to follow Algebra with guidance but still needs practice.
+P0053,S070,Jonathan Wong,T015,Mr Nicholas Lim,2025-02-18,Geometry,1.0,Student was distracted during Geometry and could not apply the concepts independently.
+P0396,S027,Caleb Loh,T014,Mr Aaron Teo,2025-02-19,Fractions,2.0,Progress in Fractions remains limited. More foundational work is needed.
+P0149,S034,Daniel Loh,T013,Ms Valerie Loh,2025-02-19,Calculus,1.0,Student did not fully understand Calculus today and showed some confusion.
+P0235,S029,Aiden Lim,T003,Ms Marcus Wong,2025-02-20,Geometry,2.0,Session on Geometry was steady. Student grasped some parts but not yet fully consistent.
+P0266,S059,Grace Ong,T002,Mr Nicholas Tan,2025-02-20,Fractions,2.0,Student was distracted during Fractions and could not apply the concepts independently.
+P0160,S011,Evelyn Wong,T018,Ms Melissa Lim,2025-02-21,Fractions,2.0,Student was able to follow Fractions with guidance but still needs practice.
+P0349,S004,David Goh,T008,Ms Jasmine Loh,2025-02-22,Fractions,1.0,Covered Fractions. Student showed partial understanding and needs more reinforcement.
+P0056,S047,Ella Tan,T013,Ms Valerie Loh,2025-02-22,Statistics,1.0,Student did not fully understand Statistics today and showed some confusion.
+P0330,S044,Nathan Wong,T013,Ms Valerie Loh,2025-02-22,Algebra,2.0,Student was distracted during Algebra and could not apply the concepts independently.
+P0377,S075,Jonathan Loh,T014,Mr Aaron Teo,2025-02-22,Geometry,1.5,Progress in Geometry remains limited. More foundational work is needed.
+P0245,S014,Nathan Ng,T005,Mr Amanda Chua,2025-02-22,Calculus,1.5,Good progress in Calculus. Student understood the practice questions better.
+P0370,S076,Harper Ong,T010,Ms Serene Toh,2025-02-23,Calculus,1.5,Session on Calculus was steady. Student grasped some parts but not yet fully consistent.
+P0371,S054,Noah Toh,T021,Ms Serene Loh,2025-02-24,Algebra,1.0,Student still struggles with Algebra and needs more guided practice.
+P0054,S061,Noah Chua,T001,Ms Joanna Goh,2025-02-24,Algebra,2.0,Student still struggles with Algebra and needs more guided practice.
+P0104,S059,Grace Ong,T002,Mr Nicholas Tan,2025-02-24,Geometry,1.0,Progress in Geometry remains limited. More foundational work is needed.
+P0173,S074,Nathan Loh,T005,Mr Amanda Chua,2025-02-25,Geometry,1.0,Student was distracted during Geometry and could not apply the concepts independently.
+P0057,S014,Nathan Ng,T002,Mr Nicholas Tan,2025-02-25,Statistics,1.0,Session on Statistics was steady. Student grasped some parts but not yet fully consistent.
+P0335,S078,Joshua Koh,T001,Ms Joanna Goh,2025-02-25,Algebra,2.0,Student still struggles with Algebra and needs more guided practice.
+P0050,S037,Hannah Lim,T009,Mr Wei Ming Ng,2025-02-25,Geometry,1.5,Student was distracted during Geometry and could not apply the concepts independently.
+P0256,S031,Jonathan Goh,T021,Ms Serene Loh,2025-02-25,Fractions,2.0,Progress in Fractions remains limited. More foundational work is needed.
+P0325,S053,Caleb Koh,T025,Ms Alicia Ho,2025-02-25,Statistics,1.0,Student still struggles with Statistics and needs more guided practice.
+P0074,S016,Hannah Toh,T009,Mr Wei Ming Ng,2025-02-25,Statistics,1.5,Student was distracted during Statistics and could not apply the concepts independently.
+P0165,S018,Joshua Ho,T007,Mr Aaron Chew,2025-02-26,Algebra,1.5,Student was engaged and demonstrated stronger understanding of Algebra.
+P0117,S009,Matthew Teo,T016,Ms Jeremy Neo,2025-02-26,Geometry,1.5,Student did not fully understand Geometry today and showed some confusion.
+P0036,S045,Aiden Ng,T023,Ms Terence Koh,2025-02-27,Fractions,2.0,Student was distracted during Fractions and could not apply the concepts independently.
+P0027,S049,Amelia Yeo,T025,Ms Alicia Ho,2025-02-28,Geometry,2.0,Session on Geometry was steady. Student grasped some parts but not yet fully consistent.
+P0041,S026,Zoe Ng,T025,Ms Alicia Ho,2025-03-01,Algebra,1.5,Student still struggles with Algebra and needs more guided practice.
+P0156,S067,Sarah Loh,T012,Ms Alicia Koh,2025-03-01,Calculus,2.0,Student was able to follow Calculus with guidance but still needs practice.
+P0061,S068,Benjamin Wong,T013,Ms Valerie Loh,2025-03-02,Geometry,2.0,Progress in Geometry remains limited. More foundational work is needed.
+P0046,S041,Aiden Goh,T023,Ms Terence Koh,2025-03-02,Algebra,2.0,Good progress in Algebra. Student understood the practice questions better.
+P0248,S016,Hannah Toh,T007,Mr Aaron Chew,2025-03-03,Geometry,1.5,Student still struggles with Geometry and needs more guided practice.
+P0373,S076,Harper Ong,T017,Mr Aaron Ong,2025-03-03,Calculus,2.0,Session on Calculus was steady. Student grasped some parts but not yet fully consistent.
+P0242,S056,Charlotte Yeo,T006,Ms Sabrina Lim,2025-03-04,Calculus,2.0,Worked through Calculus. More repetition will be needed to build confidence.
+P0372,S013,Noah Yeo,T018,Ms Melissa Lim,2025-03-04,Calculus,2.0,Student did not fully understand Calculus today and showed some confusion.
+P0014,S071,Joshua Neo,T016,Ms Jeremy Neo,2025-03-04,Fractions,2.0,Student was distracted during Fractions and could not apply the concepts independently.
+P0365,S004,David Goh,T015,Mr Nicholas Lim,2025-03-04,Calculus,1.5,Student did not fully understand Calculus today and showed some confusion.
+P0346,S055,David Koh,T016,Ms Jeremy Neo,2025-03-05,Fractions,1.5,Progress in Fractions remains limited. More foundational work is needed.
+P0136,S041,Aiden Goh,T005,Mr Amanda Chua,2025-03-05,Algebra,2.0,Student was distracted during Algebra and could not apply the concepts independently.
+P0183,S040,Jonathan Lee,T018,Ms Melissa Lim,2025-03-06,Geometry,2.0,Student still struggles with Geometry and needs more guided practice.
+P0021,S053,Caleb Koh,T004,Mr Aaron Goh,2025-03-06,Calculus,1.5,Progress in Calculus remains limited. More foundational work is needed.
+P0034,S048,Isabella Chua,T011,Mr Chloe Lee,2025-03-07,Fractions,1.5,Session on Fractions was steady. Student grasped some parts but not yet fully consistent.
+P0018,S001,Isabella Tan,T004,Mr Aaron Goh,2025-03-07,Calculus,1.5,Progress in Calculus remains limited. More foundational work is needed.
+P0311,S026,Zoe Ng,T011,Mr Chloe Lee,2025-03-07,Calculus,2.0,Student did not fully understand Calculus today and showed some confusion.
+P0121,S075,Jonathan Loh,T021,Ms Serene Loh,2025-03-07,Fractions,1.0,Student did not fully understand Fractions today and showed some confusion.
+P0215,S052,Zoe Tan,T017,Mr Aaron Ong,2025-03-08,Geometry,2.0,Student was distracted during Geometry and could not apply the concepts independently.
+P0375,S018,Joshua Ho,T015,Mr Nicholas Lim,2025-03-08,Geometry,1.5,Student was distracted during Geometry and could not apply the concepts independently.
+P0038,S042,Noah Wong,T019,Ms Terence Loh,2025-03-09,Algebra,2.0,Student still struggles with Algebra and needs more guided practice.
+P0368,S046,Harper Toh,T024,Mr Brandon Koh,2025-03-10,Algebra,1.5,Covered Algebra. Student showed partial understanding and needs more reinforcement.
+P0397,S020,Zoe Lee,T022,Mr Valerie Chua,2025-03-10,Geometry,1.5,Student still struggles with Geometry and needs more guided practice.
+P0296,S053,Caleb Koh,T008,Ms Jasmine Loh,2025-03-11,Statistics,2.0,Session on Statistics was steady. Student grasped some parts but not yet fully consistent.
+P0291,S073,Isabella Loh,T024,Mr Brandon Koh,2025-03-12,Statistics,1.5,Student still struggles with Statistics and needs more guided practice.
+P0347,S051,Grace Koh,T017,Mr Aaron Ong,2025-03-12,Fractions,1.0,Student still struggles with Fractions and needs more guided practice.
+P0308,S062,Joshua Ng,T013,Ms Valerie Loh,2025-03-14,Geometry,1.5,Student was distracted during Geometry and could not apply the concepts independently.
+P0338,S060,Grace Tan,T022,Mr Valerie Chua,2025-03-15,Algebra,1.5,Good progress in Algebra. Student understood the practice questions better.
+P0129,S025,Lucas Neo,T024,Mr Brandon Koh,2025-03-15,Geometry,1.0,Covered Geometry. Student showed partial understanding and needs more reinforcement.
+P0216,S029,Aiden Lim,T025,Ms Alicia Ho,2025-03-15,Fractions,2.0,Worked through Fractions. More repetition will be needed to build confidence.
+P0394,S062,Joshua Ng,T025,Ms Alicia Ho,2025-03-15,Statistics,1.0,Student was distracted during Statistics and could not apply the concepts independently.
+P0289,S069,Ella Goh,T001,Ms Joanna Goh,2025-03-15,Geometry,2.0,Student did not fully understand Geometry today and showed some confusion.
+P0174,S054,Noah Toh,T017,Mr Aaron Ong,2025-03-15,Algebra,1.0,Session on Algebra was steady. Student grasped some parts but not yet fully consistent.
+P0009,S068,Benjamin Wong,T020,Ms Hannah Neo,2025-03-15,Fractions,1.0,Covered Fractions. Student showed partial understanding and needs more reinforcement.
+P0083,S077,Grace Yeo,T010,Ms Serene Toh,2025-03-15,Algebra,2.0,Progress in Algebra remains limited. More foundational work is needed.
+P0112,S053,Caleb Koh,T004,Mr Aaron Goh,2025-03-16,Calculus,1.0,Student was distracted during Calculus and could not apply the concepts independently.
+P0178,S016,Hannah Toh,T012,Ms Alicia Koh,2025-03-16,Fractions,1.5,Student showed improvement in Fractions and was more confident today.
+P0189,S011,Evelyn Wong,T024,Mr Brandon Koh,2025-03-17,Algebra,1.0,Student still struggles with Algebra and needs more guided practice.
+P0322,S045,Aiden Ng,T012,Ms Alicia Koh,2025-03-17,Algebra,1.5,Student did not fully understand Algebra today and showed some confusion.
+P0024,S019,Liam Chua,T022,Mr Valerie Chua,2025-03-17,Statistics,2.0,Progress in Statistics remains limited. More foundational work is needed.
+P0199,S057,Ethan Ho,T007,Mr Aaron Chew,2025-03-17,Statistics,1.5,Student still struggles with Statistics and needs more guided practice.
+P0362,S060,Grace Tan,T023,Ms Terence Koh,2025-03-18,Fractions,2.0,Student did not fully understand Fractions today and showed some confusion.
+P0271,S037,Hannah Lim,T024,Mr Brandon Koh,2025-03-18,Statistics,2.0,Progress in Statistics remains limited. More foundational work is needed.
+P0399,S042,Noah Wong,T010,Ms Serene Toh,2025-03-18,Fractions,2.0,Covered Fractions. Student showed partial understanding and needs more reinforcement.
+P0356,S054,Noah Toh,T007,Mr Aaron Chew,2025-03-18,Calculus,1.5,Student still struggles with Calculus and needs more guided practice.
+P0273,S009,Matthew Teo,T010,Ms Serene Toh,2025-03-18,Statistics,1.5,Student still struggles with Statistics and needs more guided practice.
+P0355,S047,Ella Tan,T022,Mr Valerie Chua,2025-03-19,Fractions,1.0,Student did not fully understand Fractions today and showed some confusion.
+P0045,S027,Caleb Loh,T024,Mr Brandon Koh,2025-03-19,Algebra,1.5,Student still struggles with Algebra and needs more guided practice.
+P0126,S077,Grace Yeo,T001,Ms Joanna Goh,2025-03-19,Calculus,1.5,Student still struggles with Calculus and needs more guided practice.
+P0236,S032,Zoe Toh,T009,Mr Wei Ming Ng,2025-03-19,Fractions,2.0,Student showed improvement in Fractions and was more confident today.
+P0254,S006,Sophia Ho,T023,Ms Terence Koh,2025-03-20,Calculus,1.5,Student still struggles with Calculus and needs more guided practice.
+P0102,S006,Sophia Ho,T023,Ms Terence Koh,2025-03-20,Statistics,1.0,Student did not fully understand Statistics today and showed some confusion.
+P0226,S040,Jonathan Lee,T011,Mr Chloe Lee,2025-03-21,Algebra,1.5,Student was distracted during Algebra and could not apply the concepts independently.
+P0095,S039,Amelia Lim,T011,Mr Chloe Lee,2025-03-21,Geometry,2.0,Progress in Geometry remains limited. More foundational work is needed.
+P0212,S026,Zoe Ng,T013,Ms Valerie Loh,2025-03-22,Calculus,2.0,Session on Calculus was steady. Student grasped some parts but not yet fully consistent.
+P0219,S056,Charlotte Yeo,T011,Mr Chloe Lee,2025-03-23,Algebra,2.0,Student was engaged and demonstrated stronger understanding of Algebra.
+P0290,S035,Harper Wong,T025,Ms Alicia Ho,2025-03-23,Calculus,1.5,Progress in Calculus remains limited. More foundational work is needed.
+P0246,S074,Nathan Loh,T015,Mr Nicholas Lim,2025-03-23,Geometry,2.0,Progress in Geometry remains limited. More foundational work is needed.
+P0228,S009,Matthew Teo,T009,Mr Wei Ming Ng,2025-03-23,Fractions,2.0,Student still struggles with Fractions and needs more guided practice.
+P0270,S030,Isaac Goh,T016,Ms Jeremy Neo,2025-03-23,Statistics,1.0,Student was distracted during Statistics and could not apply the concepts independently.
+P0354,S063,Daniel Toh,T003,Ms Marcus Wong,2025-03-23,Statistics,2.0,Progress in Statistics remains limited. More foundational work is needed.
+P0303,S046,Harper Toh,T001,Ms Joanna Goh,2025-03-24,Geometry,1.5,Student showed improvement in Geometry and was more confident today.
+P0124,S023,Emma Chua,T023,Ms Terence Koh,2025-03-24,Statistics,2.0,Session on Statistics was steady. Student grasped some parts but not yet fully consistent.
+P0284,S036,Sophia Goh,T022,Mr Valerie Chua,2025-03-25,Statistics,2.0,Student was distracted during Statistics and could not apply the concepts independently.
+P0329,S022,Mia Toh,T021,Ms Serene Loh,2025-03-25,Fractions,2.0,Student was distracted during Fractions and could not apply the concepts independently.
+P0200,S062,Joshua Ng,T010,Ms Serene Toh,2025-03-25,Algebra,2.0,Student was engaged and demonstrated stronger understanding of Algebra.
+P0105,S030,Isaac Goh,T017,Mr Aaron Ong,2025-03-25,Geometry,1.0,Student still struggles with Geometry and needs more guided practice.
+P0113,S032,Zoe Toh,T015,Mr Nicholas Lim,2025-03-25,Algebra,1.0,Student was distracted during Algebra and could not apply the concepts independently.
+P0274,S047,Ella Tan,T009,Mr Wei Ming Ng,2025-03-26,Geometry,2.0,Student still struggles with Geometry and needs more guided practice.
+P0055,S023,Emma Chua,T003,Ms Marcus Wong,2025-03-27,Algebra,1.0,Student did not fully understand Algebra today and showed some confusion.
+P0268,S020,Zoe Lee,T023,Ms Terence Koh,2025-03-27,Fractions,1.5,Worked through Fractions. More repetition will be needed to build confidence.
+P0139,S004,David Goh,T025,Ms Alicia Ho,2025-03-28,Calculus,2.0,Student still struggles with Calculus and needs more guided practice.
+P0312,S010,Sarah Toh,T006,Ms Sabrina Lim,2025-03-28,Algebra,1.5,Student was able to follow Algebra with guidance but still needs practice.
+P0238,S024,Sophia Wong,T019,Ms Terence Loh,2025-03-28,Fractions,2.0,Student still struggles with Fractions and needs more guided practice.
+P0090,S009,Matthew Teo,T012,Ms Alicia Koh,2025-03-31,Geometry,1.0,Student was able to follow Geometry with guidance but still needs practice.
+P0203,S045,Aiden Ng,T006,Ms Sabrina Lim,2025-04-01,Algebra,2.0,Worked through Algebra. More repetition will be needed to build confidence.
+P0179,S001,Isabella Tan,T021,Ms Serene Loh,2025-04-01,Statistics,1.0,Clear improvement in Statistics; can move towards more advanced questions next lesson.
+P0193,S030,Isaac Goh,T024,Mr Brandon Koh,2025-04-02,Geometry,1.0,Progress in Geometry remains limited. More foundational work is needed.
+P0052,S046,Harper Toh,T014,Mr Aaron Teo,2025-04-02,Statistics,1.0,Student was distracted during Statistics and could not apply the concepts independently.
+P0013,S021,Isaac Chua,T024,Mr Brandon Koh,2025-04-02,Geometry,1.5,Student was distracted during Geometry and could not apply the concepts independently.
+P0147,S032,Zoe Toh,T017,Mr Aaron Ong,2025-04-03,Statistics,1.0,Progress in Statistics remains limited. More foundational work is needed.
+P0319,S018,Joshua Ho,T012,Ms Alicia Koh,2025-04-03,Geometry,2.0,Student was able to follow Geometry with guidance but still needs practice.
+P0208,S066,Ella Ho,T015,Mr Nicholas Lim,2025-04-03,Geometry,1.5,Student still struggles with Geometry and needs more guided practice.
+P0051,S039,Amelia Lim,T015,Mr Nicholas Lim,2025-04-03,Fractions,1.0,Progress in Fractions remains limited. More foundational work is needed.
+P0224,S012,Sarah Ho,T023,Ms Terence Koh,2025-04-03,Algebra,2.0,Progress in Algebra remains limited. More foundational work is needed.
+P0037,S068,Benjamin Wong,T021,Ms Serene Loh,2025-04-04,Statistics,1.0,Student was distracted during Statistics and could not apply the concepts independently.
+P0033,S067,Sarah Loh,T025,Ms Alicia Ho,2025-04-04,Statistics,2.0,Progress in Statistics remains limited. More foundational work is needed.
+P0039,S050,Olivia Wong,T011,Mr Chloe Lee,2025-04-05,Calculus,2.0,Progress in Calculus remains limited. More foundational work is needed.
+P0265,S079,Grace Loh,T009,Mr Wei Ming Ng,2025-04-06,Calculus,1.5,Session on Calculus was steady. Student grasped some parts but not yet fully consistent.
+P0138,S046,Harper Toh,T012,Ms Alicia Koh,2025-04-06,Geometry,1.5,Student was distracted during Geometry and could not apply the concepts independently.
+P0324,S056,Charlotte Yeo,T019,Ms Terence Loh,2025-04-06,Calculus,1.5,Student was distracted during Calculus and could not apply the concepts independently.
+P0168,S038,Sarah Teo,T022,Mr Valerie Chua,2025-04-06,Algebra,1.0,Covered Algebra. Student showed partial understanding and needs more reinforcement.
+P0210,S045,Aiden Ng,T025,Ms Alicia Ho,2025-04-06,Geometry,1.5,Covered Geometry. Student showed partial understanding and needs more reinforcement.
+P0167,S040,Jonathan Lee,T014,Mr Aaron Teo,2025-04-06,Statistics,1.0,Student was distracted during Statistics and could not apply the concepts independently.
+P0285,S054,Noah Toh,T017,Mr Aaron Ong,2025-04-07,Statistics,1.5,Student was able to follow Statistics with guidance but still needs practice.
+P0340,S042,Noah Wong,T016,Ms Jeremy Neo,2025-04-07,Calculus,1.5,Student showed improvement in Calculus and was more confident today.
+P0278,S047,Ella Tan,T010,Ms Serene Toh,2025-04-08,Statistics,1.0,Student did not fully understand Statistics today and showed some confusion.
+P0381,S006,Sophia Ho,T012,Ms Alicia Koh,2025-04-08,Fractions,2.0,Student did not fully understand Fractions today and showed some confusion.
+P0374,S004,David Goh,T024,Mr Brandon Koh,2025-04-08,Geometry,1.5,Progress in Geometry remains limited. More foundational work is needed.
+P0016,S043,Nathan Goh,T003,Ms Marcus Wong,2025-04-08,Algebra,2.0,Student did not fully understand Algebra today and showed some confusion.
+P0040,S045,Aiden Ng,T012,Ms Alicia Koh,2025-04-08,Statistics,2.0,Progress in Statistics remains limited. More foundational work is needed.
+P0023,S031,Jonathan Goh,T023,Ms Terence Koh,2025-04-08,Fractions,2.0,Progress in Fractions remains limited. More foundational work is needed.
+P0022,S051,Grace Koh,T023,Ms Terence Koh,2025-04-09,Fractions,1.5,Student still struggles with Fractions and needs more guided practice.
+P0141,S051,Grace Koh,T012,Ms Alicia Koh,2025-04-09,Statistics,1.5,Progress in Statistics remains limited. More foundational work is needed.
+P0255,S061,Noah Chua,T005,Mr Amanda Chua,2025-04-11,Algebra,2.0,Student was distracted during Algebra and could not apply the concepts independently.
+P0006,S056,Charlotte Yeo,T020,Ms Hannah Neo,2025-04-12,Statistics,2.0,Student still struggles with Statistics and needs more guided practice.
+P0109,S055,David Koh,T006,Ms Sabrina Lim,2025-04-12,Algebra,2.0,Student still struggles with Algebra and needs more guided practice.
+P0025,S006,Sophia Ho,T025,Ms Alicia Ho,2025-04-12,Algebra,1.5,Covered Algebra. Student showed partial understanding and needs more reinforcement.
+P0191,S020,Zoe Lee,T011,Mr Chloe Lee,2025-04-12,Statistics,2.0,Clear improvement in Statistics; can move towards more advanced questions next lesson.
+P0314,S020,Zoe Lee,T010,Ms Serene Toh,2025-04-13,Algebra,2.0,Covered Algebra. Student showed partial understanding and needs more reinforcement.
+P0313,S035,Harper Wong,T005,Mr Amanda Chua,2025-04-14,Fractions,1.5,Progress in Fractions remains limited. More foundational work is needed.
+P0398,S046,Harper Toh,T003,Ms Marcus Wong,2025-04-14,Geometry,1.5,Student did not fully understand Geometry today and showed some confusion.
+P0321,S048,Isabella Chua,T005,Mr Amanda Chua,2025-04-14,Fractions,2.0,Session on Fractions was steady. Student grasped some parts but not yet fully consistent.
+P0260,S017,Olivia Chua,T025,Ms Alicia Ho,2025-04-14,Geometry,1.5,Student still struggles with Geometry and needs more guided practice.
+P0049,S001,Isabella Tan,T016,Ms Jeremy Neo,2025-04-15,Calculus,1.5,Student still struggles with Calculus and needs more guided practice.
+P0388,S017,Olivia Chua,T006,Ms Sabrina Lim,2025-04-16,Algebra,1.0,Student did not fully understand Algebra today and showed some confusion.
+P0227,S013,Noah Yeo,T001,Ms Joanna Goh,2025-04-16,Statistics,1.5,Covered Statistics. Student showed partial understanding and needs more reinforcement.
+P0075,S004,David Goh,T010,Ms Serene Toh,2025-04-16,Fractions,1.5,Worked through Fractions. More repetition will be needed to build confidence.
+P0082,S061,Noah Chua,T021,Ms Serene Loh,2025-04-16,Algebra,1.5,Clear improvement in Algebra; can move towards more advanced questions next lesson.
+P0305,S022,Mia Toh,T002,Mr Nicholas Tan,2025-04-17,Fractions,1.0,Covered Fractions. Student showed partial understanding and needs more reinforcement.
+P0076,S058,Chloe Teo,T015,Mr Nicholas Lim,2025-04-17,Calculus,2.0,Student showed improvement in Calculus and was more confident today.
+P0166,S019,Liam Chua,T013,Ms Valerie Loh,2025-04-17,Algebra,1.0,Worked through Algebra. More repetition will be needed to build confidence.
+P0063,S002,Ethan Wong,T017,Mr Aaron Ong,2025-04-18,Fractions,2.0,Student still struggles with Fractions and needs more guided practice.
+P0348,S008,Ryan Toh,T011,Mr Chloe Lee,2025-04-18,Algebra,2.0,Student still struggles with Algebra and needs more guided practice.
+P0339,S020,Zoe Lee,T008,Ms Jasmine Loh,2025-04-18,Fractions,1.5,Clear improvement in Fractions; can move towards more advanced questions next lesson.
+P0251,S035,Harper Wong,T018,Ms Melissa Lim,2025-04-18,Statistics,1.0,Student did not fully understand Statistics today and showed some confusion.
+P0345,S054,Noah Toh,T011,Mr Chloe Lee,2025-04-19,Statistics,2.0,Student was distracted during Statistics and could not apply the concepts independently.
+P0336,S033,Ethan Lim,T002,Mr Nicholas Tan,2025-04-19,Algebra,1.5,Student still struggles with Algebra and needs more guided practice.
+P0077,S023,Emma Chua,T024,Mr Brandon Koh,2025-04-20,Geometry,1.5,Session on Geometry was steady. Student grasped some parts but not yet fully consistent.
+P0068,S016,Hannah Toh,T017,Mr Aaron Ong,2025-04-20,Calculus,2.0,Covered Calculus. Student showed partial understanding and needs more reinforcement.
+P0106,S015,Samuel Koh,T010,Ms Serene Toh,2025-04-21,Calculus,1.0,Student did not fully understand Calculus today and showed some confusion.
+P0259,S069,Ella Goh,T001,Ms Joanna Goh,2025-04-21,Algebra,1.0,Progress in Algebra remains limited. More foundational work is needed.
+P0073,S053,Caleb Koh,T011,Mr Chloe Lee,2025-04-21,Statistics,1.0,Covered Statistics. Student showed partial understanding and needs more reinforcement.
+P0231,S025,Lucas Neo,T002,Mr Nicholas Tan,2025-04-21,Fractions,2.0,Student still struggles with Fractions and needs more guided practice.
+P0115,S014,Nathan Ng,T010,Ms Serene Toh,2025-04-22,Fractions,2.0,Worked through Fractions. More repetition will be needed to build confidence.
+P0003,S034,Daniel Loh,T004,Mr Aaron Goh,2025-04-23,Algebra,1.0,Clear improvement in Algebra; can move towards more advanced questions next lesson.
+P0195,S020,Zoe Lee,T010,Ms Serene Toh,2025-04-23,Calculus,1.5,Session on Calculus was steady. Student grasped some parts but not yet fully consistent.
+P0125,S046,Harper Toh,T002,Mr Nicholas Tan,2025-04-23,Fractions,1.0,Student was distracted during Fractions and could not apply the concepts independently.
+P0244,S032,Zoe Toh,T010,Ms Serene Toh,2025-04-23,Fractions,1.5,Clear improvement in Fractions; can move towards more advanced questions next lesson.
+P0030,S029,Aiden Lim,T010,Ms Serene Toh,2025-04-23,Geometry,1.0,Progress in Geometry remains limited. More foundational work is needed.
+P0158,S053,Caleb Koh,T021,Ms Serene Loh,2025-04-23,Statistics,1.5,Progress in Statistics remains limited. More foundational work is needed.
+P0020,S061,Noah Chua,T025,Ms Alicia Ho,2025-04-24,Algebra,1.5,Progress in Algebra remains limited. More foundational work is needed.
+P0099,S069,Ella Goh,T024,Mr Brandon Koh,2025-04-24,Calculus,1.5,Progress in Calculus remains limited. More foundational work is needed.
+P0202,S030,Isaac Goh,T017,Mr Aaron Ong,2025-04-24,Fractions,1.5,Student was distracted during Fractions and could not apply the concepts independently.
+P0098,S074,Nathan Loh,T021,Ms Serene Loh,2025-04-24,Geometry,2.0,Worked through Geometry. More repetition will be needed to build confidence.
+P0069,S015,Samuel Koh,T023,Ms Terence Koh,2025-04-24,Calculus,1.0,Covered Calculus. Student showed partial understanding and needs more reinforcement.
+P0155,S046,Harper Toh,T008,Ms Jasmine Loh,2025-04-24,Fractions,2.0,Student was engaged and demonstrated stronger understanding of Fractions.
+P0317,S013,Noah Yeo,T019,Ms Terence Loh,2025-04-25,Fractions,1.5,Progress in Fractions remains limited. More foundational work is needed.
+P0201,S027,Caleb Loh,T023,Ms Terence Koh,2025-04-25,Geometry,2.0,Student was distracted during Geometry and could not apply the concepts independently.
+P0326,S020,Zoe Lee,T007,Mr Aaron Chew,2025-04-25,Statistics,2.0,Session on Statistics was steady. Student grasped some parts but not yet fully consistent.
+P0249,S035,Harper Wong,T005,Mr Amanda Chua,2025-04-26,Geometry,1.0,Student did not fully understand Geometry today and showed some confusion.
+P0128,S008,Ryan Toh,T018,Ms Melissa Lim,2025-04-26,Calculus,1.0,Student showed improvement in Calculus and was more confident today.
+P0134,S059,Grace Ong,T022,Mr Valerie Chua,2025-04-26,Algebra,1.0,Progress in Algebra remains limited. More foundational work is needed.
+P0094,S064,Isabella Teo,T014,Mr Aaron Teo,2025-04-27,Calculus,1.5,Student did not fully understand Calculus today and showed some confusion.
+P0390,S066,Ella Ho,T015,Mr Nicholas Lim,2025-04-27,Statistics,1.5,Student still struggles with Statistics and needs more guided practice.
+P0243,S017,Olivia Chua,T018,Ms Melissa Lim,2025-04-27,Geometry,1.0,Student still struggles with Geometry and needs more guided practice.
+P0047,S055,David Koh,T019,Ms Terence Loh,2025-04-27,Calculus,1.5,Student was distracted during Calculus and could not apply the concepts independently.
+P0176,S049,Amelia Yeo,T019,Ms Terence Loh,2025-04-28,Statistics,1.0,Student still struggles with Statistics and needs more guided practice.
+P0043,S061,Noah Chua,T012,Ms Alicia Koh,2025-04-29,Algebra,2.0,Progress in Algebra remains limited. More foundational work is needed.
+P0187,S006,Sophia Ho,T016,Ms Jeremy Neo,2025-04-29,Fractions,2.0,Worked through Fractions. More repetition will be needed to build confidence.
+P0019,S047,Ella Tan,T003,Ms Marcus Wong,2025-04-30,Algebra,1.5,Good progress in Algebra. Student understood the practice questions better.
+P0229,S062,Joshua Ng,T012,Ms Alicia Koh,2025-04-30,Calculus,2.0,Progress in Calculus remains limited. More foundational work is needed.
+P0182,S080,Emma Ho,T001,Ms Joanna Goh,2025-05-01,Calculus,1.0,Student was distracted during Calculus and could not apply the concepts independently.
+P0258,S038,Sarah Teo,T025,Ms Alicia Ho,2025-05-01,Statistics,1.5,Student still struggles with Statistics and needs more guided practice.
+P0300,S076,Harper Ong,T024,Mr Brandon Koh,2025-05-01,Geometry,1.0,Good progress in Geometry. Student understood the practice questions better.
+P0005,S015,Samuel Koh,T016,Ms Jeremy Neo,2025-05-01,Algebra,1.5,Progress in Algebra remains limited. More foundational work is needed.
+P0157,S005,Zoe Yeo,T001,Ms Joanna Goh,2025-05-01,Geometry,1.0,Session on Geometry was steady. Student grasped some parts but not yet fully consistent.
+P0064,S048,Isabella Chua,T005,Mr Amanda Chua,2025-05-02,Algebra,1.5,Progress in Algebra remains limited. More foundational work is needed.
+P0276,S009,Matthew Teo,T011,Mr Chloe Lee,2025-05-02,Statistics,1.5,Student did not fully understand Statistics today and showed some confusion.
+P0133,S079,Grace Loh,T008,Ms Jasmine Loh,2025-05-02,Geometry,2.0,Student did not fully understand Geometry today and showed some confusion.
+P0302,S002,Ethan Wong,T011,Mr Chloe Lee,2025-05-03,Calculus,2.0,Student did not fully understand Calculus today and showed some confusion.
+P0295,S074,Nathan Loh,T002,Mr Nicholas Tan,2025-05-03,Geometry,1.0,Student did not fully understand Geometry today and showed some confusion.
+P0085,S032,Zoe Toh,T020,Ms Hannah Neo,2025-05-04,Fractions,1.0,Covered Fractions. Student showed partial understanding and needs more reinforcement.
+P0391,S062,Joshua Ng,T010,Ms Serene Toh,2025-05-04,Statistics,2.0,Clear improvement in Statistics; can move towards more advanced questions next lesson.
+P0287,S060,Grace Tan,T006,Ms Sabrina Lim,2025-05-04,Geometry,1.0,Student did not fully understand Geometry today and showed some confusion.
+P0383,S043,Nathan Goh,T021,Ms Serene Loh,2025-05-06,Geometry,2.0,Student was distracted during Geometry and could not apply the concepts independently.
+P0306,S063,Daniel Toh,T008,Ms Jasmine Loh,2025-05-07,Calculus,1.0,Student was engaged and demonstrated stronger understanding of Calculus.
+P0123,S025,Lucas Neo,T003,Ms Marcus Wong,2025-05-07,Fractions,1.5,Clear improvement in Fractions; can move towards more advanced questions next lesson.
+P0358,S056,Charlotte Yeo,T014,Mr Aaron Teo,2025-05-07,Statistics,1.0,Progress in Statistics remains limited. More foundational work is needed.
+P0196,S080,Emma Ho,T020,Ms Hannah Neo,2025-05-08,Fractions,2.0,Worked through Fractions. More repetition will be needed to build confidence.
+P0002,S050,Olivia Wong,T011,Mr Chloe Lee,2025-05-09,Fractions,2.0,Progress in Fractions remains limited. More foundational work is needed.
+P0159,S055,David Koh,T022,Mr Valerie Chua,2025-05-09,Calculus,2.0,Worked through Calculus. More repetition will be needed to build confidence.
+P0282,S076,Harper Ong,T016,Ms Jeremy Neo,2025-05-09,Calculus,2.0,Clear improvement in Calculus; can move towards more advanced questions next lesson.
+P0353,S029,Aiden Lim,T022,Mr Valerie Chua,2025-05-09,Fractions,1.5,Student did not fully understand Fractions today and showed some confusion.
+P0135,S015,Samuel Koh,T015,Mr Nicholas Lim,2025-05-10,Algebra,2.0,Student was able to follow Algebra with guidance but still needs practice.
+P0130,S060,Grace Tan,T008,Ms Jasmine Loh,2025-05-10,Statistics,1.5,Student was distracted during Statistics and could not apply the concepts independently.
+P0127,S043,Nathan Goh,T017,Mr Aaron Ong,2025-05-10,Geometry,1.0,Progress in Geometry remains limited. More foundational work is needed.
+P0263,S067,Sarah Loh,T020,Ms Hannah Neo,2025-05-10,Calculus,1.5,Student was engaged and demonstrated stronger understanding of Calculus.
+P0328,S032,Zoe Toh,T014,Mr Aaron Teo,2025-05-10,Statistics,1.0,Student did not fully understand Statistics today and showed some confusion.
+P0309,S019,Liam Chua,T016,Ms Jeremy Neo,2025-05-10,Fractions,1.5,Progress in Fractions remains limited. More foundational work is needed.
+P0119,S046,Harper Toh,T024,Mr Brandon Koh,2025-05-11,Statistics,1.0,Progress in Statistics remains limited. More foundational work is needed.
+P0118,S042,Noah Wong,T013,Ms Valerie Loh,2025-05-11,Algebra,2.0,Covered Algebra. Student showed partial understanding and needs more reinforcement.
+P0331,S052,Zoe Tan,T007,Mr Aaron Chew,2025-05-11,Algebra,1.5,Student still struggles with Algebra and needs more guided practice.
+P0272,S060,Grace Tan,T025,Ms Alicia Ho,2025-05-11,Statistics,2.0,Clear improvement in Statistics; can move towards more advanced questions next lesson.
+P0222,S018,Joshua Ho,T010,Ms Serene Toh,2025-05-11,Geometry,1.0,Student still struggles with Geometry and needs more guided practice.
+P0205,S037,Hannah Lim,T002,Mr Nicholas Tan,2025-05-12,Geometry,2.0,Student was able to follow Geometry with guidance but still needs practice.
+P0100,S069,Ella Goh,T017,Mr Aaron Ong,2025-05-12,Fractions,1.0,Session on Fractions was steady. Student grasped some parts but not yet fully consistent.
+P0269,S047,Ella Tan,T019,Ms Terence Loh,2025-05-12,Fractions,1.0,Session on Fractions was steady. Student grasped some parts but not yet fully consistent.
+P0164,S028,Aiden Yeo,T001,Ms Joanna Goh,2025-05-12,Calculus,1.0,Student was distracted during Calculus and could not apply the concepts independently.
+P0214,S045,Aiden Ng,T023,Ms Terence Koh,2025-05-13,Calculus,1.5,Student still struggles with Calculus and needs more guided practice.
+P0232,S069,Ella Goh,T022,Mr Valerie Chua,2025-05-13,Algebra,1.0,Progress in Algebra remains limited. More foundational work is needed.
+P0234,S017,Olivia Chua,T016,Ms Jeremy Neo,2025-05-13,Geometry,1.5,Student still struggles with Geometry and needs more guided practice.
+P0197,S073,Isabella Loh,T011,Mr Chloe Lee,2025-05-13,Geometry,1.5,Student still struggles with Geometry and needs more guided practice.
+P0146,S027,Caleb Loh,T004,Mr Aaron Goh,2025-05-15,Fractions,1.0,Student was distracted during Fractions and could not apply the concepts independently.
+P0181,S022,Mia Toh,T018,Ms Melissa Lim,2025-05-15,Algebra,2.0,Student still struggles with Algebra and needs more guided practice.
+P0137,S043,Nathan Goh,T018,Ms Melissa Lim,2025-05-15,Calculus,2.0,Student did not fully understand Calculus today and showed some confusion.
+P0359,S042,Noah Wong,T015,Mr Nicholas Lim,2025-05-15,Calculus,1.5,Student was distracted during Calculus and could not apply the concepts independently.
+P0072,S070,Jonathan Wong,T013,Ms Valerie Loh,2025-05-16,Calculus,1.5,Student was distracted during Calculus and could not apply the concepts independently.
+P0093,S074,Nathan Loh,T006,Ms Sabrina Lim,2025-05-16,Algebra,1.0,Student was distracted during Algebra and could not apply the concepts independently.
+P0007,S066,Ella Ho,T004,Mr Aaron Goh,2025-05-17,Geometry,1.5,Progress in Geometry remains limited. More foundational work is needed.
+P0107,S058,Chloe Teo,T002,Mr Nicholas Tan,2025-05-17,Calculus,2.0,Student was able to follow Calculus with guidance but still needs practice.
+P0286,S030,Isaac Goh,T018,Ms Melissa Lim,2025-05-17,Calculus,1.5,Progress in Calculus remains limited. More foundational work is needed.
+P0367,S073,Isabella Loh,T019,Ms Terence Loh,2025-05-18,Algebra,2.0,Student did not fully understand Algebra today and showed some confusion.
+P0361,S069,Ella Goh,T017,Mr Aaron Ong,2025-05-18,Fractions,1.5,Student did not fully understand Fractions today and showed some confusion.
+P0177,S016,Hannah Toh,T004,Mr Aaron Goh,2025-05-18,Calculus,1.0,Good progress in Calculus. Student understood the practice questions better.
+P0151,S007,Noah Loh,T004,Mr Aaron Goh,2025-05-19,Statistics,2.0,Student still struggles with Statistics and needs more guided practice.
+P0386,S073,Isabella Loh,T008,Ms Jasmine Loh,2025-05-19,Fractions,2.0,Student still struggles with Fractions and needs more guided practice.
+P0008,S055,David Koh,T013,Ms Valerie Loh,2025-05-19,Calculus,1.0,Student showed improvement in Calculus and was more confident today.
+P0059,S001,Isabella Tan,T002,Mr Nicholas Tan,2025-05-19,Fractions,1.5,Student did not fully understand Fractions today and showed some confusion.
+P0352,S051,Grace Koh,T023,Ms Terence Koh,2025-05-19,Fractions,1.0,Student still struggles with Fractions and needs more guided practice.
+P0292,S071,Joshua Neo,T007,Mr Aaron Chew,2025-05-20,Statistics,1.5,Student was distracted during Statistics and could not apply the concepts independently.
+P0241,S043,Nathan Goh,T007,Mr Aaron Chew,2025-05-20,Calculus,1.5,Progress in Calculus remains limited. More foundational work is needed.
+P0220,S027,Caleb Loh,T015,Mr Nicholas Lim,2025-05-21,Algebra,2.0,Progress in Algebra remains limited. More foundational work is needed.
+P0301,S074,Nathan Loh,T016,Ms Jeremy Neo,2025-05-21,Algebra,1.0,Student was distracted during Algebra and could not apply the concepts independently.
+P0382,S038,Sarah Teo,T001,Ms Joanna Goh,2025-05-21,Calculus,2.0,Session on Calculus was steady. Student grasped some parts but not yet fully consistent.
+P0262,S054,Noah Toh,T019,Ms Terence Loh,2025-05-22,Geometry,1.5,Student still struggles with Geometry and needs more guided practice.
+P0131,S046,Harper Toh,T015,Mr Nicholas Lim,2025-05-22,Statistics,2.0,Student still struggles with Statistics and needs more guided practice.
+P0230,S073,Isabella Loh,T022,Mr Valerie Chua,2025-05-22,Fractions,2.0,Student did not fully understand Fractions today and showed some confusion.
+P0225,S005,Zoe Yeo,T009,Mr Wei Ming Ng,2025-05-22,Calculus,1.0,Covered Calculus. Student showed partial understanding and needs more reinforcement.
+P0162,S079,Grace Loh,T001,Ms Joanna Goh,2025-05-22,Geometry,1.0,Covered Geometry. Student showed partial understanding and needs more reinforcement.
+P0088,S047,Ella Tan,T006,Ms Sabrina Lim,2025-05-23,Statistics,1.0,Session on Statistics was steady. Student grasped some parts but not yet fully consistent.
+P0288,S003,Amelia Goh,T023,Ms Terence Koh,2025-05-23,Geometry,1.5,Student was able to follow Geometry with guidance but still needs practice.
+P0081,S057,Ethan Ho,T021,Ms Serene Loh,2025-05-23,Fractions,1.0,Progress in Fractions remains limited. More foundational work is needed.
+P0086,S060,Grace Tan,T005,Mr Amanda Chua,2025-05-23,Geometry,1.5,Student still struggles with Geometry and needs more guided practice.
+P0364,S067,Sarah Loh,T012,Ms Alicia Koh,2025-05-23,Calculus,2.0,Student was able to follow Calculus with guidance but still needs practice.
+P0108,S061,Noah Chua,T005,Mr Amanda Chua,2025-05-24,Statistics,2.0,Session on Statistics was steady. Student grasped some parts but not yet fully consistent.
+P0042,S061,Noah Chua,T023,Ms Terence Koh,2025-05-24,Statistics,1.5,Student did not fully understand Statistics today and showed some confusion.
+P0145,S049,Amelia Yeo,T021,Ms Serene Loh,2025-05-24,Geometry,1.5,Progress in Geometry remains limited. More foundational work is needed.
+P0333,S043,Nathan Goh,T017,Mr Aaron Ong,2025-05-25,Calculus,1.0,Student was distracted during Calculus and could not apply the concepts independently.
+P0327,S012,Sarah Ho,T012,Ms Alicia Koh,2025-05-25,Algebra,1.0,Student still struggles with Algebra and needs more guided practice.
+P0091,S006,Sophia Ho,T021,Ms Serene Loh,2025-05-25,Fractions,2.0,Worked through Fractions. More repetition will be needed to build confidence.
+P0240,S002,Ethan Wong,T023,Ms Terence Koh,2025-05-27,Fractions,1.5,Student still struggles with Fractions and needs more guided practice.
+P0304,S068,Benjamin Wong,T007,Mr Aaron Chew,2025-05-27,Algebra,1.0,Student still struggles with Algebra and needs more guided practice.
+P0279,S049,Amelia Yeo,T003,Ms Marcus Wong,2025-05-27,Algebra,2.0,Student still struggles with Algebra and needs more guided practice.
+P0132,S021,Isaac Chua,T001,Ms Joanna Goh,2025-05-27,Calculus,2.0,Student did not fully understand Calculus today and showed some confusion.
+P0087,S040,Jonathan Lee,T014,Mr Aaron Teo,2025-05-27,Geometry,1.0,Student was distracted during Geometry and could not apply the concepts independently.
+P0252,S006,Sophia Ho,T025,Ms Alicia Ho,2025-05-28,Geometry,2.0,Progress in Geometry remains limited. More foundational work is needed.
+P0111,S009,Matthew Teo,T017,Mr Aaron Ong,2025-05-28,Geometry,1.5,Clear improvement in Geometry; can move towards more advanced questions next lesson.
+P0185,S079,Grace Loh,T015,Mr Nicholas Lim,2025-05-29,Algebra,2.0,Session on Algebra was steady. Student grasped some parts but not yet fully consistent.
+P0318,S018,Joshua Ho,T008,Ms Jasmine Loh,2025-05-30,Geometry,2.0,Student still struggles with Geometry and needs more guided practice.
+P0071,S010,Sarah Toh,T011,Mr Chloe Lee,2025-05-30,Geometry,2.0,Session on Geometry was steady. Student grasped some parts but not yet fully consistent.
+P0277,S015,Samuel Koh,T019,Ms Terence Loh,2025-05-30,Algebra,1.5,Student did not fully understand Algebra today and showed some confusion.
+P0275,S051,Grace Koh,T021,Ms Serene Loh,2025-05-30,Calculus,1.5,Student still struggles with Calculus and needs more guided practice.
+P0017,S044,Nathan Wong,T021,Ms Serene Loh,2025-05-30,Calculus,1.0,Student did not fully understand Calculus today and showed some confusion.

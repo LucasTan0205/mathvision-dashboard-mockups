@@ -1,0 +1,26 @@
+tutor_id,tutor_name,tutor_type,primary_curriculum,specialty_topic,years_experience,rating,available_slots,preferred_min_grade,preferred_max_grade,past_success_rate,branch
+T001,Ms Joanna Goh,part-time,IB,Calculus,1,4.08,Mon_17;Mon_19;Sat_10;Wed_18,8,12,0.94,East
+T002,Mr Nicholas Tan,full-time,Local,Calculus,3,3.58,Mon_19;Tue_16;Wed_18,5,8,0.68,West
+T003,Ms Marcus Wong,part-time,IGCSE,Algebra,6,3.84,Mon_17;Sat_10,7,10,0.93,Central
+T004,Mr Aaron Goh,part-time,Local,Statistics,4,4.2,Mon_19;Sat_10;Tue_16,5,9,0.79,East
+T005,Mr Amanda Chua,instructor,IGCSE,Calculus,7,4.91,Mon_17;Mon_19,5,7,0.59,West
+T006,Ms Sabrina Lim,full-time,IGCSE,Geometry,2,4.26,Mon_17;Mon_19;Wed_18,9,11,0.59,West
+T007,Mr Aaron Chew,full-time,IGCSE,Geometry,8,4.2,Mon_17;Mon_19;Sat_10;Tue_16,8,12,0.88,Central
+T008,Ms Jasmine Loh,part-time,IB,Geometry,3,4.23,Mon_19;Sat_10;Tue_16,7,10,0.9,East
+T009,Mr Wei Ming Ng,part-time,IB,Calculus,4,4.54,Mon_17;Sat_10;Tue_16;Wed_18,7,11,0.67,West
+T010,Ms Serene Toh,full-time,IB,Calculus,6,4.03,Mon_19;Sat_10;Tue_16,6,9,0.64,East
+T011,Mr Chloe Lee,part-time,IB,Geometry,5,4.97,Mon_19;Tue_16,6,9,0.69,West
+T012,Ms Alicia Koh,part-time,Local,Statistics,5,4.55,Mon_17;Wed_18,5,9,0.9,East
+T013,Ms Valerie Loh,part-time,Local,Geometry,8,3.67,Sat_10;Wed_18,7,10,0.58,East
+T014,Mr Aaron Teo,instructor,Local,Statistics,7,4.41,Mon_19;Sat_10;Tue_16;Wed_18,5,7,0.67,East
+T015,Mr Nicholas Lim,instructor,Local,Fractions,5,4.49,Mon_19;Sat_10,8,11,0.77,Central
+T016,Ms Jeremy Neo,part-time,IB,Geometry,8,3.61,Mon_19;Tue_16,5,8,0.72,East
+T017,Mr Aaron Ong,part-time,Local,Geometry,5,4.16,Mon_19;Tue_16;Wed_18,6,10,0.75,West
+T018,Ms Melissa Lim,full-time,IGCSE,Geometry,1,3.64,Mon_17;Mon_19;Sat_10;Tue_16,8,10,0.78,Central
+T019,Ms Terence Loh,part-time,IGCSE,Calculus,8,4.95,Mon_19;Tue_16;Wed_18,8,12,0.68,Central
+T020,Ms Hannah Neo,full-time,IB,Statistics,1,4.18,Mon_17;Sat_10;Tue_16,6,9,0.94,West
+T021,Ms Serene Loh,part-time,IGCSE,Geometry,8,4.44,Mon_19;Tue_16,9,11,0.77,West
+T022,Mr Valerie Chua,instructor,IGCSE,Fractions,3,3.97,Sat_10;Wed_18,8,12,0.59,Central
+T023,Ms Terence Koh,instructor,IB,Statistics,5,4.12,Mon_19;Sat_10;Wed_18,8,10,0.77,West
+T024,Mr Brandon Koh,part-time,IB,Geometry,5,4.73,Mon_17;Tue_16;Wed_18,6,10,0.73,West
+T025,Ms Alicia Ho,instructor,Local,Fractions,7,3.85,Mon_17;Tue_16;Wed_18,7,10,0.74,West
