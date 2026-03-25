@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TuitionHub – Tutor Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --cream:       #F5F0E8;
+  --cream-dark:  #EDE6D6;
+  --card:        #FAF7F2;
+  --sidebar-bg:  #FDFAF5;
+  --green-dark:  #2C4A3E;
+  --green-mid:   #3D6B5A;
+  --green-pale:  #E8F0EC;
+  --amber:       #C8841A;
+  --amber-light: #F9EDD5;
+  --red:         #B03A2E;
+  --red-light:   #FDECEA;
+  --blue:        #2A4A7A;
+  --blue-pale:   #E8EEF8;
+  --purple:      #5B3D8A;
+  --purple-mid:  #7B5DB0;
+  --purple-pale: #EDE8F8;
+  --purple-line: #C4B5E8;
+  --slate:       #4A5568;
+  --slate-bg:    #5A6880;
+  --text-1:      #1A1A1A;
+  --text-2:      #5A5A5A;
+  --text-3:      #9A9A9A;
+  --border:      #E2DAC8;
+  --shadow:      0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.04);
+  --shadow-lg:   0 8px 28px rgba(0,0,0,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-1);display:flex;height:100vh;overflow:hidden;user-select:none;}
+
+/* SIDEBAR */
+.sidebar{width:210px;min-width:210px;background:var(--sidebar-bg);border-right:1px solid var(--border);display:flex;flex-direction:column;}
+.sb-header{padding:22px 18px 16px;border-bottom:1px solid var(--border);}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.brand-icon{width:36px;height:36px;background:var(--green-dark);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:13px;}
+.brand-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;}
+.brand-sub{font-size:10px;color:var(--text-3);letter-spacing:.07em;text-transform:uppercase;}
+.user-pill{background:var(--cream-dark);border-radius:10px;padding:11px;display:flex;align-items:center;gap:9px;}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--green-dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;}
+.user-name{font-size:13px;font-weight:600;}
+.user-role{font-size:10px;color:var(--text-3);margin-top:1px;}
+.sb-nav{padding:16px 12px;flex:1;}
+.nav-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);padding:0 6px;margin-bottom:6px;}
+.nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;cursor:pointer;color:var(--text-2);font-size:13px;margin-bottom:2px;transition:background .15s;}
+.nav-item:hover{background:var(--cream-dark);color:var(--text-1);}
+.nav-item.active{background:var(--green-dark);color:#fff;}
+.nav-icon{width:15px;height:15px;opacity:.8;flex-shrink:0;}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.topbar{background:var(--sidebar-bg);border-bottom:1px solid var(--border);padding:0 24px;height:54px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.breadcrumb{font-size:13px;color:var(--text-3);}
+.breadcrumb span{color:var(--text-1);font-weight:500;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.notif{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--cream-dark);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;font-size:13px;}
+.notif-dot{position:absolute;top:-2px;right:-2px;width:11px;height:11px;background:var(--amber);border-radius:50%;font-size:7px;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;}
+
+.content{flex:1;overflow-y:auto;padding:24px;}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:800;}
+.cal-sub{font-size:12px;color:var(--text-3);margin-top:2px;}
+.header-right{display:flex;align-items:center;gap:8px;}
+.btn{border:none;border-radius:10px;padding:7px 15px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .15s;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text-2);}
+.btn-outline:hover{background:var(--cream-dark);}
+.btn-primary{background:var(--green-dark);color:#fff;}
+.btn-primary:hover{background:var(--green-mid);}
+.btn-purple{background:var(--purple);color:#fff;}
+.btn-purple:hover{background:var(--purple-mid);}
+.btn-sm{padding:5px 12px;font-size:11px;}
+
+/* INFO BANNER */
+.info-banner{display:flex;align-items:flex-start;gap:10px;background:var(--purple-pale);border:1px solid var(--purple-line);border-radius:11px;padding:12px 16px;margin-bottom:14px;font-size:12px;color:var(--purple);}
+.info-banner strong{font-weight:600;}
+.info-banner-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+
+/* Week date display */
+.week-display{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:var(--text-1);margin-bottom:10px;letter-spacing:-.01em;text-align:center;}
+
+/* LEGEND */
+.legend{display:flex;align-items:center;gap:14px;margin-bottom:12px;flex-wrap:wrap;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-2);}
+.leg-dot{width:9px;height:9px;border-radius:2px;}
+
+/* GRID */
+.tt-nav-wrap{display:flex;align-items:flex-start;gap:10px;}
+.tt-outer{flex:1;background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);}
+.tt-side-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--text-2);flex-shrink:0;transition:background .15s;margin-top:11px;}
+.tt-side-btn:hover{background:var(--cream-dark);}
+.tt-grid{display:grid;grid-template-columns:52px repeat(7,1fr);}
+.hcell{padding:10px 6px;text-align:center;border-bottom:1px solid var(--border);font-size:10px;font-weight:600;color:var(--text-3);letter-spacing:.05em;}
+.hcell.today-h{color:var(--green-dark);}
+.day-num{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--text-1);display:block;line-height:1.2;}
+.hcell.today-h .day-num{color:var(--green-dark);}
+.today-pip{display:inline-block;width:4px;height:4px;background:var(--green-dark);border-radius:50%;margin-left:3px;vertical-align:middle;}
+.tcell{padding:0 5px;font-size:9px;color:var(--text-3);border-right:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;align-items:flex-start;padding-top:3px;height:34px;}
+.tcell.half{border-bottom:1px dashed #E8E0CE;}
+.slot{height:34px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;transition:background .08s;}
+.slot.half-hour{border-bottom:1px dashed #E8E0CE;}
+
+/* Select in avail mode */
+body.avail-mode .slot.open{cursor:crosshair;}
+body.avail-mode .slot.open:hover{background:rgba(91,61,138,.06);}
+.slot.selecting{background:rgba(91,61,138,.18)!important;}
+
+.slot.avail-locked{cursor:not-allowed!important;background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,.028) 4px,rgba(0,0,0,.028) 8px)!important;}
+.slot.avail-locked:hover{background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,.028) 4px,rgba(0,0,0,.028) 8px)!important;}
+.hcell.avail-locked-h{opacity:.55;}
+.locked-badge{display:block;font-size:8px;font-weight:600;letter-spacing:.03em;background:var(--cream-dark);color:var(--text-3);border-radius:4px;padding:2px 5px;margin-top:4px;}
+
+/* Selection bar */
+.sel-bar{display:none;align-items:center;gap:10px;background:var(--purple-pale);border:1px solid var(--purple-line);border-radius:11px;padding:10px 16px;margin-bottom:14px;animation:fadeIn .2s ease;}
+.sel-bar.visible{display:flex;}
+.sel-bar-text{flex:1;font-size:12px;color:var(--purple);}
+.sel-bar-text strong{color:var(--purple);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-3px);}to{opacity:1;transform:none;}}
+
+/* SESSION BLOCKS */
+.sess-block{position:absolute;left:3px;right:3px;top:2px;border-radius:6px;padding:4px 7px;cursor:pointer;z-index:2;transition:opacity .15s;}
+.sess-block:hover{opacity:.82;}
+.sess-block .sb-label{font-size:9px;font-weight:600;}
+.sess-block .sb-sub{font-size:9px;margin-top:1px;}
+
+/* Availability — purple dashed */
+.sess-block.availability{background:var(--purple-pale);border:1.5px dashed var(--purple-mid);}
+.sess-block.availability .sb-label{color:var(--purple);}
+.sess-block.availability .sb-sub{color:var(--purple-mid);opacity:.75;}
+
+/* Confirmed — solid green */
+.sess-block.confirmed{background:var(--green-dark);}
+.sess-block.confirmed .sb-label{color:rgba(255,255,255,.95);}
+.sess-block.confirmed .sb-sub{color:rgba(255,255,255,.65);}
+
+/* Standby — solid slate (filled, not dashed) */
+.sess-block.standby{background:var(--slate-bg);}
+.sess-block.standby .sb-label{color:rgba(255,255,255,.95);}
+.sess-block.standby .sb-sub{color:rgba(255,255,255,.62);}
+
+/* Done — dark charcoal */
+.sess-block.done{filter:none;background:#4A4A4A!important;}
+.sess-block.done .sb-label{color:rgba(255,255,255,.85)!important;}
+.sess-block.done .sb-sub{color:rgba(255,255,255,.5)!important;}
+
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--green-dark);color:#fff;padding:11px 22px;border-radius:30px;font-size:12px;font-weight:500;opacity:0;transition:all .3s;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* OVERLAYS / POPUPS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(20,15,8,.42);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.overlay.open{display:flex;}
+.popup{background:var(--card);border-radius:20px;width:460px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.22);animation:popIn .22s cubic-bezier(.34,1.56,.64,1);}
+@keyframes popIn{from{opacity:0;transform:scale(.93) translateY(10px);}to{opacity:1;transform:none;}}
+.pop-head{padding:22px 22px 0;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.pop-close{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--cream-dark);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:var(--text-2);flex-shrink:0;}
+.pop-close:hover{background:var(--border);}
+.pop-body{padding:16px 22px 22px;}
+.pop-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:5px;}
+.pop-date{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1.2;margin-bottom:14px;}
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:14px;}
+.sp-confirmed{background:var(--green-pale);color:var(--green-dark);}
+.sp-availability{background:var(--purple-pale);color:var(--purple);}
+.sp-standby{background:#E8EBF0;color:var(--slate);}
+.sp-done{background:#EDE0F5;color:#6A3E9A;}
+.detail-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.detail-icon{font-size:14px;flex-shrink:0;width:18px;text-align:center;}
+.detail-text{font-size:13px;color:var(--text-2);}
+.detail-text strong{color:var(--text-1);}
+.divider{height:1px;background:var(--border);margin:14px 0;}
+
+/* Student card in popup */
+.stu-card-pop{background:var(--cream-dark);border-radius:12px;padding:14px 16px;margin-bottom:14px;}
+.stu-card-pop-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.stu-av{width:42px;height:42px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;}
+.stu-name{font-size:14px;font-weight:600;}
+.stu-meta{font-size:11px;color:var(--text-3);margin-top:2px;}
+.stu-card-actions{display:flex;gap:8px;margin-top:2px;}
+.stu-action-btn{font-size:11px;padding:5px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;background:var(--card);color:var(--text-2);transition:background .15s;}
+.stu-action-btn:hover{background:var(--cream);}
+.stu-action-btn.primary{background:var(--green-pale);color:var(--green-dark);border-color:transparent;}
+
+/* Standby info */
+.standby-box{background:#E8EBF0;border:1px solid #C8D0DC;border-radius:11px;padding:14px 16px;margin-bottom:14px;}
+.standby-box-title{font-size:13px;font-weight:600;color:var(--slate);margin-bottom:4px;}
+.standby-box-body{font-size:12px;color:var(--text-2);line-height:1.6;}
+
+/* Avail info */
+.avail-info-box{background:var(--purple-pale);border:1px solid var(--purple-line);border-radius:11px;padding:14px 16px;margin-bottom:14px;}
+.avail-info-title{font-size:13px;font-weight:600;color:var(--purple);margin-bottom:4px;}
+.avail-info-body{font-size:12px;color:#6A5090;line-height:1.6;}
+.remove-avail-btn{width:100%;margin-top:10px;background:transparent;border:1px solid var(--purple-line);color:var(--purple);border-radius:9px;padding:8px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:background .15s;}
+.remove-avail-btn:hover{background:rgba(91,61,138,.08);}
+
+/* Lesson report form */
+.report-section{background:var(--cream-dark);border-radius:11px;padding:16px;}
+.report-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.report-sub{font-size:11px;color:var(--text-3);margin-bottom:14px;}
+.pfield-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:5px;}
+
+/* Tag input system */
+.tag-input-wrap{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 8px;display:flex;flex-wrap:wrap;gap:5px;min-height:38px;cursor:text;margin-bottom:10px;transition:border-color .15s;}
+.tag-input-wrap:focus-within{border-color:var(--green-mid);}
+.topic-tag{display:inline-flex;align-items:center;gap:4px;background:var(--green-pale);color:var(--green-dark);font-size:11px;font-weight:500;padding:3px 8px 3px 10px;border-radius:20px;}
+.topic-tag-x{cursor:pointer;font-size:13px;line-height:1;color:var(--green-mid);opacity:.7;}
+.topic-tag-x:hover{opacity:1;}
+.tag-real-input{border:none;outline:none;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text-1);background:transparent;min-width:100px;flex:1;padding:2px 2px;}
+.report-textarea{width:100%;background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text-1);resize:none;height:80px;outline:none;margin-bottom:12px;transition:border-color .15s;}
+.report-textarea:focus{border-color:var(--green-mid);}
+.report-done{background:var(--green-pale);border-radius:10px;padding:13px;text-align:center;color:var(--green-dark);font-size:13px;font-weight:500;}
+
+/* Submit availability modal */
+.avail-modal{background:var(--card);border-radius:20px;width:400px;box-shadow:0 24px 64px rgba(0,0,0,.18);animation:popIn .22s cubic-bezier(.34,1.56,.64,1);padding:28px;}
+.am-icon{font-size:32px;margin-bottom:10px;}
+.am-title{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;margin-bottom:5px;}
+.am-sub{font-size:12px;color:var(--text-2);line-height:1.6;margin-bottom:16px;}
+.am-slots{background:var(--purple-pale);border:1px solid var(--purple-line);border-radius:10px;padding:13px;margin-bottom:18px;max-height:160px;overflow-y:auto;}
+.am-row{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--purple);margin-bottom:5px;}
+.am-row:last-child{margin-bottom:0;}
+.am-dot{width:6px;height:6px;border-radius:50%;background:var(--purple-mid);flex-shrink:0;}
+.modal-actions{display:flex;gap:8px;}
+.modal-actions .btn{flex:1;text-align:center;}
+
+/* STUDENT PROFILE POPUP (inside the main popup) */
+.stu-profile-modal{background:var(--card);border-radius:20px;width:460px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.22);animation:popIn .22s cubic-bezier(.34,1.56,.64,1);}
+.stu-profile-head{background:var(--green-dark);border-radius:20px 20px 0 0;padding:24px 24px 20px;display:flex;align-items:flex-start;gap:16px;}
+.stu-profile-av{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;flex-shrink:0;}
+.stu-profile-name{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:#fff;}
+.stu-profile-sub{font-size:12px;color:rgba(255,255,255,.7);margin-top:3px;}
+.spu-close{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:rgba(255,255,255,.8);flex-shrink:0;margin-left:auto;}
+.spu-close:hover{background:rgba(255,255,255,.25);}
+.stu-profile-body{padding:20px 24px;}
+.stu-stat-row{display:flex;gap:20px;margin-bottom:20px;}
+.stu-stat{text-align:center;flex:1;background:var(--cream-dark);border-radius:10px;padding:12px;}
+.stu-stat-val{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;}
+.stu-stat-lbl{font-size:10px;color:var(--text-3);margin-top:2px;text-transform:uppercase;letter-spacing:.05em;}
+.field-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.field-item{}
+.field-lbl{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px;}
+.field-val{font-size:13px;font-weight:500;color:var(--text-1);}
+.section-head{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin:18px 0 10px;}
+
+/* Lesson history cards (student-specific) */
+.history-month{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin:20px 0 8px;padding:0 2px;}
+.history-month:first-child{margin-top:0;}
+.lesson-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:10px;box-shadow:var(--shadow);transition:box-shadow .15s;}
+.lesson-card:hover{box-shadow:var(--shadow-lg);}
+.lc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px;}
+.lc-date-block{display:flex;align-items:center;gap:12px;}
+.lc-date-box{width:44px;height:44px;background:var(--green-dark);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;}
+.lc-date-box .lc-day{font-size:16px;font-weight:700;color:#fff;line-height:1;}
+.lc-date-box .lc-mon{font-size:9px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.05em;margin-top:1px;}
+.lc-info .lc-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;}
+.lc-info .lc-meta{font-size:12px;color:var(--text-3);margin-top:2px;}
+.lc-rating{display:flex;align-items:center;gap:4px;}
+.lc-rating .star{font-size:13px;color:#C8841A;}
+.lc-rating .star.empty{color:#D4C8B0;}
+.lc-rating .rating-num{font-size:11px;color:var(--text-3);margin-left:2px;}
+.lc-topics{margin-bottom:10px;}
+.lc-topics-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:5px;}
+.lc-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.lc-tag{background:var(--green-pale);color:var(--green-dark);font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;}
+.lc-notes{background:var(--cream-dark);border-radius:10px;padding:10px 13px;}
+.lc-notes-label{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);margin-bottom:4px;}
+.lc-notes-text{font-size:12px;color:var(--text-2);line-height:1.6;}
+.lc-dur{font-size:11px;color:var(--text-3);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
+.no-history{text-align:center;padding:40px 20px;color:var(--text-3);}
+.no-history-icon{font-size:36px;margin-bottom:10px;opacity:.5;}
+
+/* Global lesson reports page */
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--text-2);cursor:pointer;margin-bottom:18px;transition:color .15s;}
+.back-btn:hover{color:var(--text-1);}
+
+/* QUALIFICATIONS */
+.qual-wrap{max-width:640px;}
+.qual-section-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin:24px 0 12px;}
+.qual-section-title:first-child{margin-top:0;}
+.qual-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;}
+.qual-icon{width:38px;height:38px;border-radius:10px;background:var(--green-pale);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.qual-content{flex:1;}
+.qual-title{font-size:14px;font-weight:600;margin-bottom:2px;}
+.qual-meta{font-size:11px;color:var(--text-3);}
+.qual-status{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;margin-top:5px;}
+.qs-verified{background:var(--green-pale);color:var(--green-dark);}
+.qs-pending{background:var(--amber-light);color:#7A5010;}
+.subj-tags{display:flex;flex-wrap:wrap;gap:8px;}
+.subj-tag{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;}
+.subj-tag.active{background:var(--green-dark);border-color:var(--green-dark);color:#fff;}
+.subj-tag:not(.active):hover{background:var(--cream-dark);}
+.add-qual-row{display:flex;gap:8px;margin-top:12px;}
+.add-qual-row input{flex:1;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:12px;font-family:'DM Sans',sans-serif;color:var(--text-1);outline:none;transition:border-color .15s;}
+
+/* HOURS */
+.hours-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.hours-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);}
+.hours-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:800;color:var(--green-dark);}
+.hours-lbl{font-size:11px;color:var(--text-3);margin-top:3px;text-transform:uppercase;letter-spacing:.06em;}
+.hours-sub{font-size:12px;color:var(--text-2);margin-top:4px;}
+.psection-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:14px;}
+.hours-table{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:24px;}
+.ht-head{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr;background:var(--cream-dark);border-bottom:1px solid var(--border);}
+.ht-col{padding:10px 14px;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-3);}
+.ht-row{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr 1fr;border-bottom:1px solid var(--border);transition:background .1s;}
+.ht-row:last-child{border-bottom:none;}
+.ht-row:hover{background:var(--cream-dark);}
+.ht-cell{padding:12px 14px;font-size:12px;color:var(--text-2);display:flex;align-items:center;}
+.ht-cell.bold{font-weight:600;color:var(--text-1);}
+.pay-badge{display:inline-flex;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;}
+.pay-paid{background:var(--green-pale);color:var(--green-dark);}
+.pay-pending{background:var(--amber-light);color:#7A5010;}
+
+/* PROFILE */
+.profile-wrap{max-width:640px;}
+.profile-avatar-section{display:flex;align-items:center;gap:18px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px;}
+.profile-av{width:64px;height:64px;border-radius:50%;background:var(--green-dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;flex-shrink:0;}
+.profile-av-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;}
+.profile-av-role{font-size:12px;color:var(--text-3);margin-top:2px;}
+.profile-av-change{font-size:11px;color:var(--green-mid);margin-top:6px;cursor:pointer;text-decoration:underline;}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+.pfield-input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text-1);outline:none;transition:border-color .15s;}
+.psection-title-sm{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:14px;}
+
+/* SETTINGS */
+.settings-wrap{max-width:600px;}
+.settings-section-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin:24px 0 10px;}
+.settings-section-title:first-child{margin-top:0;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:8px;}
+.setting-name{font-size:13px;font-weight:600;}
+.setting-sub{font-size:11px;color:var(--text-3);margin-top:2px;}
+.toggle{width:42px;height:24px;border-radius:12px;background:var(--border);position:relative;cursor:pointer;flex-shrink:0;transition:background .2s;}
+.toggle.active{background:var(--green-dark);}
+.toggle-knob{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle.active .toggle-knob{left:21px;}
+
+/* NOTIFICATION POPUP */
+.notif-overlay{display:none;position:fixed;inset:0;background:rgba(20,15,8,.42);z-index:200;align-items:flex-start;justify-content:flex-end;backdrop-filter:blur(2px);padding:60px 24px 0;}
+.notif-overlay.open{display:flex;}
+.notif-popup{background:var(--card);border-radius:18px;width:420px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,.22);animation:popIn .22s cubic-bezier(.34,1.56,.64,1);}
+.notif-popup-head{padding:20px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-shrink:0;}
+.notif-popup-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;}
+.notif-popup-sub{font-size:11px;color:var(--text-3);margin-top:2px;}
+.notif-popup-body{overflow-y:auto;padding:14px 16px 16px;flex:1;}
+.notif-item{display:flex;align-items:flex-start;gap:14px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:8px;transition:box-shadow .15s;}
+.notif-item.unread{background:#FDFAF2;border-color:#E8D8A0;}
+.notif-icon-wrap{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ni-amber{background:var(--amber-light);}
+.ni-green{background:var(--green-pale);}
+.ni-purple{background:var(--purple-pale);}
+.ni-blue{background:#E8EEF8;}
+.notif-content{flex:1;}
+.notif-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.notif-body{font-size:12px;color:var(--text-2);line-height:1.5;}
+.notif-time{font-size:11px;color:var(--text-3);margin-top:4px;}
+.notif-action-row{margin-top:8px;}
+.notif-action-row .btn{font-size:11px;padding:5px 12px;}
+.unread-pip{width:8px;height:8px;border-radius:50%;background:var(--amber);flex-shrink:0;margin-top:4px;}
+
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-header">
+    <div class="brand">
+      <div class="brand-icon">TH</div>
+      <div><div class="brand-name">TuitionHub</div><div class="brand-sub">Tutor Portal</div></div>
+    </div>
+    <div class="user-pill">
+      <div class="avatar">HR</div>
+      <div><div class="user-name">Mr. Hafiz Rahman</div><div class="user-role">Mathematics Tutor</div></div>
+    </div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-label">Main</div>
+    <div class="nav-item active" id="nav-timetable" onclick="showPage('timetable',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+      Timetable
+    </div>
+    <div class="nav-item" id="nav-history" onclick="showPage('history',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="14" height="3" rx="1"/><rect x="1" y="6" width="14" height="3" rx="1"/><rect x="1" y="11" width="9" height="3" rx="1"/></svg>
+      Lesson Reports
+    </div>
+    <div class="nav-item" id="nav-hours" onclick="showPage('hours',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4v4l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
+      Hours & Pay
+    </div>
+    <div class="nav-label" style="margin-top:16px;">Account</div>
+    <div class="nav-item" id="nav-profile" onclick="showPage('profile',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="5" r="3.5"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6H2z"/></svg>
+      Profile
+    </div>
+    <div class="nav-item" id="nav-settings" onclick="showPage('settings',this)">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="currentColor"><path d="M8 10a2 2 0 100-4 2 2 0 000 4zm5.66-1.5a5.9 5.9 0 000-1l1.3-1-.96-1.66-1.55.52a5.8 5.8 0 00-.87-.5L11.3 3.5H9.7l-.28 1.36a5.8 5.8 0 00-.87.5L7 4.84 6.04 6.5l1.3 1a5.9 5.9 0 000 1l-1.3 1 .96 1.66 1.55-.52c.27.19.56.36.87.5L9.7 12.5h1.6l.28-1.36c.31-.14.6-.31.87-.5l1.55.52.96-1.66-1.3-1z"/></svg>
+      Settings
+    </div>
+  </nav>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="breadcrumb" id="breadcrumb">Portal · <span>Timetable</span></div>
+    <div class="topbar-right">
+      <div class="notif" onclick="openNotif()">🔔<div class="notif-dot" id="notifDot">3</div></div>
+    </div>
+  </div>
+
+  <!-- TIMETABLE -->
+  <div class="content" id="page-timetable">
+    <div class="cal-header">
+      <div>
+        <div class="cal-title">My Timetable</div>
+        <div class="cal-sub" id="weekRangeSub"></div>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-outline btn-sm" id="cancelAvailBtn" style="display:none" onclick="cancelAvailMode()">Cancel</button>
+        <button class="btn btn-purple btn-sm" id="submitAvailBtn" style="display:none" onclick="openSubmitModal()">Submit Availability (<span id="availCount">0</span>)</button>
+        <button class="btn btn-purple btn-sm" id="setAvailBtn" onclick="enterAvailMode()">+ Mark Availability</button>
+      </div>
+    </div>
+    <div class="info-banner" id="availBanner" style="display:none">
+      <div class="info-banner-icon">🟣</div>
+      <div><strong>Availability mode on.</strong> Click and drag across empty slots to mark yourself available. Submit when done.</div>
+    </div>
+    <div class="sel-bar" id="selBar">
+      <div class="sel-bar-text">🟣 <strong id="selCount">0</strong> slot(s) selected — <span id="selTime"></span></div>
+      <button class="btn btn-outline btn-sm" onclick="clearSelection()">Clear</button>
+    </div>
+    <div class="week-display" id="weekDisplay"></div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--purple-pale);border:1.5px dashed var(--purple-mid)"></div>My Availability</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--green-dark)"></div>Confirmed (with student)</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--slate-bg)"></div>Standby</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#4A4A4A"></div>Completed</div>
+    </div>
+    <div class="tt-nav-wrap">
+      <div class="tt-side-btn" onclick="shiftWeek(-1)">‹</div>
+      <div class="tt-outer"><div class="tt-grid" id="ttGrid"></div></div>
+      <div class="tt-side-btn" onclick="shiftWeek(1)">›</div>
+    </div>
+  </div>
+
+  <!-- LESSON REPORTS -->
+  <div class="content" id="page-history" style="display:none">
+    <div class="cal-header">
+      <div><div class="cal-title">Lesson Reports</div><div class="cal-sub">All sessions you've taught</div></div>
+      <button class="btn btn-outline btn-sm" onclick="showToast('Statement exported.')">Export PDF</button>
+    </div>
+    <div id="historyList"></div>
+  </div>
+
+  <!-- HOURS & PAY -->
+  <div class="content" id="page-hours" style="display:none">
+    <div class="cal-header">
+      <div><div class="cal-title">Hours & Pay</div><div class="cal-sub">March 2026</div></div>
+      <button class="btn btn-outline btn-sm" onclick="showToast('Statement downloaded.')">Download Statement</button>
+    </div>
+    <div class="hours-bar">
+      <div class="hours-card"><div class="hours-val">18.5</div><div class="hours-lbl">Hours This Month</div><div class="hours-sub">+2.5 hrs vs last month</div></div>
+      <div class="hours-card"><div class="hours-val">$740</div><div class="hours-lbl">Earnings This Month</div><div class="hours-sub">At $40/hr rate</div></div>
+      <div class="hours-card"><div class="hours-val">6</div><div class="hours-lbl">Sessions This Month</div><div class="hours-sub">2 upcoming this week</div></div>
+    </div>
+    <div class="psection-title">Session Log</div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;">
+      <button class="btn btn-sm" id="tabLogged" onclick="switchPayTab('logged')" style="background:var(--green-dark);color:#fff;">Logged</button>
+      <button class="btn btn-outline btn-sm" id="tabPaid" onclick="switchPayTab('paid')">Paid</button>
+    </div>
+
+    <div id="payTabLogged">
+      <div class="hours-table">
+        <div class="ht-head">
+          <div class="ht-col">Student</div><div class="ht-col">Date & Time</div><div class="ht-col">Duration</div><div class="ht-col">Amount</div><div class="ht-col">Report</div>
+        </div>
+        <div class="ht-row"><div class="ht-cell bold">Sarah Amira</div><div class="ht-cell">22 Mar · 3:00 PM</div><div class="ht-cell">1.5 hrs</div><div class="ht-cell">$60</div><div class="ht-cell"><span class="pay-badge pay-pending">Pending</span></div></div>
+        <div class="ht-row"><div class="ht-cell bold">Standby</div><div class="ht-cell">24 Mar · 2:00 PM</div><div class="ht-cell">1 hr</div><div class="ht-cell">$40</div><div class="ht-cell"><span class="pay-badge pay-pending">Pending</span></div></div>
+        <div class="ht-row"><div class="ht-cell bold">Darren Lim</div><div class="ht-cell">21 Mar · 10:00 AM</div><div class="ht-cell">1 hr</div><div class="ht-cell">$40</div><div class="ht-cell"><span class="pay-badge" style="background:var(--green-pale);color:var(--green-dark)">Submitted</span></div></div>
+        <div class="ht-row"><div class="ht-cell bold">Sarah Amira</div><div class="ht-cell">19 Mar · 3:00 PM</div><div class="ht-cell">1.5 hrs</div><div class="ht-cell">$60</div><div class="ht-cell"><span class="pay-badge" style="background:var(--green-pale);color:var(--green-dark)">Submitted</span></div></div>
+        <div class="ht-row"><div class="ht-cell bold">Wei Jie Tan</div><div class="ht-cell">17 Mar · 2:00 PM</div><div class="ht-cell">1.5 hrs</div><div class="ht-cell">$60</div><div class="ht-cell"><span class="pay-badge" style="background:var(--green-pale);color:var(--green-dark)">Submitted</span></div></div>
+        <div class="ht-row"><div class="ht-cell bold">Standby</div><div class="ht-cell">15 Mar · 1:00 PM</div><div class="ht-cell">1 hr</div><div class="ht-cell">$40</div><div class="ht-cell"><span class="pay-badge" style="background:var(--green-pale);color:var(--green-dark)">Submitted</span></div></div>
+      </div>
+    </div>
+
+    <div id="payTabPaid" style="display:none">
+      <div class="hours-table">
+        <div class="ht-head">
+          <div class="ht-col">Student</div><div class="ht-col">Date & Time</div><div class="ht-col">Duration</div><div class="ht-col">Amount</div><div class="ht-col">Status</div>
+        </div>
+        <div class="ht-row"><div class="ht-cell bold">Wei Jie Tan</div><div class="ht-cell">28 Feb · 2:00 PM</div><div class="ht-cell">1.5 hrs</div><div class="ht-cell">$60</div><div class="ht-cell"><span class="pay-badge pay-paid">Paid</span></div></div>
+        <div class="ht-row"><div class="ht-cell bold">Standby</div><div class="ht-cell">26 Feb · 1:00 PM</div><div class="ht-cell">1 hr</div><div class="ht-cell">$40</div><div class="ht-cell"><span class="pay-badge pay-paid">Paid</span></div></div>
+        <div class="ht-row"><div class="ht-cell bold">Sarah Amira</div><div class="ht-cell">24 Feb · 3:00 PM</div><div class="ht-cell">1.5 hrs</div><div class="ht-cell">$60</div><div class="ht-cell"><span class="pay-badge pay-paid">Paid</span></div></div>
+        <div class="ht-row"><div class="ht-cell bold">Darren Lim</div><div class="ht-cell">19 Feb · 10:00 AM</div><div class="ht-cell">1 hr</div><div class="ht-cell">$40</div><div class="ht-cell"><span class="pay-badge pay-paid">Paid</span></div></div>
+        <div class="ht-row"><div class="ht-cell bold">Priya Nair</div><div class="ht-cell">14 Feb · 5:00 PM</div><div class="ht-cell">1 hr</div><div class="ht-cell">$40</div><div class="ht-cell"><span class="pay-badge pay-paid">Paid</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="content" id="page-profile" style="display:none">
+    <div class="cal-header">
+      <div><div class="cal-title">Profile</div><div class="cal-sub">Your tutor information</div></div>
+      <button class="btn btn-primary btn-sm" onclick="showToast('Profile saved.')">Save Changes</button>
+    </div>
+    <div class="profile-wrap">
+      <div class="profile-avatar-section">
+        <div class="profile-av">HR</div>
+        <div><div class="profile-av-name">Mr. Hafiz Rahman</div><div class="profile-av-role">Mathematics Tutor</div><div class="profile-av-change">Change photo</div></div>
+      </div>
+      <div class="psection-title-sm">Personal Details</div>
+      <div class="profile-grid">
+        <div><div class="pfield-label">Full Name</div><input class="pfield-input" value="Muhammad Hafiz Bin Rahman"/></div>
+        <div><div class="pfield-label">Email</div><input class="pfield-input" value="hafiz.rahman@tuitionhub.sg"/></div>
+        <div><div class="pfield-label">Phone</div><input class="pfield-input" value="+65 9234 5678"/></div>
+        <div><div class="pfield-label">NRIC (Last 4)</div><input class="pfield-input" value="123A"/></div>
+      </div>
+      <div class="psection-title-sm">Teaching Bio</div>
+      <div style="margin-bottom:20px"><div class="pfield-label">Short Bio</div><textarea class="pfield-input" style="height:80px;resize:none">Experienced Mathematics tutor with 6+ years helping O and A Level students excel.</textarea></div>
+      <div class="psection-title-sm">Bank Details</div>
+      <div class="profile-grid" style="margin-bottom:28px;">
+        <div><div class="pfield-label">Bank Name</div><input class="pfield-input" value="DBS Bank"/></div>
+        <div><div class="pfield-label">Account Number</div><input class="pfield-input" value="•••• •••• 4521"/></div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin-bottom:24px;"></div>
+
+      <div class="psection-title-sm">Academic Credentials</div>
+      <div class="qual-card"><div class="qual-icon">🎓</div><div class="qual-content"><div class="qual-title">B.Sc. Mathematics (First Class Honours)</div><div class="qual-meta">National University of Singapore · 2019</div><div class="qual-status qs-verified">✓ Verified</div></div><button class="btn btn-outline btn-sm">View Doc</button></div>
+      <div class="qual-card"><div class="qual-icon">📜</div><div class="qual-content"><div class="qual-title">Postgraduate Diploma in Education (PGDE)</div><div class="qual-meta">National Institute of Education · 2020</div><div class="qual-status qs-verified">✓ Verified</div></div><button class="btn btn-outline btn-sm">View Doc</button></div>
+      <div class="qual-card"><div class="qual-icon">📄</div><div class="qual-content"><div class="qual-title">A-Level Further Mathematics (A)</div><div class="qual-meta">Result Certificate · 2015</div><div class="qual-status qs-pending">⏳ Pending Review</div></div><button class="btn btn-outline btn-sm">Replace</button></div>
+      <div class="add-qual-row" style="margin-bottom:24px;"><input placeholder="Add new credential (e.g. Cambridge IGCSE Certificate)"/><button class="btn btn-primary btn-sm" onclick="showToast('Credential added for review.')">Add</button></div>
+
+      <div class="psection-title-sm">Approved Teaching Subjects</div>
+      <div class="subj-tags" style="margin-bottom:8px;">
+        <div class="subj-tag active" onclick="this.classList.toggle('active')">E-Maths (O Level)</div>
+        <div class="subj-tag active" onclick="this.classList.toggle('active')">A-Maths (O Level)</div>
+        <div class="subj-tag active" onclick="this.classList.toggle('active')">H2 Maths (A Level)</div>
+        <div class="subj-tag" onclick="this.classList.toggle('active')">H1 Maths (A Level)</div>
+        <div class="subj-tag" onclick="this.classList.toggle('active')">IP Mathematics</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="content" id="page-settings" style="display:none">
+    <div class="cal-header"><div><div class="cal-title">Settings</div><div class="cal-sub">Manage your preferences</div></div></div>
+    <div class="settings-wrap">
+      <div class="settings-section-title">Notifications</div>
+      <div class="setting-row"><div><div class="setting-name">Availability Reminder</div><div class="setting-sub">Remind me to submit availability 7 days before the week</div></div><div class="toggle active" onclick="this.classList.toggle('active')"><div class="toggle-knob"></div></div></div>
+      <div class="setting-row"><div><div class="setting-name">Slot Confirmed</div><div class="setting-sub">Notify when a slot is confirmed with a student assigned</div></div><div class="toggle active" onclick="this.classList.toggle('active')"><div class="toggle-knob"></div></div></div>
+      <div class="setting-row"><div><div class="setting-name">Standby Assignment</div><div class="setting-sub">Notify when I'm assigned a standby slot</div></div><div class="toggle active" onclick="this.classList.toggle('active')"><div class="toggle-knob"></div></div></div>
+      <div class="setting-row"><div><div class="setting-name">Lesson Report Reminder</div><div class="setting-sub">Prompt me to submit a report after each session ends</div></div><div class="toggle active" onclick="this.classList.toggle('active')"><div class="toggle-knob"></div></div></div>
+      <div class="setting-row"><div><div class="setting-name">Session Reminders</div><div class="setting-sub">Get reminded 2 hours before a session</div></div><div class="toggle active" onclick="this.classList.toggle('active')"><div class="toggle-knob"></div></div></div>
+      <div class="setting-row"><div><div class="setting-name">Cancellation Alerts</div><div class="setting-sub">Notify if a session is cancelled by the centre</div></div><div class="toggle" onclick="this.classList.toggle('active')"><div class="toggle-knob"></div></div></div>
+      <div class="settings-section-title">Account</div>
+      <div class="setting-row"><div><div class="setting-name">Change Password</div><div class="setting-sub">Update your login password</div></div><button class="btn btn-outline" style="font-size:11px;padding:6px 12px" onclick="showToast('Password reset email sent.')">Reset</button></div>
+      <div class="setting-row"><div><div class="setting-name" style="color:var(--red)">Log Out</div><div class="setting-sub">Sign out of your account</div></div><button class="btn" style="font-size:11px;padding:6px 12px;background:var(--red-light);color:var(--red);border:1px solid #E0A090" onclick="showToast('Logged out.')">Log Out</button></div>
+    </div>
+  </div>
+</main>
+
+<!-- SESSION POPUP -->
+<div class="overlay" id="sessOverlay" onclick="closeSessOverlay(event)">
+  <div class="popup" id="sessPopup">
+    <div class="pop-head"><div id="popHead"></div><div class="pop-close" onclick="closeSessDirect()">✕</div></div>
+    <div class="pop-body" id="popBody"></div>
+  </div>
+</div>
+
+<!-- STUDENT PROFILE POPUP -->
+<div class="overlay" id="stuOverlay" onclick="closeStuOverlay(event)">
+  <div class="stu-profile-modal" id="stuModal">
+    <div class="stu-profile-head" id="stuHead"></div>
+    <div class="stu-profile-body" id="stuBody"></div>
+  </div>
+</div>
+
+<!-- SUBMIT AVAILABILITY MODAL -->
+<div class="overlay" id="submitOverlay" onclick="closeSubmitOverlay(event)">
+  <div class="avail-modal">
+    <div class="am-icon">🟣</div>
+    <div class="am-title">Submit Availability</div>
+    <div class="am-sub">These slots will be sent to the centre. You'll be notified of confirmed sessions 5 days before each date.</div>
+    <div class="am-slots" id="amSlots"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeSubmitDirect()">Cancel</button>
+      <button class="btn btn-purple" onclick="confirmSubmitAvail()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION POPUP -->
+<div class="notif-overlay" id="notifOverlay" onclick="closeNotifOverlay(event)">
+  <div class="notif-popup">
+    <div class="notif-popup-head">
+      <div><div class="notif-popup-title">Notifications</div><div class="notif-popup-sub">Your latest updates</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-outline btn-sm" onclick="markAllRead()">Mark all read</button>
+        <div class="pop-close" onclick="closeNotifDirect()">✕</div>
+      </div>
+    </div>
+    <div class="notif-popup-body" id="notifList"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+
+const STUDENTS = {
+  SA: { name:'Sarah Amira', initials:'SA', school:'Riverside Secondary School', level:'Sec 4', subject:'E-Maths & A-Maths', parentName:'Mdm Noraini Binte Ahmad', parentPhone:'+65 9876 5432', email:'sarah.amira@email.com', phone:'+65 9123 4567', sessions:12 },
+  DL: { name:'Darren Lim',  initials:'DL', school:'Westview Secondary',          level:'Sec 3', subject:'E-Maths',            parentName:'Mr. Lim Boon Kiat',        parentPhone:'+65 9345 6789', email:'darren.lim@email.com',  phone:'+65 9234 5678', sessions:7  },
+  PN: { name:'Priya Nair',  initials:'PN', school:'Fairfield Methodist Sec',     level:'Sec 4', subject:'A-Maths',            parentName:'Mrs. Nair Kavitha',        parentPhone:'+65 9456 7890', email:'priya.nair@email.com',   phone:'+65 9345 6781', sessions:5  },
+  WJ: { name:'Wei Jie Tan', initials:'WJ', school:'Anglo-Chinese School',         level:'JC1',  subject:'H2 Maths',           parentName:'Mr. Tan Wei Ming',         parentPhone:'+65 9567 8901', email:'weijie.tan@email.com',   phone:'+65 9456 7892', sessions:9  },
+};
+
+const SESSIONS = [
+  { id:'s1', type:'confirmed', stuKey:'SA', day:1, startRow:6,  span:3, weekOffset:0, reportDone:true  },
+  { id:'s2', type:'confirmed', stuKey:'DL', day:3, startRow:4,  span:2, weekOffset:0, reportDone:true  },
+  { id:'s3', type:'standby',   stuKey:null, day:4, startRow:6,  span:2, weekOffset:0, reportDone:false },
+  { id:'s4', type:'confirmed', stuKey:'WJ', day:5, startRow:8,  span:3, weekOffset:0, reportDone:false },
+  { id:'s5', type:'confirmed', stuKey:'SA', day:1, startRow:6,  span:3, weekOffset:1, reportDone:false },
+  { id:'s6', type:'standby',   stuKey:null, day:2, startRow:4,  span:2, weekOffset:1, reportDone:false },
+  { id:'s7', type:'confirmed', stuKey:'PN', day:4, startRow:8,  span:2, weekOffset:1, reportDone:false },
+  { id:'s8', type:'availability', stuKey:null, day:1, startRow:6, span:2, weekOffset:2, reportDone:false },
+  { id:'s9', type:'availability', stuKey:null, day:3, startRow:4, span:2, weekOffset:2, reportDone:false },
+  { id:'s10',type:'availability', stuKey:null, day:5, startRow:8, span:2, weekOffset:2, reportDone:false },
+];
+
+const LESSON_HISTORY = [
+  { id:'h1', stuKey:'SA', date:'19 Mar 2026', day:19, mon:'Mar', duration:'1.5 hrs', rating:5,
+    topics:['Quadratic Equations','Factorisation','Completing the Square'],
+    notes:'Strong understanding of factorisation demonstrated. Completing the square for non-monic quadratics needs consolidation. Assigned 3 extra practice questions.' },
+  { id:'h2', stuKey:'DL', date:'21 Mar 2026', day:21, mon:'Mar', duration:'1 hr',    rating:4,
+    topics:['Linear Graphs','Gradient-Intercept Form'],
+    notes:'Correctly identified parallel lines from equations. Struggled with negative gradients — recommended 5 additional graph sketches.' },
+  { id:'h3', stuKey:'SA', date:'12 Mar 2026', day:12, mon:'Mar', duration:'1.5 hrs', rating:5,
+    topics:['Simultaneous Equations','Substitution Method','Elimination Method'],
+    notes:'Both methods practised with word problems. Sarah excelled at substitution. Elimination with fractional coefficients flagged for revisiting.' },
+  { id:'h4', stuKey:'WJ', date:'10 Mar 2026', day:10, mon:'Mar', duration:'1.5 hrs', rating:5,
+    topics:['Integration','Definite Integrals','Area Under Curve'],
+    notes:'Wei Jie is performing above expectations for JC1. Covered definite integrals and area between curves. Advised to attempt past-paper questions independently.' },
+  { id:'h5', stuKey:'PN', date:'9 Mar 2026',  day:9,  mon:'Mar', duration:'1 hr',    rating:3,
+    topics:['Algebraic Fractions','Simplification'],
+    notes:'Adding algebraic fractions with different denominators was challenging. Needs significant LCM practice.' },
+  { id:'h6', stuKey:'SA', date:'5 Mar 2026',  day:5,  mon:'Mar', duration:'1.5 hrs', rating:5,
+    topics:['Trigonometry','SOH-CAH-TOA','Angles of Elevation & Depression'],
+    notes:'Introduced SOHCAHTOA with right-angled triangle problems. All practice solved correctly. Elevation and depression problems completed with confidence.' },
+  { id:'h7', stuKey:'SA', date:'26 Feb 2026', day:26, mon:'Feb', duration:'1.5 hrs', rating:4,
+    topics:['Circle Theorems','Cyclic Quadrilaterals'],
+    notes:'Covered 6 circle theorems. Student worked through proof-based questions well. Recommend reviewing theorem 4 and tangent properties.' },
+];
+
+const NOTIFS = [
+  { id:'n-report-s4', unread:true,  iconClass:'ni-amber', icon:'📋', title:'Lesson Report Due — Wei Jie Tan',
+    body:'Your session with Wei Jie Tan on 22 Mar has ended. Please submit a lesson report.',
+    time:'Today, 5:00 PM', action:{ label:'Submit Report', fn:"openReportFromNotif('s4')" } },
+  { id:'n-confirm',   unread:true,  iconClass:'ni-green',  icon:'✅', title:'Slot Confirmed — 29 Mar',
+    body:'Your Monday 3:00 PM slot has been confirmed. Student: Sarah Amira (Sec 4 E-Maths).', time:'Today, 10:02 AM' },
+  { id:'n-pay', unread:false, iconClass:'ni-blue', icon:'💳', title:'Payment Processed',
+    body:'$240 transferred to your DBS account for sessions on 14–28 Feb.', time:'1 Mar, 9:00 AM' },
+];
+
+// ── SELECT STATE ──────────────────────────────────────────────────────────
+let availMode    = false;
+let selecting    = false;
+let selStart     = null;
+let selEnd       = null;
+let selectedSlots= new Set();   // keys: "weekOffset-col-row"
+let weekOffset   = 0;
+
+// ── WEEK / GRID ────────────────────────────────────────────────────────────
+const DAYS  = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+const TIMES = [];
+for(let h=8;h<=20;h++){ TIMES.push(`${h}:00`); if(h<20) TIMES.push(''); }
+
+function getWeekDates(off=0){
+  const today=new Date(), dow=today.getDay();
+  const mon=new Date(today); mon.setDate(today.getDate()-(dow===0?6:dow-1)+off*7);
+  return Array.from({length:7},(_,i)=>{ const d=new Date(mon); d.setDate(mon.getDate()+i); return d; });
+}
+function shiftWeek(dir){ weekOffset+=dir; clearSelection(); buildGrid(); }
+
+function buildGrid(){
+  const dates=getWeekDates(weekOffset);
+  const todayStr=new Date().toDateString();
+  const today=new Date(); today.setHours(0,0,0,0);
+  const cutoff=new Date(today); cutoff.setDate(today.getDate()+7); // must be >= 7 days away
+
+  const grid=document.getElementById('ttGrid');
+  grid.innerHTML='';
+
+  const s=dates[0],e=dates[6];
+  const monthYear = s.toLocaleString('default',{month:'long',year:'numeric'});
+  document.getElementById('weekRangeSub').textContent=
+    `${s.getDate()} ${s.toLocaleString('default',{month:'short'})} – ${e.getDate()} ${e.toLocaleString('default',{month:'short'})} ${e.getFullYear()}`;
+  document.getElementById('weekDisplay').textContent=
+    s.getMonth()===e.getMonth()
+      ? `${s.toLocaleString('default',{month:'long'})} ${s.getFullYear()}`
+      : `${s.toLocaleString('default',{month:'long'})} – ${e.toLocaleString('default',{month:'long'})} ${e.getFullYear()}`;
+
+  // header
+  const blank=document.createElement('div'); blank.className='hcell'; grid.appendChild(blank);
+  dates.forEach((d,i)=>{
+    const isTd=d.toDateString()===todayStr;
+    const dClean=new Date(d); dClean.setHours(0,0,0,0);
+    const isLocked = availMode && dClean < cutoff;
+    const hc=document.createElement('div');
+    hc.className='hcell'+(isTd?' today-h':'')+(isLocked?' avail-locked-h':'');
+    hc.innerHTML=`<span class="day-num">${d.getDate()}${isTd?'<span class="today-pip"></span>':''}</span>${DAYS[i]}${isLocked?'<span class="locked-badge">Too soon</span>':''}`;
+    grid.appendChild(hc);
+  });
+
+  // body
+  TIMES.forEach((t,rowIdx)=>{
+    const isHalf=t==='';
+    const tc=document.createElement('div');
+    tc.className='tcell'+(isHalf?' half':'');
+    if(!isHalf) tc.textContent=t;
+    grid.appendChild(tc);
+
+    for(let col=1;col<=7;col++){
+      const sl=document.createElement('div');
+      const dClean=new Date(dates[col-1]); dClean.setHours(0,0,0,0);
+      const colLocked = availMode && dClean < cutoff;
+      sl.className='slot open'+(isHalf?' half-hour':'')+(colLocked?' avail-locked':'');
+      sl.dataset.col=col; sl.dataset.row=rowIdx;
+
+      // existing sessions
+      const sessHere=SESSIONS.filter(s=>s.weekOffset===weekOffset&&s.day===col&&s.startRow===rowIdx);
+
+      if(sessHere.length){
+        sessHere.forEach(sess=>{
+          const blk=document.createElement('div');
+
+          // Determine if session has already ended
+          const sessDate=new Date(dates[col-1]);
+          const startHour=8+Math.floor(sess.startRow/2);
+          const startMin=(sess.startRow%2)*30;
+          const endHour=8+Math.floor((sess.startRow+sess.span)/2);
+          const endMin=((sess.startRow+sess.span)%2)*30;
+          sessDate.setHours(endHour,endMin,0,0);
+          const isDone = sessDate < new Date();
+
+          blk.className='sess-block '+sess.type+(isDone?' done':'');
+          blk.style.height=(sess.span*34-4)+'px';
+          const stu=sess.stuKey?STUDENTS[sess.stuKey]:null;
+
+          if(sess.type==='confirmed'){
+            blk.innerHTML=`<div class="sb-label">${stu.name}</div><div class="sb-sub">${TIMES[sess.startRow]} · ${sess.span/2} hr${sess.span>2?'s':''}${isDone?' · Done':''}</div>`;
+          } else if(sess.type==='standby'){
+            blk.innerHTML=`<div class="sb-label">Standby</div><div class="sb-sub">${TIMES[sess.startRow]} · ${sess.span/2} hr${sess.span>2?'s':''}${isDone?' · Done':''}</div>`;
+          } else {
+            blk.innerHTML=`<div class="sb-label">Available</div><div class="sb-sub">${TIMES[sess.startRow]}</div>`;
+          }
+          blk.onclick=()=>openSessPopup(sess,dates[col-1],sess.startRow);
+          sl.classList.remove('open');
+          sl.appendChild(blk);
+        });
+      } else {
+        // In avail mode attach select listeners only on unlocked columns
+        if(availMode && !isHalf && !colLocked){
+          sl.addEventListener('mousedown', e=>{
+            e.preventDefault();
+            if(!sl.classList.contains('open')) return;
+            startSelect(col-1, rowIdx);
+          });
+          sl.addEventListener('mouseenter', ()=>{
+            if(selecting) updateSelect(col-1, rowIdx);
+          });
+        }
+      }
+      grid.appendChild(sl);
+    }
+  });
+  renderSelection();
+}
+
+// ── SELECTION (student-portal style) ─────────────────────────────────────
+function startSelect(col, row){
+  // col is 0-indexed here; check date is >= 7 days away
+  const today=new Date(); today.setHours(0,0,0,0);
+  const cutoff=new Date(today); cutoff.setDate(today.getDate()+7);
+  const d=new Date(getWeekDates(weekOffset)[col]); d.setHours(0,0,0,0);
+  if(d < cutoff) return;
+  if(SESSIONS.find(s=>s.weekOffset===weekOffset&&s.day===col+1&&s.startRow===row)) return;
+  selecting=true; selStart={col,row}; selEnd={col,row};
+  renderSelection();
+}
+function updateSelect(col, row){
+  if(!selecting || col!==selStart.col) return;
+  selEnd={col,row}; renderSelection();
+}
+function endSelect(){
+  if(!selecting) return;
+  selecting=false;
+  if(selStart && selEnd){
+    const col=selStart.col;
+    const today=new Date(); today.setHours(0,0,0,0);
+    const cutoff=new Date(today); cutoff.setDate(today.getDate()+7);
+    const d=new Date(getWeekDates(weekOffset)[col]); d.setHours(0,0,0,0);
+    if(d >= cutoff){
+      const r1=Math.min(selStart.row,selEnd.row), r2=Math.max(selStart.row,selEnd.row);
+      for(let r=r1;r<=r2;r++){
+        if(!SESSIONS.find(s=>s.weekOffset===weekOffset&&s.day===col+1&&s.startRow===r))
+          selectedSlots.add(`${weekOffset}-${col}-${r}`);
+      }
+    }
+  }
+  selStart=null; selEnd=null;
+  renderSelection(); updateSelBar();
+}
+function renderSelection(){
+  document.querySelectorAll('.slot').forEach(el=>el.classList.remove('selecting'));
+  selectedSlots.forEach(key=>{
+    const [wo,c,r]=key.split('-').map(Number);
+    if(wo!==weekOffset) return;
+    const el=document.querySelector(`.slot[data-col="${c+1}"][data-row="${r}"]`);
+    if(el) el.classList.add('selecting');
+  });
+  if(selecting && selStart && selEnd && selStart.col===selEnd.col){
+    const col=selStart.col;
+    const r1=Math.min(selStart.row,selEnd.row), r2=Math.max(selStart.row,selEnd.row);
+    for(let r=r1;r<=r2;r++){
+      const el=document.querySelector(`.slot[data-col="${col+1}"][data-row="${r}"]`);
+      if(el) el.classList.add('selecting');
+    }
+  }
+}
+function clearSelection(){
+  [...selectedSlots].forEach(k=>{ if(k.startsWith(`${weekOffset}-`)) selectedSlots.delete(k); });
+  renderSelection(); updateSelBar();
+}
+function updateSelBar(){
+  const bar=document.getElementById('selBar');
+  const keys=[...selectedSlots].filter(k=>k.startsWith(`${weekOffset}-`));
+  document.getElementById('availCount').textContent=keys.length;
+  if(!keys.length){ bar.classList.remove('visible'); return; }
+  bar.classList.add('visible');
+  const byCols={};
+  keys.forEach(k=>{ const [,c,r]=k.split('-').map(Number); if(!byCols[c]) byCols[c]=[]; byCols[c].push(r); });
+  const dates=getWeekDates(weekOffset);
+  const parts=Object.entries(byCols).map(([c,rows])=>{
+    rows.sort((a,b)=>a-b);
+    return `${DAYS[c]} ${dates[c].getDate()} ${dates[c].toLocaleString('default',{month:'short'})} · ${TIMES[rows[0]]}–${TIMES[rows[rows.length-1]]}`;
+  });
+  document.getElementById('selCount').textContent=keys.length;
+  document.getElementById('selTime').textContent=parts.join(', ');
+}
+document.addEventListener('mouseup', endSelect);
+
+// ── AVAIL MODE ────────────────────────────────────────────────────────────
+function enterAvailMode(){
+  availMode=true;
+  document.body.classList.add('avail-mode');
+  document.getElementById('setAvailBtn').style.display='none';
+  document.getElementById('submitAvailBtn').style.display='inline-flex';
+  document.getElementById('cancelAvailBtn').style.display='inline-flex';
+  document.getElementById('availBanner').style.display='flex';
+  buildGrid();
+}
+function cancelAvailMode(){
+  availMode=false;
+  clearSelection();
+  document.body.classList.remove('avail-mode');
+  document.getElementById('setAvailBtn').style.display='inline-flex';
+  document.getElementById('submitAvailBtn').style.display='none';
+  document.getElementById('cancelAvailBtn').style.display='none';
+  document.getElementById('availBanner').style.display='none';
+  document.getElementById('availCount').textContent='0';
+  buildGrid();
+}
+function openSubmitModal(){
+  const keys=[...selectedSlots].filter(k=>k.startsWith(`${weekOffset}-`));
+  if(!keys.length){ showToast('No slots selected yet.'); return; }
+  const dates=getWeekDates(weekOffset);
+  const byCols={};
+  keys.forEach(k=>{ const [,c,r]=k.split('-').map(Number); if(!byCols[c]) byCols[c]=[]; byCols[c].push(r); });
+  const html=Object.entries(byCols).map(([c,rows])=>{
+    rows.sort((a,b)=>a-b);
+    const d=dates[c];
+    return `<div class="am-row"><div class="am-dot"></div>${DAYS[c]} ${d.getDate()} ${d.toLocaleString('default',{month:'short'})} · ${TIMES[rows[0]]} – ${TIMES[rows[rows.length-1]]}</div>`;
+  }).join('');
+  document.getElementById('amSlots').innerHTML=html;
+  document.getElementById('submitOverlay').classList.add('open');
+}
+function confirmSubmitAvail(){
+  const keys=[...selectedSlots].filter(k=>k.startsWith(`${weekOffset}-`));
+  const byCols={};
+  keys.forEach(k=>{ const [,c,r]=k.split('-').map(Number); if(!byCols[c]) byCols[c]=[]; byCols[c].push(r); });
+  Object.entries(byCols).forEach(([c,rows])=>{
+    rows.sort((a,b)=>a-b);
+    SESSIONS.push({ id:'sa'+Date.now()+Math.random(), type:'availability', stuKey:null,
+      day:parseInt(c)+1, startRow:rows[0], span:rows.length, weekOffset, reportDone:false });
+  });
+  keys.forEach(k=>selectedSlots.delete(k));
+  closeSubmitDirect(); cancelAvailMode();
+  showToast("Availability submitted. You'll be notified 5 days before each session.");
+  buildGrid();
+}
+function closeSubmitOverlay(e){ if(e.target===document.getElementById('submitOverlay')) closeSubmitDirect(); }
+function closeSubmitDirect(){ document.getElementById('submitOverlay').classList.remove('open'); }
+
+// ── SESSION POPUP ──────────────────────────────────────────────────────────
+// Per-session topic state (keyed by session id)
+const sessionTopics = {};
+
+function openSessPopup(sess, date, rowIdx){
+  const dateStr=`${date.getDate()} ${date.toLocaleString('default',{month:'long'})} ${date.getFullYear()}`;
+  const timeStr=TIMES[rowIdx]||'';
+  const durStr=`${sess.span/2} hr${sess.span>2?'s':''}`;
+  const stu=sess.stuKey?STUDENTS[sess.stuKey]:null;
+
+  const stMap={ confirmed:{label:'Confirmed',cls:'sp-confirmed'}, standby:{label:'Standby',cls:'sp-standby'}, availability:{label:'Availability Submitted',cls:'sp-availability'}, done:{label:'Completed',cls:'sp-done'} };
+  const st=stMap[sess.type]||stMap.confirmed;
+
+  document.getElementById('popHead').innerHTML=`
+    <div class="pop-label">${sess.type==='availability'?'Availability Slot':'Session Details'}</div>
+    <div class="pop-date">${dateStr}</div>
+    <div class="status-pill ${st.cls}">${st.label}</div>`;
+
+  let body=`<div class="detail-row"><div class="detail-icon">🕐</div><div class="detail-text"><strong>${timeStr}</strong> · ${durStr}</div></div>`;
+
+  if(sess.type==='confirmed'){
+    const histCount=LESSON_HISTORY.filter(h=>h.stuKey===sess.stuKey).length;
+    body+=`
+      <div class="stu-card-pop">
+        <div class="stu-card-pop-top">
+          <div class="stu-av">${stu.initials}</div>
+          <div>
+            <div class="stu-name">${stu.name}</div>
+            <div class="stu-meta">${stu.school} · ${stu.level} · ${stu.subject}</div>
+          </div>
+        </div>
+        <div class="stu-card-actions">
+          <button class="stu-action-btn primary" onclick="openStuProfile('${sess.stuKey}')">👤 View Profile & History</button>
+        </div>
+      </div>
+      <div class="divider"></div>
+      ${sess.reportDone
+        ? `<div class="report-done">✅ Lesson report submitted for this session.</div>`
+        : buildReportForm(sess.id)
+      }`;
+  } else if(sess.type==='standby'){
+    body+=`<div class="standby-box"><div class="standby-box-title">🔵 Standby Slot</div><div class="standby-box-body">You've been assigned as additional manpower for this slot. No specific student is assigned — you may be directed to support any session, cover an absence, or assist with group work on the day.</div></div>`;
+  } else if(sess.type==='availability'){
+    body+=`<div class="avail-info-box"><div class="avail-info-title">⏳ Awaiting Confirmation</div><div class="avail-info-body">You've marked yourself available. The centre will confirm and assign a student up to 5 days before the date.</div></div><button class="remove-avail-btn" onclick="removeAvailSlot('${sess.id}')">Remove this availability slot</button>`;
+  }
+
+  document.getElementById('popBody').innerHTML=body;
+  // Init tag input if report form was rendered
+  if(sess.type==='confirmed' && !sess.reportDone){
+    if(!sessionTopics[sess.id]) sessionTopics[sess.id]=[];
+    renderTagInput(sess.id);
+  }
+  document.getElementById('sessOverlay').classList.add('open');
+}
+
+function buildReportForm(sessId){
+  return `<div class="report-section">
+    <div class="report-title">Lesson Report</div>
+    <div class="report-sub">Submit your notes after this session.</div>
+    <div class="pfield-label" style="margin-bottom:5px">Topics Covered</div>
+    <div class="tag-input-wrap" id="tagWrap-${sessId}" onclick="focusTagInput('${sessId}')">
+      <input class="tag-real-input" id="tagInput-${sessId}" placeholder="Type topic and press Enter…"
+        onkeydown="handleTagKey(event,'${sessId}')" oninput="checkTagInput(event,'${sessId}')"/>
+    </div>
+    <div class="pfield-label" style="margin-bottom:5px">Session Notes</div>
+    <textarea class="report-textarea" id="rNotes-${sessId}" placeholder="Summarise progress, areas to improve, homework set…"></textarea>
+    <button class="btn btn-primary" style="width:100%" onclick="submitReport('${sessId}')">Submit Report</button>
+  </div>`;
+}
+
+function renderTagInput(sessId){
+  const wrap=document.getElementById('tagWrap-'+sessId);
+  if(!wrap) return;
+  const input=document.getElementById('tagInput-'+sessId);
+  const tags=(sessionTopics[sessId]||[]).map(t=>`
+    <span class="topic-tag">${t}<span class="topic-tag-x" onclick="removeTag('${sessId}','${t}')">×</span></span>`).join('');
+  wrap.innerHTML=tags+`<input class="tag-real-input" id="tagInput-${sessId}" placeholder="${(sessionTopics[sessId]||[]).length?'':'Type topic and press Enter…'}"
+    onkeydown="handleTagKey(event,'${sessId}')" oninput="checkTagInput(event,'${sessId}')"/>`;
+}
+
+function handleTagKey(e,sessId){
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    const val=e.target.value.trim().replace(/,$/,'');
+    if(val){ addTag(sessId,val); e.target.value=''; }
+  } else if(e.key==='Backspace' && e.target.value===''){
+    const tags=sessionTopics[sessId]||[];
+    if(tags.length){ tags.pop(); renderTagInput(sessId); }
+  }
+}
+function checkTagInput(e,sessId){ /* live feedback placeholder */ }
+function focusTagInput(sessId){ const el=document.getElementById('tagInput-'+sessId); if(el) el.focus(); }
+function addTag(sessId,val){
+  if(!sessionTopics[sessId]) sessionTopics[sessId]=[];
+  const clean=val.trim();
+  if(clean && !sessionTopics[sessId].includes(clean)){ sessionTopics[sessId].push(clean); renderTagInput(sessId); }
+}
+function removeTag(sessId,tag){
+  if(sessionTopics[sessId]) sessionTopics[sessId]=sessionTopics[sessId].filter(t=>t!==tag);
+  renderTagInput(sessId);
+}
+
+function submitReport(sessId){
+  const sess=SESSIONS.find(s=>s.id===sessId);
+  const notes=document.getElementById('rNotes-'+sessId)?.value||'';
+  const topics=sessionTopics[sessId]||[];
+  if(sess){
+    sess.reportDone=true;
+    const stu=STUDENTS[sess.stuKey];
+    // Add to lesson history
+    const today=new Date();
+    LESSON_HISTORY.unshift({
+      id:'h'+Date.now(), stuKey:sess.stuKey,
+      date:`${today.getDate()} ${today.toLocaleString('default',{month:'short'})} ${today.getFullYear()}`,
+      day:today.getDate(), mon:today.toLocaleString('default',{month:'short'}),
+      duration:`${sess.span/2} hr${sess.span>2?'s':''}`, rating:0,
+      topics, notes
+    });
+    // Remove the report-due notification for this session
+    const nIdx=NOTIFS.findIndex(n=>n.id==='n-report-'+sessId);
+    if(nIdx>-1) NOTIFS.splice(nIdx,1);
+    renderNotifications();
+  }
+  closeSessDirect();
+  showToast('Lesson report submitted.');
+}
+
+function removeAvailSlot(sessId){
+  const idx=SESSIONS.findIndex(s=>s.id===sessId);
+  if(idx>-1) SESSIONS.splice(idx,1);
+  closeSessDirect(); buildGrid();
+  showToast('Availability slot removed.');
+}
+
+// Open from notification
+function openReportFromNotif(sessId){
+  closeNotifDirect();
+  const sess=SESSIONS.find(s=>s.id===sessId);
+  if(!sess) return;
+  showPage('timetable',document.getElementById('nav-timetable'));
+  // Navigate to correct week
+  weekOffset=sess.weekOffset; buildGrid();
+  setTimeout(()=>{
+    const dates=getWeekDates(sess.weekOffset);
+    openSessPopup(sess, dates[sess.day-1], sess.startRow);
+  },100);
+}
+
+function closeSessOverlay(e){ if(e.target===document.getElementById('sessOverlay')) closeSessDirect(); }
+function closeSessDirect(){ document.getElementById('sessOverlay').classList.remove('open'); }
+
+// ── STUDENT PROFILE POPUP ─────────────────────────────────────────────────
+function openStuProfile(stuKey){
+  const stu=STUDENTS[stuKey];
+  const history=LESSON_HISTORY.filter(h=>h.stuKey===stuKey);
+
+  document.getElementById('stuHead').innerHTML=`
+    <div class="stu-profile-av">${stu.initials}</div>
+    <div>
+      <div class="stu-profile-name">${stu.name}</div>
+      <div class="stu-profile-sub">${stu.school} · ${stu.level}</div>
+    </div>
+    <div class="spu-close" onclick="closeStuDirect()">✕</div>`;
+
+  document.getElementById('stuBody').innerHTML=`
+    <div class="stu-stat-row">
+      <div class="stu-stat"><div class="stu-stat-val">${stu.sessions}</div><div class="stu-stat-lbl">Sessions</div></div>
+      <div class="stu-stat"><div class="stu-stat-val">${history.length}</div><div class="stu-stat-lbl">Reports</div></div>
+    </div>
+    <div class="section-head">Student Details</div>
+    <div class="field-pair">
+      <div class="field-item"><div class="field-lbl">Subject</div><div class="field-val">${stu.subject}</div></div>
+      <div class="field-item"><div class="field-lbl">Level</div><div class="field-val">${stu.level}</div></div>
+      <div class="field-item"><div class="field-lbl">Email</div><div class="field-val">${stu.email}</div></div>
+      <div class="field-item"><div class="field-lbl">Phone</div><div class="field-val">${stu.phone}</div></div>
+    </div>
+    <div class="section-head">Parent / Guardian</div>
+    <div class="field-pair">
+      <div class="field-item"><div class="field-lbl">Name</div><div class="field-val">${stu.parentName}</div></div>
+      <div class="field-item"><div class="field-lbl">Phone</div><div class="field-val">${stu.parentPhone}</div></div>
+    </div>
+    <div class="section-head">Lesson History</div>
+    ${renderHistoryForStu(stuKey,true)}`;
+
+  document.getElementById('stuOverlay').classList.add('open');
+}
+
+function openStuHistory(stuKey){
+  // Opens student profile scrolled to history
+  openStuProfile(stuKey);
+}
+
+function closeStuOverlay(e){ if(e.target===document.getElementById('stuOverlay')) closeStuDirect(); }
+function closeStuDirect(){ document.getElementById('stuOverlay').classList.remove('open'); }
+
+// ── LESSON HISTORY ────────────────────────────────────────────────────────
+function renderHistoryForStu(stuKey, compact=false){
+  const all=LESSON_HISTORY.filter(h=>h.stuKey===stuKey);
+  if(!all.length) return `<div class="no-history"><div class="no-history-icon">📖</div><div>No reports yet.</div></div>`;
+  const byMonth={};
+  all.forEach(l=>{ if(!byMonth[l.mon]) byMonth[l.mon]=[]; byMonth[l.mon].push(l); });
+  let html='';
+  Object.entries(byMonth).forEach(([mon,lessons])=>{
+    html+=`<div class="history-month">${mon} ${lessons[0].date.split(' ').pop()}</div>`;
+    lessons.forEach(l=>{
+      const tags=l.topics.map(t=>`<span class="lc-tag">${t}</span>`).join('');
+      html+=`<div class="lesson-card">
+        <div class="lc-top">
+          <div class="lc-date-block">
+            <div class="lc-date-box"><div class="lc-day">${l.day}</div><div class="lc-mon">${l.mon}</div></div>
+            <div class="lc-info">
+              <div class="lc-title">${STUDENTS[l.stuKey]?.subject||'Session'}</div>
+              <div class="lc-meta">${l.date} · ${l.duration}</div>
+            </div>
+          </div>
+        </div>
+        ${tags?`<div class="lc-topics"><div class="lc-topics-label">Topics Covered</div><div class="lc-tags">${tags}</div></div>`:''}
+        ${l.notes?`<div class="lc-notes"><div class="lc-notes-label">Your Notes</div><div class="lc-notes-text">${l.notes}</div></div>`:''}
+        <div class="lc-dur">⏱ ${l.duration}</div>
+      </div>`;
+    });
+  });
+  return html;
+}
+
+function renderHistory(){
+  const container=document.getElementById('historyList');
+  if(!LESSON_HISTORY.length){
+    container.innerHTML=`<div class="no-history"><div class="no-history-icon">📖</div><div>No lesson reports yet.</div></div>`;
+    return;
+  }
+  const byMonth={};
+  LESSON_HISTORY.forEach(l=>{ if(!byMonth[l.mon]) byMonth[l.mon]=[]; byMonth[l.mon].push(l); });
+  let html='';
+  Object.entries(byMonth).forEach(([mon,lessons])=>{
+    html+=`<div class="history-month">${mon} ${lessons[0].date.split(' ').pop()}</div>`;
+    lessons.forEach(l=>{
+      const stu=STUDENTS[l.stuKey];
+      const tags=l.topics.map(t=>`<span class="lc-tag">${t}</span>`).join('');
+      html+=`<div class="lesson-card">
+        <div class="lc-top">
+          <div class="lc-date-block">
+            <div class="lc-date-box"><div class="lc-day">${l.day}</div><div class="lc-mon">${l.mon}</div></div>
+            <div class="lc-info">
+              <div class="lc-title">${stu?.name||'Session'}</div>
+              <div class="lc-meta">${l.date} · ${l.duration} · ${stu?.subject||''}</div>
+            </div>
+          </div>
+        </div>
+        ${tags?`<div class="lc-topics"><div class="lc-topics-label">Topics Covered</div><div class="lc-tags">${tags}</div></div>`:''}
+        ${l.notes?`<div class="lc-notes"><div class="lc-notes-label">Your Notes</div><div class="lc-notes-text">${l.notes}</div></div>`:''}
+        <div class="lc-dur">⏱ ${l.duration}</div>
+      </div>`;
+    });
+  });
+  container.innerHTML=html;
+}
+
+// ── NOTIFICATIONS ──────────────────────────────────────────────────────────
+function renderNotifications(){
+  const el=document.getElementById('notifList');
+  const unread=NOTIFS.filter(n=>n.unread).length;
+  const dot=document.getElementById('notifDot');
+  dot.textContent=unread||''; dot.style.display=unread?'':'none';
+  el.innerHTML=NOTIFS.map(n=>`
+    <div class="notif-item${n.unread?' unread':''}">
+      <div class="notif-icon-wrap ${n.iconClass}">${n.icon}</div>
+      <div class="notif-content">
+        <div class="notif-title">${n.title}</div>
+        <div class="notif-body">${n.body}</div>
+        <div class="notif-time">${n.time}</div>
+        ${n.action?`<div class="notif-action-row"><button class="btn btn-primary btn-sm" onclick="${n.action.fn}">${n.action.label}</button></div>`:''}
+      </div>
+      ${n.unread?'<div class="unread-pip"></div>':''}
+    </div>`).join('');
+}
+function openNotif(){ renderNotifications(); document.getElementById('notifOverlay').classList.add('open'); }
+function closeNotifOverlay(e){ if(e.target===document.getElementById('notifOverlay')) closeNotifDirect(); }
+function closeNotifDirect(){ document.getElementById('notifOverlay').classList.remove('open'); }
+function markAllRead(){ NOTIFS.forEach(n=>n.unread=false); renderNotifications(); showToast('All notifications marked as read.'); }
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+function switchPayTab(tab){
+  document.getElementById('payTabLogged').style.display = tab==='logged'?'':'none';
+  document.getElementById('payTabPaid').style.display   = tab==='paid'  ?'':'none';
+  document.getElementById('tabLogged').style.background = tab==='logged'?'var(--green-dark)':'transparent';
+  document.getElementById('tabLogged').style.color      = tab==='logged'?'#fff':'var(--text-2)';
+  document.getElementById('tabLogged').style.border     = tab==='logged'?'none':'1px solid var(--border)';
+  document.getElementById('tabPaid').style.background   = tab==='paid'  ?'var(--green-dark)':'transparent';
+  document.getElementById('tabPaid').style.color        = tab==='paid'  ?'#fff':'var(--text-2)';
+  document.getElementById('tabPaid').style.border       = tab==='paid'  ?'none':'1px solid var(--border)';
+}
+
+function showPage(name,el){
+  document.querySelectorAll('.content').forEach(p=>p.style.display='none');
+  const page=document.getElementById('page-'+name);
+  if(page) page.style.display='block';
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const labels={timetable:'Timetable',history:'Lesson Reports',hours:'Hours & Pay',profile:'Profile',settings:'Settings'};
+  document.getElementById('breadcrumb').innerHTML=`Portal · <span>${labels[name]||name}</span>`;
+  if(name==='history') renderHistory();
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+buildGrid();
+renderNotifications();
+</script>
+</body>
+</html>

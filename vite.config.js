@@ -7,6 +7,17 @@ export default defineConfig(({ mode }) => {
 
   return {
     base: mode === 'production' ? productionBase : '/',
+    server: {
+      proxy: {
+        '/analytics': 'http://localhost:8000',
+        '/data': 'http://localhost:8000',
+        '/files': 'http://localhost:8000',
+        '/jobs': 'http://localhost:8000',
+        '/results': 'http://localhost:8000',
+        '/health': 'http://localhost:8000',
+        '/matching': 'http://localhost:8000',
+      }
+    },
     build: {
       rollupOptions: {
         input: {
@@ -18,7 +29,9 @@ export default defineConfig(({ mode }) => {
           marketingInsights: 'marketing-insights.html',
           payrollAnalytics: 'payroll-analytics.html',
           records: 'records.html',
-          csvUpload: resolve(__dirname, 'csv-upload.html')
+          csvUpload: resolve(__dirname, 'csv-upload.html'),
+          studentPortal: 'student-portal.html',
+          tutorPortal: 'tutor-portal.html'
         }
       }
     }

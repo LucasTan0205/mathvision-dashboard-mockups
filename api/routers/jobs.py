@@ -3,9 +3,8 @@
 import threading
 from pathlib import Path
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from api.auth import verify_api_key
 from api.models import JobCreateResponse, JobStatus
 from api.services import job_runner
 
@@ -15,7 +14,7 @@ router = APIRouter(tags=["jobs"])
 
 
 @router.post("/jobs", response_model=JobCreateResponse, status_code=201)
-async def create_job(_: str = Depends(verify_api_key)) -> JobCreateResponse:
+async def create_job() -> JobCreateResponse:
     """Trigger a new analytics run and return the job ID."""
     job_id = job_runner.create_job()
     thread = threading.Thread(target=job_runner.run_job, args=(job_id,), daemon=True)
@@ -24,13 +23,13 @@ async def create_job(_: str = Depends(verify_api_key)) -> JobCreateResponse:
 
 
 @router.get("/jobs/{job_id}", response_model=JobStatus)
-async def get_job(job_id: str, _: str = Depends(verify_api_key)) -> JobStatus:
+async def get_job(job_id: str) -> JobStatus:
     """Return current status for a job. 404 if not found."""
     return job_runner.get_job(job_id)
 
 
 @router.get("/results", response_model=list[str])
-async def get_results(_: str = Depends(verify_api_key)) -> list[str]:
+async def get_results() -> list[str]:
     """List filenames in the pre-processed output directory."""
     if not _PRE_PROCESSED_DIR.exists():
         return []

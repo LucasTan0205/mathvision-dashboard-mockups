@@ -141,6 +141,8 @@ export function createStudentIntakeContent() {
   `;
 }
 
+const API_KEY = window.MATHVISION_API_KEY ?? 'dev-key';
+
 /* ── Init (wired after DOM mount) ──────────────────────── */
 
 export function initStudentIntake() {
@@ -326,4 +328,33 @@ export function initStudentIntake() {
 
   /* Initial render */
   render();
+
+  /* Seed from CSV if localStorage is empty */
+  async function seedStudentsIfEmpty() {
+    // Never overwrite existing records
+    if (loadStudents().length > 0) return;
+    try {
+      const res = await fetch('/data/students', { headers: { 'X-API-Key': API_KEY } });
+      if (!res.ok) return;
+      const rows = await res.json();
+      if (!rows.length) return;
+      const mapped = rows.map(r => ({
+        id: uid(),
+        name: r.student_name ?? r.name ?? '',
+        studentId: r.student_id ?? '',
+        curriculum: r.curriculum ?? '',
+        grade: r.grade_level ?? r.grade ?? '',
+        topics: r.weak_topic ? [r.weak_topic] : [],
+        slots: r.requested_slot ? [r.requested_slot] : [],
+        notes: '',
+        parent: '',
+        createdAt: Date.now()
+      }));
+      students = mapped;
+      saveStudents(students);
+      render();
+    } catch { /* silent — empty state shown */ }
+  }
+
+  seedStudentsIfEmpty();
 }
