@@ -5,6 +5,7 @@
   // { label: 'Tutor Capacity', path: '/capacity-utilization.html', icon: 'bar-chart-line' },
   // { label: 'Marketing Insights', path: '/marketing-insights.html', icon: 'clipboard-data' },
   // { label: 'Payroll Analytics', path: '/payroll-analytics.html', icon: 'wallet' },
+  { label: 'CSV Upload', path: '/csv-upload.html', icon: 'cloud-upload' },
   { label: 'Records', path: '/records.html', icon: 'folder2-open' }
 ];
 
