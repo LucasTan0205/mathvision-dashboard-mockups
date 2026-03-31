@@ -41,7 +41,8 @@ _REPO_ROOT = os.path.abspath(os.path.join(_HERE, "..", ".."))
 
 _CSV_PATH      = os.path.join(_REPO_ROOT, "analytics-engine", "data", "raw", "pairings_raw.csv")
 _STUDENTS_PATH = os.path.join(_REPO_ROOT, "analytics-engine", "data", "raw", "students.csv")
-_DB_PATH       = os.path.join(_REPO_ROOT, "analytics-engine", "data", "pairing_store.db")
+_DEFAULT_DB    = os.path.join(_REPO_ROOT, "analytics-engine", "data", "pairing_store.db")
+_DB_PATH       = os.environ.get("DB_PATH", _DEFAULT_DB)
 
 _TIME_SLOT_MAP = {0: "morning", 1: "afternoon", 2: "evening"}
 

@@ -11,3 +11,6 @@ Thumbs.db
 *.db-wal
 *.sqlite
 *.sqlite3
+
+# DB container — do not push
+container/Dockerfile.db
