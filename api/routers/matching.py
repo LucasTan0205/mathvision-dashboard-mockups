@@ -33,7 +33,18 @@ router = APIRouter(prefix="/matching", tags=["matching"])
 _jobs: dict[str, MatchingRunResponse] = {}
 
 
-@router.post("/run", response_model=MatchingRunResponse, status_code=200)
+@router.get("/pairings", response_model=list[dict])
+async def get_all_pairings(
+    time_slot: Optional[str] = None,
+) -> list[dict]:
+    """
+    Return all pairings with student and tutor names joined in.
+    Optionally filter by time_slot exact match or day prefix (e.g. 'Mon', 'Tue').
+    """
+    return pairing_store.get_pairings_by_slot(time_slot)
+
+
+
 async def matching_run(request: MatchingRunRequest) -> MatchingRunResponse:
     """Run the matching pipeline and return the result."""
     response = run_matching(request)

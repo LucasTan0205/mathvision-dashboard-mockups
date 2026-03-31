@@ -1,0 +1,26 @@
+services:
+
+  db:
+    build:
+      context: ..
+      dockerfile: container/Dockerfile.db
+    volumes:
+      - db-data:/data
+    restart: "no"   # init container — runs once then exits
+
+  app:
+    build:
+      context: ..
+      dockerfile: container/Dockerfile.app
+    ports:
+      - "80:80"
+    volumes:
+      - db-data:/app/analytics-engine/data
+    environment:
+      - DB_PATH=/app/analytics-engine/data/pairing_store.db
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  db-data:

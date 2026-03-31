@@ -307,10 +307,40 @@ export function createManpowerManagementContent() {
           <p class="panel-label">Live coverage</p>
           <h3 class="panel-title">Shift coverage</h3>
         </div>
-        <span class="feature-pill"><i class="bi bi-clock-history"></i> Real-time</span>
+        <button class="btn mp-btn mp-btn--outline" id="viewTimetableBtn" type="button">
+          <i class="bi bi-calendar3"></i> View all timetables
+        </button>
       </div>
       <div class="mp-shifts-grid">${shiftCards}</div>
     </section>
+
+    <!-- Timetable modal -->
+    <div class="mp-timetable-overlay" id="timetableOverlay" role="dialog" aria-modal="true" aria-label="Timetable">
+      <div class="mp-timetable-modal">
+        <div class="mp-timetable-modal__header">
+          <div>
+            <p class="panel-label">Schedule</p>
+            <h3 class="panel-title" id="timetableTitle">All Timetables</h3>
+          </div>
+          <button class="mp-timetable-modal__close" id="timetableClose" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="mp-timetable-modal__filters">
+          <button class="mp-tt-filter mp-tt-filter--active" data-slot="">All days</button>
+          <button class="mp-tt-filter" data-slot="Mon">Monday</button>
+          <button class="mp-tt-filter" data-slot="Tue">Tuesday</button>
+          <button class="mp-tt-filter" data-slot="Wed">Wednesday</button>
+          <button class="mp-tt-filter" data-slot="Thu">Thursday</button>
+          <button class="mp-tt-filter" data-slot="Fri">Friday</button>
+          <button class="mp-tt-filter" data-slot="Sat">Saturday</button>
+          <button class="mp-tt-filter" data-slot="Sun">Sunday</button>
+        </div>
+        <div class="mp-timetable-modal__body" id="timetableBody">
+          <div class="mp-timetable-loading"><i class="bi bi-arrow-repeat mp-spin"></i> Loading pairings…</div>
+        </div>
+      </div>
+    </div>
 
     <section class="mp-dual">
       <div class="mp-dual__left">
@@ -881,4 +911,168 @@ export function initManpowerManagementCharts() {
 
   initPairingGraph();
   initUtilisationPanel();
+  initTimetable();
+}
+
+/* ── Timetable modal ─────────────────────────────────────────────── */
+
+function initTimetable() {
+  const overlay  = document.getElementById('timetableOverlay');
+  const closeBtn = document.getElementById('timetableClose');
+  const body     = document.getElementById('timetableBody');
+  const title    = document.getElementById('timetableTitle');
+  const filters  = document.querySelectorAll('.mp-tt-filter');
+  const openBtn  = document.getElementById('viewTimetableBtn');
+
+  if (!overlay) return;
+
+  let _currentSlot = '';
+
+  // ── Open / close ──────────────────────────────────────────────
+  function openTimetable(slot = '') {
+    _currentSlot = slot;
+    // Sync filter buttons
+    filters.forEach(btn => {
+      btn.classList.toggle('mp-tt-filter--active', btn.dataset.slot === slot);
+    });
+    const dayNames = { Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday' };
+    title.textContent = slot
+      ? `${dayNames[slot] || slot} Timetable`
+      : 'All Timetables';
+    overlay.classList.add('mp-timetable-overlay--visible');
+    fetchAndRenderPairings(slot);
+  }
+
+  function closeTimetable() {
+    overlay.classList.remove('mp-timetable-overlay--visible');
+  }
+
+  openBtn?.addEventListener('click', () => openTimetable(''));
+  closeBtn?.addEventListener('click', closeTimetable);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeTimetable(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTimetable(); });
+
+  // ── Filter buttons ────────────────────────────────────────────
+  filters.forEach(btn => {
+    btn.addEventListener('click', () => {
+      openTimetable(btn.dataset.slot);
+    });
+  });
+
+  // ── Shift tile click → open filtered by day ──────────────────
+  document.addEventListener('click', e => {
+    const tile = e.target.closest('.mp-slot--filled');
+    if (!tile) return;
+    // Shift cards don't carry day info — open all timetables
+    openTimetable('');
+  });
+
+  // ── Heatmap cell click → open filtered by day ────────────────
+  document.addEventListener('click', e => {
+    const cell = e.target.closest('.mp-heat__cell[data-demand-tip]');
+    if (!cell) return;
+    // Get the column index to determine day
+    const row  = cell.closest('tr');
+    if (!row) return;
+    const cells = Array.from(row.querySelectorAll('td.mp-heat__cell'));
+    const colIdx = cells.indexOf(cell);
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const day  = days[colIdx] ?? '';
+    openTimetable(day);
+  });
+
+  // ── Fetch & render ────────────────────────────────────────────
+  async function fetchAndRenderPairings(slot) {
+    body.innerHTML = '<div class="mp-timetable-loading"><i class="bi bi-arrow-repeat mp-spin"></i> Loading pairings…</div>';
+    const qs  = slot ? `?time_slot=${encodeURIComponent(slot)}` : '';
+    try {
+      const res = await fetch(`/matching/pairings${qs}`, {
+        headers: { 'X-API-Key': API_KEY }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const pairings = await res.json();
+      renderPairings(pairings, slot);
+    } catch (err) {
+      body.innerHTML = `<p class="mp-timetable-empty">Could not load pairings — ${err.message}</p>`;
+    }
+  }
+
+  function renderPairings(pairings, slot) {
+    if (!pairings.length) {
+      body.innerHTML = `<p class="mp-timetable-empty">No confirmed pairings${slot ? ` for ${slot}` : ''} yet.</p>`;
+      return;
+    }
+
+    const DAY_ORDER = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const DAY_FULL  = { Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday' };
+
+    // Group by day prefix (first 3 chars of time_slot, normalised)
+    const groups = {};
+    pairings.forEach(p => {
+      const raw = (p.time_slot || '').trim();
+      const dayKey = raw.slice(0, 3);  // e.g. "Mon", "Sat"
+      const normKey = dayKey.charAt(0).toUpperCase() + dayKey.slice(1).toLowerCase();
+      if (!groups[normKey]) groups[normKey] = [];
+      groups[normKey].push(p);
+    });
+
+    const sortedKeys = Object.keys(groups).sort((a, b) => {
+      const ai = DAY_ORDER.indexOf(a), bi = DAY_ORDER.indexOf(b);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+
+    body.innerHTML = sortedKeys.map(dayKey => {
+      // Sort pairings within day by time
+      const dayPairings = groups[dayKey].sort((a, b) => a.time_slot.localeCompare(b.time_slot));
+
+      const rows = dayPairings.map((p, idx) => {
+        const score = Math.round(p.satisfaction_score);
+        const scoreClass = score >= 75 ? 'good' : score >= 50 ? 'ok' : 'low';
+        const timeLabel = (p.time_slot || '').replace(/^[A-Za-z]+_/, '');
+        const matchedDate = p.matched_at ? new Date(p.matched_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+        const band = idx % 2 === 0 ? 'even' : 'odd';
+
+        return `
+          <tr class="mp-tt-row mp-tt-row--pair-${band}">
+            <td class="mp-tt-cell mp-tt-cell--muted" style="width:60px">${timeLabel}</td>
+            <td class="mp-tt-cell">
+              <span class="mp-tt-avatar">${initials(p.student_name)}</span>
+              <span class="mp-tt-name">${p.student_name || p.student_id}</span>
+            </td>
+            <td class="mp-tt-cell mp-tt-cell--muted">${p.curriculum || '—'} · Gr ${p.grade_level || '—'}</td>
+            <td class="mp-tt-cell mp-tt-cell--muted">${p.weak_topic || '—'}</td>
+            <td class="mp-tt-cell">
+              <span class="mp-tt-avatar mp-tt-avatar--tutor">${initials(p.tutor_name)}</span>
+              <span class="mp-tt-name">${p.tutor_name || p.tutor_id}</span>
+            </td>
+            <td class="mp-tt-cell">
+              <span class="mp-tt-score mp-tt-score--${scoreClass}">${score}%</span>
+            </td>
+            <td class="mp-tt-cell mp-tt-cell--muted">${matchedDate}</td>
+          </tr>`;
+      }).join('');
+
+      const label = DAY_FULL[dayKey] || dayKey;
+      return `
+        <div class="mp-tt-group">
+          <div class="mp-tt-group__header">
+            <span class="mp-tt-group__label">${label}</span>
+            <span class="mp-tt-group__count">${dayPairings.length} pairing${dayPairings.length !== 1 ? 's' : ''}</span>
+          </div>
+          <table class="mp-tt-table">
+            <thead>
+              <tr>
+                <th>Time</th><th>Student</th><th>Level</th><th>Topic</th><th>Tutor</th><th>Match</th><th>Matched on</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }).join('');
+  }
+
+  function initials(name) {
+    if (!name) return '?';
+    return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  }
 }
