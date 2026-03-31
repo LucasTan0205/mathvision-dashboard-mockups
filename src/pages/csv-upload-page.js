@@ -263,6 +263,9 @@ function startPolling(jobId) {
             <i class="bi bi-download me-1"></i>${f}
           </a>`
         ).join('');
+        // Invalidate cached analytics data so all pages re-fetch fresh results
+        try { localStorage.removeItem('mathvision-mapping-quality-timeseries'); } catch { /* silent */ }
+        try { localStorage.removeItem('mathvision-analytics-metrics'); } catch { /* silent */ }
       }
     } catch (err) {
       clearInterval(intervalId);

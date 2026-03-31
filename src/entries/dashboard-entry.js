@@ -1,5 +1,5 @@
 ﻿import { mountPage } from '/src/app.js';
-import { createDashboardContent } from '/src/pages/dashboard-page.js';
+import { createDashboardContent, initDashboard } from '/src/pages/dashboard-page.js';
 
 mountPage({
   route: '/dashboard.html',
@@ -7,3 +7,5 @@ mountPage({
   breadcrumb: 'Dashboard',
   contentHtml: createDashboardContent()
 });
+
+initDashboard();

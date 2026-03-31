@@ -8,6 +8,9 @@ api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
 async def verify_api_key(api_key: str = Security(api_key_header)) -> str:
     expected = os.environ.get("MATHVISION_API_KEY", "")
+    # If no key is configured, skip auth (dev mode)
+    if not expected:
+        return api_key or ""
     if not api_key or api_key != expected:
         raise HTTPException(status_code=401, detail="unauthorized")
     return api_key

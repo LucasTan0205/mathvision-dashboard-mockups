@@ -1,3 +1,92 @@
+const LS_KEY = 'mathvision-analytics-metrics';
+
+function formatAccuracy(accuracy) {
+  return (parseFloat(accuracy) * 100).toFixed(1) + '%';
+}
+
+export { formatAccuracy };
+
+function isStale(runTimestamp) {
+  return Date.now() - new Date(runTimestamp).getTime() > 24 * 3600 * 1000;
+}
+
+export { isStale };
+
+function renderLastUpdated(card, runTimestamp) {
+  // Remove any existing last-updated label
+  const existing = card.querySelector('.kpi-last-updated');
+  if (existing) existing.remove();
+
+  const label = document.createElement('p');
+  label.className = 'kpi-last-updated';
+
+  if (runTimestamp) {
+    label.textContent = 'Last updated: ' + new Date(runTimestamp).toLocaleString();
+    if (isStale(runTimestamp)) {
+      label.classList.add('mp-badge--amber');
+    }
+  } else {
+    label.textContent = 'Data freshness unknown';
+  }
+
+  card.appendChild(label);
+}
+
+function findMatchScoreCard() {
+  const labels = document.querySelectorAll('.kpi-card__label');
+  for (const label of labels) {
+    if (label.textContent.trim() === 'Match score') {
+      return label.closest('article');
+    }
+  }
+  return null;
+}
+
+function applyFromCache(cache) {
+  const card = findMatchScoreCard();
+  if (!card) return;
+  const valueEl = card.querySelector('.kpi-card__value');
+  if (valueEl) valueEl.textContent = cache ? cache.matchScore : '—';
+  renderLastUpdated(card, cache ? cache.runTimestamp : null);
+}
+
+export async function initDashboard() {
+  const API_KEY = window.MATHVISION_API_KEY ?? 'dev-key';
+
+  try {
+    const [metricsRes, rankingsRes] = await Promise.all([
+      fetch('/analytics/model-metrics', { headers: { 'X-API-Key': API_KEY } }),
+      fetch('/analytics/scenario-rankings', { headers: { 'X-API-Key': API_KEY } })
+    ]);
+
+    const metricsRows = metricsRes.ok ? await metricsRes.json() : [];
+    const rankingsRows = rankingsRes.ok ? await rankingsRes.json() : [];
+
+    if (!metricsRows.length && !rankingsRows.length) {
+      const cached = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+      applyFromCache(cached);
+      return;
+    }
+
+    const matchScore = metricsRows.length ? formatAccuracy(metricsRows[0].accuracy) : '—';
+    const studentCount = new Set(rankingsRows.map(r => r.student_id)).size;
+    const runTimestamp = metricsRows.length ? (metricsRows[0].run_timestamp ?? null) : null;
+
+    const cache = { matchScore, studentCount, fetchedAt: new Date().toISOString(), runTimestamp };
+    try { localStorage.setItem(LS_KEY, JSON.stringify(cache)); } catch { /* silent */ }
+
+    const card = findMatchScoreCard();
+    if (card) {
+      const valueEl = card.querySelector('.kpi-card__value');
+      if (valueEl) valueEl.textContent = matchScore;
+      renderLastUpdated(card, runTimestamp);
+    }
+  } catch {
+    const cached = JSON.parse(localStorage.getItem(LS_KEY) || 'null');
+    applyFromCache(cached);
+  }
+}
+
 export function createDashboardContent() {
   const kpis = [
     { title: 'Overall retention', value: '84.2%', delta: 'Up 3.7% vs last quarter' },

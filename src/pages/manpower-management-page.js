@@ -1,5 +1,8 @@
 import { baseChartOptions, chartPalette, mountChart } from '/src/lib/charts.js';
 import { Chart } from 'chart.js';
+import { sliceRecentRows, transformToChartData } from '/src/lib/mapping-quality-transform.js';
+
+const API_KEY = window.MATHVISION_API_KEY ?? 'dev-key';
 
 /* ── Data ───────────────────────────────────────────────── */
 
@@ -250,6 +253,36 @@ export function createManpowerManagementContent() {
       </div>
     </section>`;
 
+  /* Section 7 – Tutor Student Pairing Graph */
+  const pairingGraph = `
+    <section class="shell-card">
+      <div class="shell-card__header">
+        <div>
+          <p class="panel-label">Matching analytics</p>
+          <h3 class="panel-title">Tutor Student Pairing</h3>
+        </div>
+        <span class="feature-pill"><i class="bi bi-graph-up"></i> Past 7 days</span>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card__canvas chart-card__canvas--tall" id="pairingChartContainer">
+          <canvas id="pairingChart" aria-label="Daily average satisfaction scores chart"></canvas>
+        </div>
+      </div>
+    </section>`;
+
+  /* Section 8 – Tutor Utilisation Panel */
+  const utilisationPanel = `
+    <section class="shell-card">
+      <div class="shell-card__header">
+        <div>
+          <p class="panel-label">Workforce</p>
+          <h3 class="panel-title">Tutor Utilisation</h3>
+        </div>
+        <span class="feature-pill"><i class="bi bi-people"></i> Live</span>
+      </div>
+      <div id="utilisationPanel"></div>
+    </section>`;
+
   /* ── Assemble ─────────────────────────────────────────── */
 
   return `
@@ -314,6 +347,10 @@ export function createManpowerManagementContent() {
     </section>
 
     ${mappingChart}
+
+    ${pairingGraph}
+
+    ${utilisationPanel}
   `;
 }
 
@@ -351,57 +388,99 @@ export function initManpowerManagementCharts() {
   /* Sparklines */
   kpis.forEach((k) => mountSparkline(k.id, k.data, k.tone));
 
-  /* Section 6 – Mapping quality line chart */
-  mountChart('skillMappingChart', {
-    type: 'line',
-    data: {
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-      datasets: [
-        {
-          label: 'Mapping quality',
-          data: [91, 89, 93, 90, 92, 94, 93],
-          borderColor: '#1D9E75',
-          backgroundColor: 'rgba(29, 158, 117, 0.10)',
-          pointBackgroundColor: '#1D9E75',
-          pointBorderColor: '#ffffff',
-          pointBorderWidth: 2,
-          pointRadius: 5,
-          pointHoverRadius: 7,
-          tension: 0.32,
-          fill: true
+  /* Section 6 – Mapping quality line chart (live data) */
+  (async () => {
+    const canvas = document.getElementById('skillMappingChart');
+    const container = canvas ? canvas.closest('.chart-card__canvas') : null;
+
+    const targetDataset = {
+      label: '90% target',
+      data: [],
+      borderColor: '#EF9F27',
+      borderDash: [6, 4],
+      borderWidth: 2,
+      pointRadius: 0,
+      pointHitRadius: 0,
+      fill: false
+    };
+
+    const LS_TIMESERIES_KEY = 'mathvision-mapping-quality-timeseries';
+
+    function renderChart(rows) {
+      const slice = sliceRecentRows(rows);
+      const { labels, values } = transformToChartData(slice);
+      const targetValues = slice.map(() => 90);
+      // Re-query canvas at render time in case the DOM was mutated
+      const liveCanvas = document.getElementById('skillMappingChart');
+      if (!liveCanvas) return;
+      mountChart('skillMappingChart', {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Mapping quality',
+              data: values,
+              borderColor: '#1D9E75',
+              backgroundColor: 'rgba(29, 158, 117, 0.10)',
+              pointBackgroundColor: '#1D9E75',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              tension: 0.32,
+              fill: true
+            },
+            { ...targetDataset, data: targetValues }
+          ]
         },
-        {
-          label: '90% target',
-          data: [90, 90, 90, 90, 90, 90, 90],
-          borderColor: '#EF9F27',
-          borderDash: [6, 4],
-          borderWidth: 2,
-          pointRadius: 0,
-          pointHitRadius: 0,
-          fill: false
-        }
-      ]
-    },
-    options: {
-      ...baseChartOptions,
-      plugins: {
-        ...baseChartOptions.plugins,
-        legend: { display: false }
-      },
-      scales: {
-        x: { ...baseChartOptions.scales.x },
-        y: {
-          ...baseChartOptions.scales.y,
-          min: 80,
-          max: 100,
-          ticks: {
-            ...baseChartOptions.scales.y.ticks,
-            callback: (v) => `${v}%`
+        options: {
+          ...baseChartOptions,
+          plugins: {
+            ...baseChartOptions.plugins,
+            legend: { display: false }
+          },
+          scales: {
+            x: { ...baseChartOptions.scales.x },
+            y: {
+              ...baseChartOptions.scales.y,
+              min: 50,
+              max: 100,
+              ticks: {
+                ...baseChartOptions.scales.y.ticks,
+                callback: (v) => `${v}%`
+              }
+            }
           }
         }
+      });
+    }
+
+    try {
+      const res = await fetch('/analytics/mapping-quality-timeseries', {
+        headers: { 'X-API-Key': API_KEY }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const rows = await res.json();
+
+      if (rows.length === 0) {
+        if (container) container.innerHTML = '<p class="mp-no-data">No data available</p>';
+        return;
+      }
+
+      try { localStorage.setItem(LS_TIMESERIES_KEY, JSON.stringify(rows)); } catch { /* silent */ }
+      renderChart(rows);
+    } catch (err) {
+      console.warn('[MappingQualityChart] fetch failed:', err);
+      const cached = (() => { try { return JSON.parse(localStorage.getItem(LS_TIMESERIES_KEY)); } catch { return null; } })();
+      if (cached && cached.length > 0) {
+        console.info('[MappingQualityChart] rendering from cache', cached.length, 'rows');
+        renderChart(cached);
+      } else {
+        if (container) container.innerHTML = '<p class="mp-error-state">Could not load mapping quality data</p>';
       }
     }
-  });
+  })();
 
   /* Expand / collapse action items */
   document.querySelectorAll('.mp-action').forEach((el) => {
@@ -410,4 +489,136 @@ export function initManpowerManagementCharts() {
       el.classList.toggle('mp-action--expanded');
     });
   });
+
+  /* Section 7 – Tutor Student Pairing graph (Task 10.1) */
+  function initPairingGraph() {
+    let backoffDelay = 5000;
+    const MAX_BACKOFF = 30000;
+    let pollTimer = null;
+
+    async function fetchAndRender() {
+      try {
+        const res = await fetch('/matching/stats/daily', {
+          headers: { 'X-API-Key': API_KEY }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        // Reset back-off on success
+        backoffDelay = 5000;
+
+        const container = document.getElementById('pairingChartContainer');
+
+        // Filter out days with no data (omit zero values per requirement 9.5)
+        const filtered = (data || []).filter(d => d.pairing_count > 0 && d.avg_satisfaction_score > 0);
+
+        if (filtered.length === 0) {
+          if (container) container.innerHTML = '<p class="mp-no-data">No pairing data available yet</p>';
+          return;
+        }
+
+        // Show at minimum the most recent 7 days
+        const recent = filtered.slice(-7);
+
+        mountChart('pairingChart', {
+          type: 'line',
+          data: {
+            labels: recent.map(d => d.date),
+            datasets: [{
+              label: 'Avg Satisfaction Score',
+              data: recent.map(d => d.avg_satisfaction_score),
+              borderColor: '#1D9E75',
+              backgroundColor: 'rgba(29, 158, 117, 0.10)',
+              pointBackgroundColor: '#1D9E75',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              tension: 0.32,
+              fill: true
+            }]
+          },
+          options: {
+            ...baseChartOptions,
+            plugins: {
+              ...baseChartOptions.plugins,
+              legend: { display: false }
+            },
+            scales: {
+              x: { ...baseChartOptions.scales.x },
+              y: {
+                ...baseChartOptions.scales.y,
+                min: 0,
+                max: 100,
+                ticks: {
+                  ...baseChartOptions.scales.y.ticks,
+                  callback: (v) => `${v}`
+                }
+              }
+            }
+          }
+        });
+      } catch (err) {
+        console.warn('[PairingGraph] fetch failed:', err);
+        // Exponential back-off on failure (max 30 s)
+        backoffDelay = Math.min(backoffDelay * 2, MAX_BACKOFF);
+        clearInterval(pollTimer);
+        pollTimer = setTimeout(() => {
+          fetchAndRender();
+          pollTimer = setInterval(fetchAndRender, 5000);
+        }, backoffDelay);
+        return;
+      }
+    }
+
+    fetchAndRender();
+    pollTimer = setInterval(fetchAndRender, 5000);
+  }
+
+  /* Section 8 – Tutor Utilisation panel (Task 10.2) */
+  function initUtilisationPanel() {
+    const BADGE_COLORS = {
+      'Appropriately-utilised': '#1D9E75',
+      'Under-utilised': '#EF9F27',
+      'Over-utilised': '#E24B4A'
+    };
+
+    async function fetchAndRender() {
+      try {
+        const res = await fetch('/matching/tutors/utilisation', {
+          headers: { 'X-API-Key': API_KEY }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        const panel = document.getElementById('utilisationPanel');
+        if (!panel) return;
+
+        if (!data || data.length === 0) {
+          panel.innerHTML = '<p class="mp-no-data">No tutor data available yet</p>';
+          return;
+        }
+
+        panel.innerHTML = data.map(tutor => {
+          const color = BADGE_COLORS[tutor.utilisation_status] || '#45504a';
+          return `
+            <div class="mp-relief__item">
+              <div class="mp-relief__info">
+                <p class="mp-relief__name">${tutor.name}</p>
+              </div>
+              <span class="mp-relief__avail">${tutor.utilisation.toFixed(1)}%</span>
+              <span class="mp-badge" style="background:${color};color:#fff;border-color:${color}">${tutor.utilisation_status}</span>
+            </div>`;
+        }).join('');
+      } catch (err) {
+        console.warn('[UtilisationPanel] fetch failed:', err);
+      }
+    }
+
+    fetchAndRender();
+    setInterval(fetchAndRender, 5000);
+  }
+
+  initPairingGraph();
+  initUtilisationPanel();
 }

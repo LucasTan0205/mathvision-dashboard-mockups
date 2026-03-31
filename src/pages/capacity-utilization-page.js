@@ -8,6 +8,8 @@ const BALANCED_MIN  = 60;
 const UNDER_MIN     = 45;
 const TARGET_CAP    = 120; // monthly teaching capacity per tutor
 
+const API_KEY = (typeof window !== 'undefined' ? window.MATHVISION_API_KEY : undefined) ?? 'dev-key';
+
 /* ── Data ───────────────────────────────────────────────── */
 
 const tutors = [
@@ -102,7 +104,7 @@ function miniGrid(avail) {
 
 /* ── Distribution buckets ──────────────────────────────── */
 
-function buildDistribution() {
+function buildDistribution(tutorList) {
   const bands = [
     { label: '0–44h', key: 'severe',     color: '#E24B4A', count: 0 },
     { label: '45–59h', key: 'under',      color: '#EF9F27', count: 0 },
@@ -110,7 +112,7 @@ function buildDistribution() {
     { label: '80–99h', key: 'high',       color: '#157a56', count: 0 },
     { label: '100h+',  key: 'overloaded', color: '#E24B4A', count: 0 }
   ];
-  tutors.forEach((t) => {
+  tutorList.forEach((t) => {
     if (t.hours >= BURNOUT_HOURS)      bands[4].count++;
     else if (t.hours >= HIGH_LOAD_MIN) bands[3].count++;
     else if (t.hours >= BALANCED_MIN)  bands[2].count++;
@@ -123,7 +125,7 @@ function buildDistribution() {
 /* ── Content builder ────────────────────────────────────── */
 
 export function createCapacityUtilizationContent() {
-  const bands = buildDistribution();
+  const bands = buildDistribution(tutors);
   const totalSpare = reassignments.reduce((s, r) => s + r.spare, 0);
 
   /* Section 1 – Actionable Insight Banner */
@@ -302,12 +304,11 @@ function mountSparkline(id, data, tone) {
   });
 }
 
-export function initCapacityUtilizationCharts() {
-  /* Sparklines */
-  kpis.forEach(k => mountSparkline(k.id, k.spark, k.tone));
+/* ── buildCharts: renders distribution chart, tutor table, trend chart ── */
 
+function buildCharts(liveTutors, usingSampleData) {
   /* Section 3 – Distribution bar chart */
-  const bands = buildDistribution();
+  const bands = buildDistribution(liveTutors);
   mountChart('capDistChart', {
     type: 'bar',
     data: {
@@ -337,6 +338,47 @@ export function initCapacityUtilizationCharts() {
       }
     }
   });
+
+  /* Populate tutor table */
+  const sortedTutors = [...liveTutors].sort((a, b) => b.hours - a.hours);
+  const tableRows = sortedTutors.map(t => {
+    const st = statusOf(t.hours);
+    const d  = delta(t.hours, t.lastMonth);
+    const remaining = TARGET_CAP - t.hours;
+    const act = actionLabel(st);
+    return `
+      <tr class="cu-row" data-status="${st.label}">
+        <td class="cu-row__name">${t.name}</td>
+        <td>${t.hours}h</td>
+        <td>${Math.round((t.hours / TARGET_CAP) * 100)}%</td>
+        <td><span class="cu-status cu-status--${st.tone}">${st.label}</span></td>
+        <td><span class="${d.cls}">${d.arrow} ${d.text}</span></td>
+        <td>${remaining}h</td>
+        <td>${act ? `<button class="btn mp-btn mp-btn--outline mp-btn--sm" type="button">${act}</button>` : '—'}</td>
+      </tr>
+      <tr class="cu-row__expand" data-status="${st.label}"><td colspan="7"><div class="cu-row__grid">${miniGrid(t.avail)}</div></td></tr>`;
+  }).join('');
+
+  const tbody = document.getElementById('cuTableBody');
+  if (tbody) tbody.innerHTML = tableRows;
+
+  /* Update tutor count pill */
+  const pill = document.querySelector('.cu-panel .feature-pill .bi-table')?.closest('.feature-pill');
+  if (pill) pill.textContent = `${liveTutors.length} tutors`;
+
+  /* Sample data banner */
+  if (usingSampleData) {
+    const tablePanel = document.querySelector('#cuTableBody')?.closest('.cu-panel');
+    if (tablePanel) {
+      const existing = tablePanel.querySelector('.cu-sample-indicator');
+      if (!existing) {
+        const indicator = document.createElement('div');
+        indicator.className = 'cu-sample-indicator';
+        indicator.textContent = 'Using sample data';
+        tablePanel.prepend(indicator);
+      }
+    }
+  }
 
   /* Section 6 – Monthly trend line chart */
   mountChart('capTrendChart', {
@@ -413,6 +455,63 @@ export function initCapacityUtilizationCharts() {
       if (expand?.classList.contains('cu-row__expand')) expand.classList.toggle('cu-row__expand--open');
     });
   });
+}
+
+export function initCapacityUtilizationCharts() {
+  /* Sparklines — mounted synchronously before async fetch */
+  kpis.forEach(k => mountSparkline(k.id, k.spark, k.tone));
+
+  /* Async IIFE: fetch pairings and build charts */
+  (async () => {
+    try {
+      const res = await fetch('/data/pairings', {
+        headers: { 'X-API-Key': API_KEY }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const rows = await res.json();
+      if (!rows || rows.length === 0) throw new Error('Empty response');
+
+      /* Filter to most recent 30-day window and aggregate */
+      const filtered = filterToRecentWindow(rows);
+      const liveTutors = aggregateTutorHours(filtered);
+
+      buildCharts(liveTutors, false);
+    } catch {
+      buildCharts(tutors, true);
+    }
+  })();
+}
+
+/* ── Exported pure helpers (used by property tests) ─────── */
+
+/**
+ * Given an array of pairing rows, returns only those within the 30-day window
+ * ending at (and including) the most recent session_date in the dataset.
+ * @param {Array<{session_date: string, duration_hours: string, tutor_name: string}>} rows
+ * @returns {Array}
+ */
+export function filterToRecentWindow(rows) {
+  if (!rows || rows.length === 0) return [];
+  const maxDate = new Date(Math.max(...rows.map(r => new Date(r.session_date))));
+  const windowStart = new Date(maxDate.getTime() - 30 * 24 * 3600 * 1000);
+  return rows.filter(r => new Date(r.session_date) >= windowStart);
+}
+
+/**
+ * Given an array of pairing rows (already filtered), aggregates total hours per tutor.
+ * @param {Array<{tutor_name: string, duration_hours: string}>} rows
+ * @returns {Array<{name: string, hours: number, lastMonth: number, avail: Array}>}
+ */
+export function aggregateTutorHours(rows) {
+  const totals = {};
+  for (const r of rows) {
+    const name = r.tutor_name;
+    if (!name) continue;
+    totals[name] = (totals[name] ?? 0) + parseFloat(r.duration_hours);
+  }
+  return Object.entries(totals)
+    .map(([name, totalHours]) => ({ name, hours: Math.round(totalHours), lastMonth: 0, avail: [] }))
+    .sort((a, b) => b.hours - a.hours);
 }
 
 function applyFilter(status) {

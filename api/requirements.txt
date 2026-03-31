@@ -2,6 +2,8 @@ fastapi
 uvicorn[standard]
 python-multipart
 nbconvert
+sentence-transformers
 hypothesis
 pytest
 httpx
+pulp

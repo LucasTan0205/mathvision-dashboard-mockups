@@ -161,6 +161,8 @@ export function createTutorProfilesContent() {
   `;
 }
 
+const API_KEY = window.MATHVISION_API_KEY ?? 'dev-key';
+
 /* ── Init ──────────────────────────────────────────────── */
 
 export function initTutorProfiles() {
@@ -407,4 +409,31 @@ export function initTutorProfiles() {
   sortEl.addEventListener('change', () => render());
 
   render();
+
+  /* Seed from CSV if localStorage is empty */
+  async function seedTutorsIfEmpty() {
+    // Never overwrite existing records
+    if (loadTutors().length > 0) return;
+    try {
+      const res = await fetch('/data/tutors', { headers: { 'X-API-Key': API_KEY } });
+      if (!res.ok) return;
+      const rows = await res.json();
+      if (!rows.length) return;
+      const mapped = rows.map(r => ({
+        id: uid(),
+        name: r.tutor_name ?? r.name ?? '',
+        experience: parseInt(r.years_experience ?? r.experience ?? '0', 10) || 0,
+        curricula: r.primary_curriculum ? [r.primary_curriculum] : [],
+        topics: r.specialty_topic ? [r.specialty_topic] : [],
+        availability: [],
+        history: '',
+        createdAt: Date.now()
+      }));
+      tutors = mapped;
+      saveTutors(tutors);
+      render();
+    } catch { /* silent — empty state shown */ }
+  }
+
+  seedTutorsIfEmpty();
 }
