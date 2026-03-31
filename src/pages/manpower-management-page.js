@@ -319,7 +319,14 @@ export function createManpowerManagementContent() {
             <p class="panel-label">Forward planning</p>
             <h3 class="panel-title">7-day demand heatmap</h3>
           </div>
+          <select id="demandBranchSelect" class="mp-branch-select" aria-label="Filter by branch">
+            <option value="">All Branches</option>
+            <option value="Central">Central</option>
+            <option value="East">East</option>
+            <option value="West">West</option>
+          </select>
         </div>
+        <div id="demand-warning-container"></div>
         <div class="mp-heat-wrap">
           <table class="mp-heat">
             <thead>
@@ -332,6 +339,7 @@ export function createManpowerManagementContent() {
           <span class="mp-heat-legend__item mp-heat-legend__item--green">Covered</span>
           <span class="mp-heat-legend__item mp-heat-legend__item--amber">Tight</span>
           <span class="mp-heat-legend__item mp-heat-legend__item--red">At risk</span>
+          <span class="mp-heat-legend__item mp-heat-legend__item--peak">Peak</span>
         </div>
       </div>
       <div class="mp-dual__right">
@@ -345,6 +353,8 @@ export function createManpowerManagementContent() {
         ${reliefItems}
       </div>
     </section>
+
+    <div id="demand-recommendations"></div>
 
     ${mappingChart}
 
@@ -384,9 +394,259 @@ function mountSparkline(id, data, tone) {
   });
 }
 
+/* ── Peak Demand Prediction – fetch, heatmap & recommendations ── */
+
+const DEMAND_LS_BRANCH_KEY = 'mathvision-demand-branch';
+const DEMAND_POLL_MS = 5 * 60 * 1000; // 5 minutes
+const DEMAND_TIMEOUT_MS = 60_000; // Prophet fitting can take 20–30s on first run
+
+let _lastDemandData = null;
+let _demandPollTimer = null;
+let _demandAbortCtrl = null;
+
+/** Colour a cell based on score and threshold */
+export function demandCellColour(score, threshold) {
+  if (score >= threshold) return 'red';
+  if (score >= 0.5) return 'amber';
+  return 'green';
+}
+
+/** Urgency class for recommendation items */
+export function demandUrgencyClass(score) {
+  return score >= 0.9 ? 'urgent' : 'watch';
+}
+
+/** Show loading skeleton in the heatmap tbody */
+function showHeatmapSkeleton() {
+  const tbody = document.querySelector('.mp-heat tbody');
+  if (!tbody) return;
+  const days = 7;
+  const slots = ['AM', 'PM', 'Eve'];
+  tbody.innerHTML = slots.map(label => `
+    <tr>
+      <th class="mp-heat__label">${label}</th>
+      ${Array.from({ length: days }, () => `<td class="mp-heat__cell"><div class="mp-skeleton mp-skeleton--cell"></div></td>`).join('')}
+    </tr>
+  `).join('');
+  // Show a non-alarming loading note
+  showDemandWarning('Calculating demand forecast — this may take up to 30 seconds on first load…');
+}
+
+/** Show or hide the warning banner */
+function showDemandWarning(msg) {
+  const container = document.getElementById('demand-warning-container');
+  if (!container) return;
+  if (!msg) { container.innerHTML = ''; return; }
+  container.innerHTML = `<div class="mp-demand-warning"><i class="bi bi-exclamation-circle-fill"></i> ${msg}</div>`;
+}
+
+/** Render live heatmap from DemandPredictionResponse */
+function renderLiveHeatmap(data) {
+  const tbody = document.querySelector('.mp-heat tbody');
+  if (!tbody || !data || !data.demand_matrix) return;
+
+  const threshold = data.peak_threshold ?? 0.75;
+  const slotLabels = ['AM', 'PM', 'Eve'];
+
+  // demand_matrix is 3 rows (morning/afternoon/evening) × 7 cols (Mon–Sun)
+  const rows = data.demand_matrix;
+  tbody.innerHTML = rows.map((row, ri) => {
+    const label = slotLabels[ri] || `Slot${ri}`;
+    const cells = row.map(cell => {
+      const colour = demandCellColour(cell.demand_score, threshold);
+      const isPeak = cell.is_peak;
+      const peakClass = isPeak ? ' mp-heat__cell--peak' : '';
+      const icon = isPeak ? ' <i class="bi bi-exclamation-triangle-fill"></i>' : '';
+
+      // Plain-language demand label for cell display
+      const demandLabel = cell.demand_score >= threshold
+        ? 'Very high'
+        : cell.demand_score >= 0.5
+          ? 'High'
+          : cell.demand_score >= 0.25
+            ? 'Moderate'
+            : 'Low';
+
+      // Find matching recommendation for tooltip
+      const rec = (data.recommendations || []).find(
+        r => r.day_of_week === cell.day_of_week && r.time_slot === cell.time_slot
+      );
+
+      // Tooltip: technical detail for those who want it
+      const tipParts = [`Forecast: ~${cell.raw_session_count} sessions`, `Demand score: ${cell.demand_score.toFixed(2)}`];
+      if (cell.forecast_lower != null && cell.forecast_upper != null) {
+        tipParts.push(`Range: ${Math.round(cell.forecast_lower)}–${Math.round(cell.forecast_upper)}`);
+      }
+      if (isPeak && rec) tipParts.push(`Suggest ${rec.recommended_additional_tutors} extra tutor${rec.recommended_additional_tutors > 1 ? 's' : ''}`);
+      const tooltipAttr = ` data-demand-tip="${tipParts.join(' · ')}"`;
+
+
+      return `<td class="mp-heat__cell mp-heat__cell--${colour}${peakClass}"${tooltipAttr}>${demandLabel}${icon}</td>`;
+    }).join('');
+    return `<tr><th class="mp-heat__label">${label}</th>${cells}</tr>`;
+  }).join('');
+
+  // Attach tooltip behaviour
+  _attachHeatmapTooltips();
+
+  showDemandWarning(null);
+}
+
+/** Tooltip hover logic for peak cells */
+function _attachHeatmapTooltips() {
+  // Remove any existing tooltip
+  document.querySelectorAll('.mp-heat__tooltip').forEach(el => el.remove());
+
+  const tooltip = document.createElement('div');
+  tooltip.className = 'mp-heat__tooltip';
+  document.body.appendChild(tooltip);
+
+  document.querySelectorAll('[data-demand-tip]').forEach(cell => {
+    cell.style.position = 'relative';
+    cell.addEventListener('mouseenter', () => {
+      tooltip.textContent = cell.getAttribute('data-demand-tip');
+      const rect = cell.getBoundingClientRect();
+      tooltip.style.left = `${rect.left + rect.width / 2 - tooltip.offsetWidth / 2}px`;
+      tooltip.style.top = `${rect.top - tooltip.offsetHeight - 6 + window.scrollY}px`;
+      tooltip.classList.add('mp-heat__tooltip--visible');
+    });
+    cell.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('mp-heat__tooltip--visible');
+    });
+  });
+}
+
+/** Render recommendations panel */
+function renderRecommendations(data) {
+  const container = document.getElementById('demand-recommendations');
+  if (!container) return;
+
+  const recs = data && data.recommendations ? data.recommendations : [];
+
+  let itemsHtml;
+  if (recs.length === 0) {
+    itemsHtml = `<p class="mp-ramp-panel__empty">No peak periods predicted for the current dataset.</p>`;
+  } else {
+    itemsHtml = recs.map(rec => {
+      const urgency = demandUrgencyClass(rec.demand_score);
+      const urgencyLabel = urgency === 'urgent' ? 'Urgent' : 'Watch';
+      const slotLabel = rec.time_slot.charAt(0).toUpperCase() + rec.time_slot.slice(1);
+      const demandPct = Math.round(rec.demand_score * 100);
+      return `
+        <div class="mp-ramp-panel__item mp-ramp-panel__item--${urgency}" data-ramp-expand>
+          <div class="mp-ramp-panel__item-head">
+            <span class="mp-ramp-panel__item-badge">${urgencyLabel}</span>
+            <div class="mp-ramp-panel__item-body">
+              <p class="mp-ramp-panel__item-title">${rec.day_label} ${slotLabel} — ${demandPct}% of peak capacity</p>
+              <p class="mp-ramp-panel__item-meta">Suggest ${rec.recommended_additional_tutors} extra tutor${rec.recommended_additional_tutors > 1 ? 's' : ''} for this slot</p>
+            </div>
+          </div>
+          <div class="mp-ramp-panel__item-detail">
+            Based on ${rec.raw_session_count} past sessions in this slot — recent sessions weighted more heavily
+            <span class="mp-ramp-panel__item-technical">Demand score: ${rec.demand_score.toFixed(2)} · Weighted count: ${rec.weighted_session_count.toFixed(2)}</span>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  container.innerHTML = `
+    <section class="mp-ramp-panel">
+      <div class="mp-ramp-panel__header">
+        <div>
+          <p class="panel-label">Predictions</p>
+          <h3 class="panel-title">Predicted Peak Demand</h3>
+        </div>
+        <span class="feature-pill"><i class="bi bi-graph-up-arrow"></i> AI-driven</span>
+      </div>
+      ${itemsHtml}
+    </section>`;
+
+  // Attach expand/collapse
+  container.querySelectorAll('[data-ramp-expand]').forEach(el => {
+    el.addEventListener('click', () => {
+      el.classList.toggle('mp-ramp-panel__item--expanded');
+    });
+  });
+}
+
+/** Fetch demand data from API */
+async function fetchDemandData(branch) {
+  // Abort any in-flight request
+  if (_demandAbortCtrl) _demandAbortCtrl.abort();
+  _demandAbortCtrl = new AbortController();
+
+  const timeoutId = setTimeout(() => _demandAbortCtrl.abort(), DEMAND_TIMEOUT_MS);
+
+  const params = new URLSearchParams();
+  if (branch) params.set('branch', branch);
+  const qs = params.toString();
+  const url = `/demand/predict${qs ? '?' + qs : ''}`;
+
+  try {
+    showHeatmapSkeleton();
+    const res = await fetch(url, {
+      headers: { 'X-API-Key': API_KEY },
+      signal: _demandAbortCtrl.signal
+    });
+    clearTimeout(timeoutId);
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    _lastDemandData = data;
+
+    renderLiveHeatmap(data);
+    renderRecommendations(data);
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      console.warn('[DemandPredict] request aborted/timed out');
+    } else {
+      console.warn('[DemandPredict] fetch failed:', err);
+    }
+    showDemandWarning('Demand data unavailable — showing last known data');
+
+    // Restore last data if available, otherwise keep static fallback
+    if (_lastDemandData) {
+      renderLiveHeatmap(_lastDemandData);
+      renderRecommendations(_lastDemandData);
+    }
+  }
+}
+
+/** Initialise demand prediction: branch selector, fetch, polling */
+function initDemandPrediction() {
+  const select = document.getElementById('demandBranchSelect');
+
+  // Restore saved branch
+  const savedBranch = localStorage.getItem(DEMAND_LS_BRANCH_KEY) || '';
+  if (select) select.value = savedBranch;
+
+  // Initial fetch
+  fetchDemandData(savedBranch || null);
+
+  // Branch change handler
+  if (select) {
+    select.addEventListener('change', () => {
+      const branch = select.value;
+      localStorage.setItem(DEMAND_LS_BRANCH_KEY, branch);
+      fetchDemandData(branch || null);
+    });
+  }
+
+  // 5-minute polling
+  if (_demandPollTimer) clearInterval(_demandPollTimer);
+  _demandPollTimer = setInterval(() => {
+    const branch = select ? select.value : '';
+    fetchDemandData(branch || null);
+  }, DEMAND_POLL_MS);
+}
+
 export function initManpowerManagementCharts() {
   /* Sparklines */
   kpis.forEach((k) => mountSparkline(k.id, k.data, k.tone));
+
+  /* Peak Demand Prediction */
+  initDemandPrediction();
 
   /* Section 6 – Mapping quality line chart (live data) */
   (async () => {

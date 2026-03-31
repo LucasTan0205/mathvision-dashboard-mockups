@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Literal
 from pydantic import BaseModel, field_validator
 
@@ -160,3 +161,47 @@ class TutorUtilisation(BaseModel):
         if v < 0.0:
             raise ValueError("utilisation must be >= 0")
         return v
+
+
+# --- Peak Demand Prediction Models ---
+
+class SessionRecord(BaseModel):
+    pairing_id: str
+    student_id: str
+    tutor_id: str
+    session_date: date
+    duration_hours: float
+    day_of_week: int            # 0=Mon, 6=Sun
+    time_slot: Literal["morning", "afternoon", "evening"]
+
+
+class DemandCell(BaseModel):
+    day_of_week: int            # 0–6
+    day_label: str              # "Monday"–"Sunday"
+    time_slot: Literal["morning", "afternoon", "evening"]
+    demand_score: float         # 0.0–1.0 normalised
+    raw_session_count: int      # Prophet yhat (rounded) or historical count
+    weighted_session_count: float
+    is_peak: bool
+    forecast_lower: float | None = None   # Prophet yhat_lower
+    forecast_upper: float | None = None   # Prophet yhat_upper
+
+
+class RampUpRecommendation(BaseModel):
+    day_of_week: int
+    day_label: str
+    time_slot: Literal["morning", "afternoon", "evening"]
+    demand_score: float
+    raw_session_count: int
+    weighted_session_count: float
+    recommended_additional_tutors: int  # >= 1
+    branch: str | None = None
+
+
+class DemandPredictionResponse(BaseModel):
+    demand_matrix: list[list[DemandCell]]  # 3 rows × 7 cols
+    peak_periods: list[DemandCell]
+    recommendations: list[RampUpRecommendation]
+    peak_threshold: float
+    branch: str | None = None
+    data_warning: str | None = None

@@ -318,7 +318,7 @@ def get_tutor_utilisation(tutor_id: str, db_path: str = DB_PATH) -> float:
             (tutor_id,),
         ).fetchone()["cnt"]
 
-    return (pairing_count / capacity) * 100.0
+    return min((pairing_count / capacity) * 100.0, 100.0)
 
 
 def get_all_tutor_utilisation(db_path: str = DB_PATH) -> list[TutorUtilisation]:
