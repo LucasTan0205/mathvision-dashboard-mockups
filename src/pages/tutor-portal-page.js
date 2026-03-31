@@ -236,7 +236,7 @@ export function createTutorPortalContent() {
         <div class="tp-setting-row"><div><div class="tp-setting-name">Cancellation Alerts</div><div class="tp-setting-sub">Notify if a session is cancelled by the centre</div></div><div class="tp-toggle" onclick="this.classList.toggle('active')"><div class="tp-toggle-knob"></div></div></div>
         <div class="tp-settings-title">Account</div>
         <div class="tp-setting-row"><div><div class="tp-setting-name">Change Password</div><div class="tp-setting-sub">Update your login password</div></div><button class="tp-btn tp-btn--outline" style="font-size:11px;padding:6px 12px;" onclick="tpShowToast('Password reset email sent.')">Reset</button></div>
-        <div class="tp-setting-row"><div><div class="tp-setting-name" style="color:var(--red);">Log Out</div><div class="tp-setting-sub">Sign out of your account</div></div><button class="tp-btn" style="font-size:11px;padding:6px 12px;background:var(--red-light);color:var(--red);border:1px solid #E0A090;" onclick="tpShowToast('Logged out.')">Log Out</button></div>
+        <div class="tp-setting-row"><div><div class="tp-setting-name" style="color:var(--red);">Log Out</div><div class="tp-setting-sub">Sign out of your account</div></div><button class="tp-btn" style="font-size:11px;padding:6px 12px;background:var(--red-light);color:var(--red);border:1px solid #E0A090;" onclick="['mv_tutor_id','mv_tutor_name','mv_tutor_profile'].forEach(k=>localStorage.removeItem(k));window.location.href='/';">Log Out</button></div>
       </div>
     </div>
   </main>
@@ -520,7 +520,7 @@ export function initTutorPortal() {
         localStorage.setItem('mv_tutor_name', payload.name);
         localStorage.setItem('mv_tutor_profile', JSON.stringify(payload));
         tpUpdateNavUser(); tpUpdateProfileAvatar(payload.name); tpShowToast('✓ Profile saved!');
-        pairingsLoaded = false; // force timetable refresh on next visit
+        pairingsLoaded = false; pairingsError = false; // force timetable refresh on next visit
       } else {
         const data = await res.json().catch(() => ({}));
         const detail = data?.detail;
@@ -537,11 +537,12 @@ export function initTutorPortal() {
   // ── Live pairings from API ─────────────────────────────────────────────
   let livePairings = {}; // { "MON_09:00": PairingRecord }
   let pairingsLoaded = false;
+  let pairingsError = false;
 
   async function tpLoadPairings() {
     try {
-      const res = await fetch(`/matching/tutors/${tutorId}/pairings`, { headers: { 'X-API-Key': '' } });
-      if (!res.ok) return;
+      const res = await fetch(`/matching/tutors/${tutorId}/pairings`);
+      if (!res.ok) { pairingsError = true; return; }
       const records = await res.json();
 
       // Fetch student names for all unique student IDs
@@ -549,7 +550,7 @@ export function initTutorPortal() {
       const studentNames = {};
       await Promise.all(studentIds.map(async id => {
         try {
-          const r = await fetch(`/matching/students/${id}`, { headers: { 'X-API-Key': '' } });
+          const r = await fetch(`/matching/students/${id}`);
           if (r.ok) { const s = await r.json(); studentNames[id] = s.name; }
         } catch {}
       }));
@@ -561,16 +562,24 @@ export function initTutorPortal() {
         livePairings[key] = { ...p, student_name: studentNames[p.student_id] || p.student_id };
       });
       pairingsLoaded = true;
-    } catch { }
+    } catch (err) {
+      console.error('Failed to load pairings:', err);
+      pairingsError = true;
+    }
   }
 
   function tpBuildGrid() {
     const grid = document.getElementById('tp-tt-main-grid');
     if (!grid) return;
 
-    if (!pairingsLoaded) {
+    if (!pairingsLoaded && !pairingsError) {
       tpLoadPairings().then(() => tpBuildGrid());
       grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Loading sessions…</div>';
+      return;
+    }
+
+    if (pairingsError) {
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Unable to load sessions. Please ensure the server is running and refresh the page.</div>';
       return;
     }
 

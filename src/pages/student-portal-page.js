@@ -235,7 +235,7 @@ export function createStudentPortalContent() {
         <div class="sp-setting-row"><div><div class="sp-setting-name">Cancellation Alerts</div><div class="sp-setting-sub">Notify if a session is cancelled by the centre</div></div><div class="sp-toggle" onclick="this.classList.toggle('active')"><div class="sp-toggle-knob"></div></div></div>
         <div class="sp-settings-title">Account</div>
         <div class="sp-setting-row"><div><div class="sp-setting-name">Change Password</div><div class="sp-setting-sub">Update your login password</div></div><button class="sp-btn sp-btn--outline" style="font-size:11px;padding:6px 12px;" onclick="spShowToast('Password reset email sent.')">Reset</button></div>
-        <div class="sp-setting-row"><div><div class="sp-setting-name" style="color:var(--red);">Log Out</div><div class="sp-setting-sub">Sign out of your account</div></div><button class="sp-btn" style="font-size:11px;padding:6px 12px;background:var(--red-light);color:var(--red);border:1px solid #E0A090;" onclick="spShowToast('Logged out.')">Log Out</button></div>
+        <div class="sp-setting-row"><div><div class="sp-setting-name" style="color:var(--red);">Log Out</div><div class="sp-setting-sub">Sign out of your account</div></div><button class="sp-btn" style="font-size:11px;padding:6px 12px;background:var(--red-light);color:var(--red);border:1px solid #E0A090;" onclick="['mv_student_id','mv_student_name','mv_student_profile'].forEach(k=>localStorage.removeItem(k));window.location.href='/';">Log Out</button></div>
       </div>
     </div>
   </main>
@@ -454,15 +454,18 @@ export function initStudentPortal() {
     };
     const submitBtn = document.getElementById('sp-submit-btn');
     submitBtn.disabled = true; submitBtn.textContent = 'Saving…';
+
+    // Persist locally regardless of API availability
+    localStorage.setItem('mv_student_name', payload.name);
+    localStorage.setItem('mv_student_profile', JSON.stringify(payload));
+    spUpdateNavUser(); spUpdateProfileAvatar(payload.name);
+
     try {
-      const res = await fetch('/matching/students', { method:'POST', headers:{'Content-Type':'application/json','X-API-Key':''}, body:JSON.stringify(payload) });
+      const res = await fetch('/matching/students', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
       if (res.ok) {
         successBanner.style.display = 'block';
-        // Persist name for nav/profile
-        localStorage.setItem('mv_student_name', payload.name);
-        localStorage.setItem('mv_student_profile', JSON.stringify(payload));
-        spUpdateNavUser(); spUpdateProfileAvatar(payload.name); spShowToast('✓ Profile saved!');
-        pairingsLoaded = false; // force timetable refresh on next visit
+        spShowToast('✓ Profile saved!');
+        pairingsLoaded = false; pairingsError = false; // force timetable refresh on next visit
       } else {
         const data = await res.json().catch(() => ({}));
         const detail = data?.detail;
@@ -470,8 +473,8 @@ export function initStudentPortal() {
         errorBanner.style.display = 'block';
       }
     } catch {
-      errorBanner.textContent = 'Network error. Please check your connection and try again.';
-      errorBanner.style.display = 'block';
+      successBanner.style.display = 'block';
+      spShowToast('✓ Profile saved locally!');
     } finally { submitBtn.disabled = false; submitBtn.textContent = 'Save Profile'; }
   });
 
@@ -506,11 +509,12 @@ export function initStudentPortal() {
   // Live pairings fetched from API (keyed by slotKey "DAY_HH:MM")
   let livePairings = {}; // { "MON_09:00": PairingRecord, ... }
   let pairingsLoaded = false;
+  let pairingsError = false;
 
   async function spLoadPairings() {
     try {
-      const res = await fetch(`/matching/students/${studentId}/pairings`, { headers: { 'X-API-Key': '' } });
-      if (!res.ok) return;
+      const res = await fetch(`/matching/students/${studentId}/pairings`);
+      if (!res.ok) { pairingsError = true; return; }
       const records = await res.json();
 
       // Fetch tutor names for all unique tutor IDs
@@ -518,7 +522,7 @@ export function initStudentPortal() {
       const tutorNames = {};
       await Promise.all(tutorIds.map(async id => {
         try {
-          const r = await fetch(`/matching/tutors/${id}`, { headers: { 'X-API-Key': '' } });
+          const r = await fetch(`/matching/tutors/${id}`);
           if (r.ok) { const t = await r.json(); tutorNames[id] = t.name; }
         } catch {}
       }));
@@ -530,17 +534,25 @@ export function initStudentPortal() {
         livePairings[key] = { ...p, tutor_name: tutorNames[p.tutor_id] || p.tutor_id };
       });
       pairingsLoaded = true;
-    } catch { }
+    } catch (err) {
+      console.error('Failed to load pairings:', err);
+      pairingsError = true;
+    }
   }
 
   function spBuildMainGrid() {
     const grid = document.getElementById('sp-tt-main-grid');
     if (!grid) return;
 
-    if (!pairingsLoaded) {
+    if (!pairingsLoaded && !pairingsError) {
       spLoadPairings().then(() => spBuildMainGrid());
       // Show loading state while fetching
       grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Loading sessions…</div>';
+      return;
+    }
+
+    if (pairingsError) {
+      grid.innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--text-3);font-size:13px;">Unable to load sessions. Please ensure the server is running and refresh the page.</div>';
       return;
     }
     grid.innerHTML = '';
