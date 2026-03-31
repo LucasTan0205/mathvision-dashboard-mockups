@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
         '/results': 'http://localhost:8000',
         '/health': 'http://localhost:8000',
         '/matching': 'http://localhost:8000',
+        '/demand': 'http://localhost:8000',
       }
     },
     build: {
