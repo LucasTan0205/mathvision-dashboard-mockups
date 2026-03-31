@@ -307,10 +307,40 @@ export function createManpowerManagementContent() {
           <p class="panel-label">Live coverage</p>
           <h3 class="panel-title">Shift coverage</h3>
         </div>
-        <span class="feature-pill"><i class="bi bi-clock-history"></i> Real-time</span>
+        <button class="btn mp-btn mp-btn--outline" id="viewTimetableBtn" type="button">
+          <i class="bi bi-calendar3"></i> View all timetables
+        </button>
       </div>
       <div class="mp-shifts-grid">${shiftCards}</div>
     </section>
+
+    <!-- Timetable modal -->
+    <div class="mp-timetable-overlay" id="timetableOverlay" role="dialog" aria-modal="true" aria-label="Timetable">
+      <div class="mp-timetable-modal">
+        <div class="mp-timetable-modal__header">
+          <div>
+            <p class="panel-label">Schedule</p>
+            <h3 class="panel-title" id="timetableTitle">All Timetables</h3>
+          </div>
+          <button class="mp-timetable-modal__close" id="timetableClose" aria-label="Close">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="mp-timetable-modal__filters">
+          <button class="mp-tt-filter mp-tt-filter--active" data-slot="">All days</button>
+          <button class="mp-tt-filter" data-slot="Mon">Monday</button>
+          <button class="mp-tt-filter" data-slot="Tue">Tuesday</button>
+          <button class="mp-tt-filter" data-slot="Wed">Wednesday</button>
+          <button class="mp-tt-filter" data-slot="Thu">Thursday</button>
+          <button class="mp-tt-filter" data-slot="Fri">Friday</button>
+          <button class="mp-tt-filter" data-slot="Sat">Saturday</button>
+          <button class="mp-tt-filter" data-slot="Sun">Sunday</button>
+        </div>
+        <div class="mp-timetable-modal__body" id="timetableBody">
+          <div class="mp-timetable-loading"><i class="bi bi-arrow-repeat mp-spin"></i> Loading pairings…</div>
+        </div>
+      </div>
+    </div>
 
     <section class="mp-dual">
       <div class="mp-dual__left">
@@ -319,7 +349,14 @@ export function createManpowerManagementContent() {
             <p class="panel-label">Forward planning</p>
             <h3 class="panel-title">7-day demand heatmap</h3>
           </div>
+          <select id="demandBranchSelect" class="mp-branch-select" aria-label="Filter by branch">
+            <option value="">All Branches</option>
+            <option value="Central">Central</option>
+            <option value="East">East</option>
+            <option value="West">West</option>
+          </select>
         </div>
+        <div id="demand-warning-container"></div>
         <div class="mp-heat-wrap">
           <table class="mp-heat">
             <thead>
@@ -332,6 +369,7 @@ export function createManpowerManagementContent() {
           <span class="mp-heat-legend__item mp-heat-legend__item--green">Covered</span>
           <span class="mp-heat-legend__item mp-heat-legend__item--amber">Tight</span>
           <span class="mp-heat-legend__item mp-heat-legend__item--red">At risk</span>
+          <span class="mp-heat-legend__item mp-heat-legend__item--peak">Peak</span>
         </div>
       </div>
       <div class="mp-dual__right">
@@ -345,6 +383,8 @@ export function createManpowerManagementContent() {
         ${reliefItems}
       </div>
     </section>
+
+    <div id="demand-recommendations"></div>
 
     ${mappingChart}
 
@@ -384,9 +424,259 @@ function mountSparkline(id, data, tone) {
   });
 }
 
+/* ── Peak Demand Prediction – fetch, heatmap & recommendations ── */
+
+const DEMAND_LS_BRANCH_KEY = 'mathvision-demand-branch';
+const DEMAND_POLL_MS = 5 * 60 * 1000; // 5 minutes
+const DEMAND_TIMEOUT_MS = 60_000; // Prophet fitting can take 20–30s on first run
+
+let _lastDemandData = null;
+let _demandPollTimer = null;
+let _demandAbortCtrl = null;
+
+/** Colour a cell based on score and threshold */
+export function demandCellColour(score, threshold) {
+  if (score >= threshold) return 'red';
+  if (score >= 0.5) return 'amber';
+  return 'green';
+}
+
+/** Urgency class for recommendation items */
+export function demandUrgencyClass(score) {
+  return score >= 0.9 ? 'urgent' : 'watch';
+}
+
+/** Show loading skeleton in the heatmap tbody */
+function showHeatmapSkeleton() {
+  const tbody = document.querySelector('.mp-heat tbody');
+  if (!tbody) return;
+  const days = 7;
+  const slots = ['AM', 'PM', 'Eve'];
+  tbody.innerHTML = slots.map(label => `
+    <tr>
+      <th class="mp-heat__label">${label}</th>
+      ${Array.from({ length: days }, () => `<td class="mp-heat__cell"><div class="mp-skeleton mp-skeleton--cell"></div></td>`).join('')}
+    </tr>
+  `).join('');
+  // Show a non-alarming loading note
+  showDemandWarning('Calculating demand forecast — this may take up to 30 seconds on first load…');
+}
+
+/** Show or hide the warning banner */
+function showDemandWarning(msg) {
+  const container = document.getElementById('demand-warning-container');
+  if (!container) return;
+  if (!msg) { container.innerHTML = ''; return; }
+  container.innerHTML = `<div class="mp-demand-warning"><i class="bi bi-exclamation-circle-fill"></i> ${msg}</div>`;
+}
+
+/** Render live heatmap from DemandPredictionResponse */
+function renderLiveHeatmap(data) {
+  const tbody = document.querySelector('.mp-heat tbody');
+  if (!tbody || !data || !data.demand_matrix) return;
+
+  const threshold = data.peak_threshold ?? 0.75;
+  const slotLabels = ['AM', 'PM', 'Eve'];
+
+  // demand_matrix is 3 rows (morning/afternoon/evening) × 7 cols (Mon–Sun)
+  const rows = data.demand_matrix;
+  tbody.innerHTML = rows.map((row, ri) => {
+    const label = slotLabels[ri] || `Slot${ri}`;
+    const cells = row.map(cell => {
+      const colour = demandCellColour(cell.demand_score, threshold);
+      const isPeak = cell.is_peak;
+      const peakClass = isPeak ? ' mp-heat__cell--peak' : '';
+      const icon = isPeak ? ' <i class="bi bi-exclamation-triangle-fill"></i>' : '';
+
+      // Plain-language demand label for cell display
+      const demandLabel = cell.demand_score >= threshold
+        ? 'Very high'
+        : cell.demand_score >= 0.5
+          ? 'High'
+          : cell.demand_score >= 0.25
+            ? 'Moderate'
+            : 'Low';
+
+      // Find matching recommendation for tooltip
+      const rec = (data.recommendations || []).find(
+        r => r.day_of_week === cell.day_of_week && r.time_slot === cell.time_slot
+      );
+
+      // Tooltip: technical detail for those who want it
+      const tipParts = [`Forecast: ~${cell.raw_session_count} sessions`, `Demand score: ${cell.demand_score.toFixed(2)}`];
+      if (cell.forecast_lower != null && cell.forecast_upper != null) {
+        tipParts.push(`Range: ${Math.round(cell.forecast_lower)}–${Math.round(cell.forecast_upper)}`);
+      }
+      if (isPeak && rec) tipParts.push(`Suggest ${rec.recommended_additional_tutors} extra tutor${rec.recommended_additional_tutors > 1 ? 's' : ''}`);
+      const tooltipAttr = ` data-demand-tip="${tipParts.join(' · ')}"`;
+
+
+      return `<td class="mp-heat__cell mp-heat__cell--${colour}${peakClass}"${tooltipAttr}>${demandLabel}${icon}</td>`;
+    }).join('');
+    return `<tr><th class="mp-heat__label">${label}</th>${cells}</tr>`;
+  }).join('');
+
+  // Attach tooltip behaviour
+  _attachHeatmapTooltips();
+
+  showDemandWarning(null);
+}
+
+/** Tooltip hover logic for peak cells */
+function _attachHeatmapTooltips() {
+  // Remove any existing tooltip
+  document.querySelectorAll('.mp-heat__tooltip').forEach(el => el.remove());
+
+  const tooltip = document.createElement('div');
+  tooltip.className = 'mp-heat__tooltip';
+  document.body.appendChild(tooltip);
+
+  document.querySelectorAll('[data-demand-tip]').forEach(cell => {
+    cell.style.position = 'relative';
+    cell.addEventListener('mouseenter', () => {
+      tooltip.textContent = cell.getAttribute('data-demand-tip');
+      const rect = cell.getBoundingClientRect();
+      tooltip.style.left = `${rect.left + rect.width / 2 - tooltip.offsetWidth / 2}px`;
+      tooltip.style.top = `${rect.top - tooltip.offsetHeight - 6 + window.scrollY}px`;
+      tooltip.classList.add('mp-heat__tooltip--visible');
+    });
+    cell.addEventListener('mouseleave', () => {
+      tooltip.classList.remove('mp-heat__tooltip--visible');
+    });
+  });
+}
+
+/** Render recommendations panel */
+function renderRecommendations(data) {
+  const container = document.getElementById('demand-recommendations');
+  if (!container) return;
+
+  const recs = data && data.recommendations ? data.recommendations : [];
+
+  let itemsHtml;
+  if (recs.length === 0) {
+    itemsHtml = `<p class="mp-ramp-panel__empty">No peak periods predicted for the current dataset.</p>`;
+  } else {
+    itemsHtml = recs.map(rec => {
+      const urgency = demandUrgencyClass(rec.demand_score);
+      const urgencyLabel = urgency === 'urgent' ? 'Urgent' : 'Watch';
+      const slotLabel = rec.time_slot.charAt(0).toUpperCase() + rec.time_slot.slice(1);
+      const demandPct = Math.round(rec.demand_score * 100);
+      return `
+        <div class="mp-ramp-panel__item mp-ramp-panel__item--${urgency}" data-ramp-expand>
+          <div class="mp-ramp-panel__item-head">
+            <span class="mp-ramp-panel__item-badge">${urgencyLabel}</span>
+            <div class="mp-ramp-panel__item-body">
+              <p class="mp-ramp-panel__item-title">${rec.day_label} ${slotLabel} — ${demandPct}% of peak capacity</p>
+              <p class="mp-ramp-panel__item-meta">Suggest ${rec.recommended_additional_tutors} extra tutor${rec.recommended_additional_tutors > 1 ? 's' : ''} for this slot</p>
+            </div>
+          </div>
+          <div class="mp-ramp-panel__item-detail">
+            Based on ${rec.raw_session_count} past sessions in this slot — recent sessions weighted more heavily
+            <span class="mp-ramp-panel__item-technical">Demand score: ${rec.demand_score.toFixed(2)} · Weighted count: ${rec.weighted_session_count.toFixed(2)}</span>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  container.innerHTML = `
+    <section class="mp-ramp-panel">
+      <div class="mp-ramp-panel__header">
+        <div>
+          <p class="panel-label">Predictions</p>
+          <h3 class="panel-title">Predicted Peak Demand</h3>
+        </div>
+        <span class="feature-pill"><i class="bi bi-graph-up-arrow"></i> AI-driven</span>
+      </div>
+      ${itemsHtml}
+    </section>`;
+
+  // Attach expand/collapse
+  container.querySelectorAll('[data-ramp-expand]').forEach(el => {
+    el.addEventListener('click', () => {
+      el.classList.toggle('mp-ramp-panel__item--expanded');
+    });
+  });
+}
+
+/** Fetch demand data from API */
+async function fetchDemandData(branch) {
+  // Abort any in-flight request
+  if (_demandAbortCtrl) _demandAbortCtrl.abort();
+  _demandAbortCtrl = new AbortController();
+
+  const timeoutId = setTimeout(() => _demandAbortCtrl.abort(), DEMAND_TIMEOUT_MS);
+
+  const params = new URLSearchParams();
+  if (branch) params.set('branch', branch);
+  const qs = params.toString();
+  const url = `/demand/predict${qs ? '?' + qs : ''}`;
+
+  try {
+    showHeatmapSkeleton();
+    const res = await fetch(url, {
+      headers: { 'X-API-Key': API_KEY },
+      signal: _demandAbortCtrl.signal
+    });
+    clearTimeout(timeoutId);
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    _lastDemandData = data;
+
+    renderLiveHeatmap(data);
+    renderRecommendations(data);
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      console.warn('[DemandPredict] request aborted/timed out');
+    } else {
+      console.warn('[DemandPredict] fetch failed:', err);
+    }
+    showDemandWarning('Demand data unavailable — showing last known data');
+
+    // Restore last data if available, otherwise keep static fallback
+    if (_lastDemandData) {
+      renderLiveHeatmap(_lastDemandData);
+      renderRecommendations(_lastDemandData);
+    }
+  }
+}
+
+/** Initialise demand prediction: branch selector, fetch, polling */
+function initDemandPrediction() {
+  const select = document.getElementById('demandBranchSelect');
+
+  // Restore saved branch
+  const savedBranch = localStorage.getItem(DEMAND_LS_BRANCH_KEY) || '';
+  if (select) select.value = savedBranch;
+
+  // Initial fetch
+  fetchDemandData(savedBranch || null);
+
+  // Branch change handler
+  if (select) {
+    select.addEventListener('change', () => {
+      const branch = select.value;
+      localStorage.setItem(DEMAND_LS_BRANCH_KEY, branch);
+      fetchDemandData(branch || null);
+    });
+  }
+
+  // 5-minute polling
+  if (_demandPollTimer) clearInterval(_demandPollTimer);
+  _demandPollTimer = setInterval(() => {
+    const branch = select ? select.value : '';
+    fetchDemandData(branch || null);
+  }, DEMAND_POLL_MS);
+}
+
 export function initManpowerManagementCharts() {
   /* Sparklines */
   kpis.forEach((k) => mountSparkline(k.id, k.data, k.tone));
+
+  /* Peak Demand Prediction */
+  initDemandPrediction();
 
   /* Section 6 – Mapping quality line chart (live data) */
   (async () => {
@@ -621,4 +911,168 @@ export function initManpowerManagementCharts() {
 
   initPairingGraph();
   initUtilisationPanel();
+  initTimetable();
+}
+
+/* ── Timetable modal ─────────────────────────────────────────────── */
+
+function initTimetable() {
+  const overlay  = document.getElementById('timetableOverlay');
+  const closeBtn = document.getElementById('timetableClose');
+  const body     = document.getElementById('timetableBody');
+  const title    = document.getElementById('timetableTitle');
+  const filters  = document.querySelectorAll('.mp-tt-filter');
+  const openBtn  = document.getElementById('viewTimetableBtn');
+
+  if (!overlay) return;
+
+  let _currentSlot = '';
+
+  // ── Open / close ──────────────────────────────────────────────
+  function openTimetable(slot = '') {
+    _currentSlot = slot;
+    // Sync filter buttons
+    filters.forEach(btn => {
+      btn.classList.toggle('mp-tt-filter--active', btn.dataset.slot === slot);
+    });
+    const dayNames = { Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday' };
+    title.textContent = slot
+      ? `${dayNames[slot] || slot} Timetable`
+      : 'All Timetables';
+    overlay.classList.add('mp-timetable-overlay--visible');
+    fetchAndRenderPairings(slot);
+  }
+
+  function closeTimetable() {
+    overlay.classList.remove('mp-timetable-overlay--visible');
+  }
+
+  openBtn?.addEventListener('click', () => openTimetable(''));
+  closeBtn?.addEventListener('click', closeTimetable);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeTimetable(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTimetable(); });
+
+  // ── Filter buttons ────────────────────────────────────────────
+  filters.forEach(btn => {
+    btn.addEventListener('click', () => {
+      openTimetable(btn.dataset.slot);
+    });
+  });
+
+  // ── Shift tile click → open filtered by day ──────────────────
+  document.addEventListener('click', e => {
+    const tile = e.target.closest('.mp-slot--filled');
+    if (!tile) return;
+    // Shift cards don't carry day info — open all timetables
+    openTimetable('');
+  });
+
+  // ── Heatmap cell click → open filtered by day ────────────────
+  document.addEventListener('click', e => {
+    const cell = e.target.closest('.mp-heat__cell[data-demand-tip]');
+    if (!cell) return;
+    // Get the column index to determine day
+    const row  = cell.closest('tr');
+    if (!row) return;
+    const cells = Array.from(row.querySelectorAll('td.mp-heat__cell'));
+    const colIdx = cells.indexOf(cell);
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const day  = days[colIdx] ?? '';
+    openTimetable(day);
+  });
+
+  // ── Fetch & render ────────────────────────────────────────────
+  async function fetchAndRenderPairings(slot) {
+    body.innerHTML = '<div class="mp-timetable-loading"><i class="bi bi-arrow-repeat mp-spin"></i> Loading pairings…</div>';
+    const qs  = slot ? `?time_slot=${encodeURIComponent(slot)}` : '';
+    try {
+      const res = await fetch(`/matching/pairings${qs}`, {
+        headers: { 'X-API-Key': API_KEY }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const pairings = await res.json();
+      renderPairings(pairings, slot);
+    } catch (err) {
+      body.innerHTML = `<p class="mp-timetable-empty">Could not load pairings — ${err.message}</p>`;
+    }
+  }
+
+  function renderPairings(pairings, slot) {
+    if (!pairings.length) {
+      body.innerHTML = `<p class="mp-timetable-empty">No confirmed pairings${slot ? ` for ${slot}` : ''} yet.</p>`;
+      return;
+    }
+
+    const DAY_ORDER = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const DAY_FULL  = { Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday' };
+
+    // Group by day prefix (first 3 chars of time_slot, normalised)
+    const groups = {};
+    pairings.forEach(p => {
+      const raw = (p.time_slot || '').trim();
+      const dayKey = raw.slice(0, 3);  // e.g. "Mon", "Sat"
+      const normKey = dayKey.charAt(0).toUpperCase() + dayKey.slice(1).toLowerCase();
+      if (!groups[normKey]) groups[normKey] = [];
+      groups[normKey].push(p);
+    });
+
+    const sortedKeys = Object.keys(groups).sort((a, b) => {
+      const ai = DAY_ORDER.indexOf(a), bi = DAY_ORDER.indexOf(b);
+      return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    });
+
+    body.innerHTML = sortedKeys.map(dayKey => {
+      // Sort pairings within day by time
+      const dayPairings = groups[dayKey].sort((a, b) => a.time_slot.localeCompare(b.time_slot));
+
+      const rows = dayPairings.map((p, idx) => {
+        const score = Math.round(p.satisfaction_score);
+        const scoreClass = score >= 75 ? 'good' : score >= 50 ? 'ok' : 'low';
+        const timeLabel = (p.time_slot || '').replace(/^[A-Za-z]+_/, '');
+        const matchedDate = p.matched_at ? new Date(p.matched_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+        const band = idx % 2 === 0 ? 'even' : 'odd';
+
+        return `
+          <tr class="mp-tt-row mp-tt-row--pair-${band}">
+            <td class="mp-tt-cell mp-tt-cell--muted" style="width:60px">${timeLabel}</td>
+            <td class="mp-tt-cell">
+              <span class="mp-tt-avatar">${initials(p.student_name)}</span>
+              <span class="mp-tt-name">${p.student_name || p.student_id}</span>
+            </td>
+            <td class="mp-tt-cell mp-tt-cell--muted">${p.curriculum || '—'} · Gr ${p.grade_level || '—'}</td>
+            <td class="mp-tt-cell mp-tt-cell--muted">${p.weak_topic || '—'}</td>
+            <td class="mp-tt-cell">
+              <span class="mp-tt-avatar mp-tt-avatar--tutor">${initials(p.tutor_name)}</span>
+              <span class="mp-tt-name">${p.tutor_name || p.tutor_id}</span>
+            </td>
+            <td class="mp-tt-cell">
+              <span class="mp-tt-score mp-tt-score--${scoreClass}">${score}%</span>
+            </td>
+            <td class="mp-tt-cell mp-tt-cell--muted">${matchedDate}</td>
+          </tr>`;
+      }).join('');
+
+      const label = DAY_FULL[dayKey] || dayKey;
+      return `
+        <div class="mp-tt-group">
+          <div class="mp-tt-group__header">
+            <span class="mp-tt-group__label">${label}</span>
+            <span class="mp-tt-group__count">${dayPairings.length} pairing${dayPairings.length !== 1 ? 's' : ''}</span>
+          </div>
+          <table class="mp-tt-table">
+            <thead>
+              <tr>
+                <th>Time</th><th>Student</th><th>Level</th><th>Topic</th><th>Tutor</th><th>Match</th><th>Matched on</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+    }).join('');
+  }
+
+  function initials(name) {
+    if (!name) return '?';
+    return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  }
 }

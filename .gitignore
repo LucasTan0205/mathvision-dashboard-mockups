@@ -4,3 +4,13 @@ dist/
 .DS_Store
 Thumbs.db
 .kiro/
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# DB container — do not push
+container/Dockerfile.db

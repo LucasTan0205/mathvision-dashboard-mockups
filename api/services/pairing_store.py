@@ -19,7 +19,8 @@ from api.models import DailyStats, PairingRecord, StudentProfile, TutorProfile, 
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _REPO_ROOT = os.path.abspath(os.path.join(_HERE, "..", ".."))
-DB_PATH = os.path.join(_REPO_ROOT, "analytics-engine", "data", "pairing_store.db")
+_DEFAULT_DB = os.path.join(_REPO_ROOT, "analytics-engine", "data", "pairing_store.db")
+DB_PATH = os.environ.get("DB_PATH", _DEFAULT_DB)
 
 # ---------------------------------------------------------------------------
 # Schema DDL
@@ -196,6 +197,45 @@ def get_pairings_for_tutor(tutor_id: str, db_path: str = DB_PATH) -> list[Pairin
     return [PairingRecord(**dict(row)) for row in rows]
 
 
+def get_pairings_by_slot(
+    time_slot: str | None = None,
+    db_path: str = DB_PATH,
+) -> list[dict]:
+    """
+    Return all pairings joined with student and tutor names.
+    time_slot can be:
+      - None / empty  → all pairings
+      - A day prefix like 'Mon', 'Tue' → all slots for that day (case-insensitive)
+      - An exact slot like 'Mon_19:00'
+    """
+    with get_connection(db_path) as conn:
+        base_select = """
+            SELECT
+                p.pairing_id, p.student_id, p.tutor_id, p.time_slot,
+                p.satisfaction_score, p.tutor_utilisation, p.matched_at,
+                COALESCE(sp.name, p.student_id) AS student_name,
+                COALESCE(tp.name, p.tutor_id)   AS tutor_name,
+                COALESCE(sp.curriculum, '')      AS curriculum,
+                COALESCE(sp.grade_level, 0)      AS grade_level,
+                COALESCE(sp.weak_topic, '')      AS weak_topic,
+                COALESCE(sp.branch, '')          AS branch
+            FROM pairings p
+            LEFT JOIN student_profiles sp ON sp.student_id = p.student_id
+            LEFT JOIN tutor_profiles   tp ON tp.tutor_id   = p.tutor_id
+        """
+        if time_slot:
+            # Day-prefix match (e.g. 'Mon') — case-insensitive LIKE
+            rows = conn.execute(
+                base_select + " WHERE LOWER(p.time_slot) LIKE LOWER(?) ORDER BY p.time_slot, p.matched_at DESC",
+                (f"{time_slot}%",),
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                base_select + " ORDER BY p.time_slot, p.matched_at DESC"
+            ).fetchall()
+    return [dict(row) for row in rows]
+
+
 def get_student_profile(student_id: str, db_path: str = DB_PATH) -> StudentProfile | None:
     """Return the StudentProfile for the given student_id, or None if not found."""
     with get_connection(db_path) as conn:
@@ -318,7 +358,7 @@ def get_tutor_utilisation(tutor_id: str, db_path: str = DB_PATH) -> float:
             (tutor_id,),
         ).fetchone()["cnt"]
 
-    return (pairing_count / capacity) * 100.0
+    return min((pairing_count / capacity) * 100.0, 100.0)
 
 
 def get_all_tutor_utilisation(db_path: str = DB_PATH) -> list[TutorUtilisation]:
