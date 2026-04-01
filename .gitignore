@@ -5,6 +5,11 @@ dist/
 Thumbs.db
 .kiro/
 
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
 # Database files
 *.db
 *.db-shm
