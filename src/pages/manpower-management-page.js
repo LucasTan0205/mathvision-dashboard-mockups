@@ -283,31 +283,9 @@ export function createManpowerManagementContent() {
       <div id="utilisationPanel"></div>
     </section>`;
 
-  /* Section 0 – Pending Lesson Confirmations */
-  const pendingConfirmations = `
-    <section class="shell-card mp-confirm-panel" id="mp-confirm-panel">
-      <div class="shell-card__header">
-        <div>
-          <p class="panel-label">Action required</p>
-          <h3 class="panel-title">Pending Lesson Confirmations</h3>
-        </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <button class="btn mp-btn mp-btn--primary" id="mp-confirm-all-btn" type="button" style="display:none;">
-            <i class="bi bi-check2-all"></i> Confirm All
-          </button>
-          <span class="mp-confirm-badge" id="mp-confirm-count">Loading…</span>
-        </div>
-      </div>
-      <div id="mp-confirm-body">
-        <div class="mp-timetable-loading"><i class="bi bi-arrow-repeat mp-spin"></i> Loading pending lessons…</div>
-      </div>
-    </section>`;
-
   /* ── Assemble ─────────────────────────────────────────── */
 
   return `
-    ${pendingConfirmations}
-
     ${banner}
 
     <section class="mp-kpi-grid">${kpiCards}</section>
@@ -934,159 +912,6 @@ export function initManpowerManagementCharts() {
   initPairingGraph();
   initUtilisationPanel();
   initTimetable();
-  initPendingConfirmations();
-}
-
-/* ── Pending Lesson Confirmations panel ──────────────────────────── */
-
-function initPendingConfirmations() {
-  const body      = document.getElementById('mp-confirm-body');
-  const badge     = document.getElementById('mp-confirm-count');
-  const confirmAllBtn = document.getElementById('mp-confirm-all-btn');
-  if (!body) return;
-
-  async function fetchAndRender() {
-    try {
-      const res = await fetch('/matching/pairings', { headers: { 'X-API-Key': API_KEY } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const all = await res.json();
-      const pending = all.filter(p => (p.status || 'pending') === 'pending');
-
-      // Deduplicate by student+tutor+day (show one row per unique pairing, not per 30-min slot)
-      const seen = new Set();
-      const deduped = pending.filter(p => {
-        const day = (p.time_slot || '').slice(0, 3);
-        const key = `${p.student_id}_${p.tutor_id}_${day}`;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-
-      badge.textContent = deduped.length > 0 ? `${deduped.length} pending` : '✓ All confirmed';
-      badge.className = 'mp-confirm-badge ' + (deduped.length > 0 ? 'mp-confirm-badge--pending' : 'mp-confirm-badge--clear');
-      if (confirmAllBtn) confirmAllBtn.style.display = deduped.length > 0 ? '' : 'none';
-
-      if (deduped.length === 0) {
-        body.innerHTML = '<p class="mp-timetable-empty">No pending lessons — all matched sessions have been confirmed.</p>';
-        return;
-      }
-
-      const DAY_FULL = { Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday' };
-
-      function initials(name) {
-        if (!name) return '?';
-        return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
-      }
-
-      body.innerHTML = `
-        <table class="mp-tt-table">
-          <thead>
-            <tr><th>Day</th><th>Student</th><th>Level</th><th>Topic</th><th>Tutor</th><th>Match</th><th>Action</th></tr>
-          </thead>
-          <tbody>
-            ${deduped.map(p => {
-              const day = (p.time_slot || '').slice(0, 3);
-              const dayLabel = DAY_FULL[day] || day;
-              const score = Math.round(p.satisfaction_score);
-              const scoreClass = score >= 75 ? 'good' : score >= 50 ? 'ok' : 'low';
-              return `
-                <tr id="mp-pc-row-${p.pairing_id}">
-                  <td class="mp-tt-cell mp-tt-cell--muted">${dayLabel}</td>
-                  <td class="mp-tt-cell">
-                    <span class="mp-tt-avatar">${initials(p.student_name)}</span>
-                    <span class="mp-tt-name">${p.student_name || p.student_id}</span>
-                  </td>
-                  <td class="mp-tt-cell mp-tt-cell--muted">${p.curriculum || '—'} · Gr ${p.grade_level || '—'}</td>
-                  <td class="mp-tt-cell mp-tt-cell--muted">${p.weak_topic || '—'}</td>
-                  <td class="mp-tt-cell">
-                    <span class="mp-tt-avatar mp-tt-avatar--tutor">${initials(p.tutor_name)}</span>
-                    <span class="mp-tt-name">${p.tutor_name || p.tutor_id}</span>
-                  </td>
-                  <td class="mp-tt-cell"><span class="mp-tt-score mp-tt-score--${scoreClass}">${score}%</span></td>
-                  <td class="mp-tt-cell">
-                    <button class="mp-tt-confirm-btn" data-pairing-id="${p.pairing_id}" data-student-id="${p.student_id}" data-tutor-id="${p.tutor_id}" data-day="${day}">Confirm</button>
-                  </td>
-                </tr>`;
-            }).join('')}
-          </tbody>
-        </table>`;
-    } catch (err) {
-      console.warn('[PendingConfirmations] fetch failed:', err);
-      body.innerHTML = '<p class="mp-timetable-empty">Could not load pending lessons.</p>';
-    }
-  }
-
-  // Confirm button — confirms ALL slots for the same student+tutor+day
-  body.addEventListener('click', async e => {
-    const btn = e.target.closest('.mp-tt-confirm-btn');
-    if (!btn) return;
-    btn.disabled = true;
-    btn.textContent = 'Confirming…';
-
-    const { pairingId, studentId, tutorId, day } = {
-      pairingId: btn.dataset.pairingId,
-      studentId: btn.dataset.studentId,
-      tutorId:   btn.dataset.tutorId,
-      day:       btn.dataset.day,
-    };
-
-    try {
-      // Fetch all pairings for this student to find sibling slots (same student+tutor+day)
-      const res = await fetch(`/matching/students/${studentId}/pairings`);
-      const all = res.ok ? await res.json() : [];
-      const siblings = all.filter(p =>
-        p.tutor_id === tutorId &&
-        (p.time_slot || '').slice(0, 3) === day &&
-        (p.status || 'pending') === 'pending'
-      );
-
-      // Confirm all sibling slots in parallel
-      const targets = siblings.length > 0 ? siblings.map(p => p.pairing_id) : [pairingId];
-      await Promise.all(targets.map(id =>
-        fetch(`/matching/pairings/${id}/confirm`, { method: 'PATCH' })
-      ));
-
-      // Remove the row and refresh the count
-      document.getElementById(`mp-pc-row-${pairingId}`)?.remove();
-      const remaining = body.querySelectorAll('.mp-tt-confirm-btn').length;
-      badge.textContent = remaining > 0 ? `${remaining} pending` : '✓ All confirmed';
-      if (remaining === 0) {
-        badge.className = 'mp-confirm-badge mp-confirm-badge--clear';
-        if (confirmAllBtn) confirmAllBtn.style.display = 'none';
-        body.innerHTML = '<p class="mp-timetable-empty">No pending lessons — all matched sessions have been confirmed.</p>';
-      }
-    } catch (err) {
-      btn.disabled = false;
-      btn.textContent = 'Confirm';
-      console.error('[PendingConfirmations] confirm failed:', err);
-    }
-  });
-
-  // Confirm All button
-  confirmAllBtn?.addEventListener('click', async () => {
-    const allBtns = [...body.querySelectorAll('.mp-tt-confirm-btn:not(:disabled)')];
-    if (allBtns.length === 0) return;
-    confirmAllBtn.disabled = true;
-    confirmAllBtn.innerHTML = '<i class="bi bi-arrow-repeat mp-spin"></i> Confirming…';
-
-    // Collect all unique pairing IDs from the individual confirm buttons
-    const pairingIds = allBtns.map(b => b.dataset.pairingId);
-    try {
-      await Promise.all(pairingIds.map(id =>
-        fetch(`/matching/pairings/${id}/confirm`, { method: 'PATCH' })
-      ));
-      badge.textContent = '✓ All confirmed';
-      badge.className = 'mp-confirm-badge mp-confirm-badge--clear';
-      confirmAllBtn.style.display = 'none';
-      body.innerHTML = '<p class="mp-timetable-empty">No pending lessons — all matched sessions have been confirmed.</p>';
-    } catch (err) {
-      confirmAllBtn.disabled = false;
-      confirmAllBtn.innerHTML = '<i class="bi bi-check2-all"></i> Confirm All';
-      console.error('[PendingConfirmations] confirm all failed:', err);
-    }
-  });
-
-  fetchAndRender();
 }
 
 /* ── Timetable modal ─────────────────────────────────────────────── */
@@ -1102,9 +927,185 @@ function initTimetable() {
   if (!overlay) return;
 
   let _currentSlot = '';
+  let _periodLocks = []; // cached period locks
+
+  // ── Period lock helpers ────────────────────────────────────────
+  async function fetchPeriodLocks() {
+    try {
+      const res = await fetch('/matching/period-locks', {
+        headers: { 'X-API-Key': API_KEY }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      _periodLocks = await res.json();
+    } catch (err) {
+      console.warn('[PeriodLocks] fetch failed:', err);
+      _periodLocks = [];
+    }
+  }
+
+  function isLocked(day, period) {
+    return _periodLocks.some(l => l.day_of_week === day && l.period === period);
+  }
+
+  function getLockId(day, period) {
+    const lock = _periodLocks.find(l => l.day_of_week === day && l.period === period);
+    return lock ? lock.lock_id : null;
+  }
+
+  async function togglePeriodLock(day, period) {
+    const lockId = getLockId(day, period);
+    try {
+      if (lockId) {
+        const res = await fetch(`/matching/period-locks/${lockId}`, {
+          method: 'DELETE',
+          headers: { 'X-API-Key': API_KEY }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      } else {
+        const res = await fetch('/matching/period-locks', {
+          method: 'POST',
+          headers: { 'X-API-Key': API_KEY, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ day_of_week: day, period, locked_by: 'ops' })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      }
+      await fetchPeriodLocks();
+      renderPeriodLockBar(_currentSlot);
+    } catch (err) {
+      console.warn('[PeriodLocks] toggle failed:', err);
+    }
+  }
+
+  function renderPeriodLockBar(slot) {
+    let existing = overlay.querySelector('.mp-period-lock-bar');
+    if (existing) existing.remove();
+
+    // Only show when a specific day filter is active
+    if (!slot) return;
+
+    const periods = ['AM', 'PM', 'EVE'];
+    const bar = document.createElement('div');
+    bar.className = 'mp-period-lock-bar';
+    bar.innerHTML = `
+      <span class="mp-period-lock-bar__label"><i class="bi bi-lock"></i> Period locks</span>
+      ${periods.map(p => {
+        const locked = isLocked(slot, p);
+        return `<button class="mp-period-lock-btn ${locked ? 'mp-period-lock-btn--active' : ''}"
+                  data-day="${slot}" data-period="${p}" type="button">
+          <i class="bi bi-${locked ? 'lock-fill' : 'unlock'}"></i> ${p}
+        </button>`;
+      }).join('')}
+    `;
+
+    // Insert after filters, before body
+    const filtersDiv = overlay.querySelector('.mp-timetable-modal__filters');
+    if (filtersDiv && filtersDiv.nextSibling) {
+      filtersDiv.parentNode.insertBefore(bar, filtersDiv.nextSibling);
+    } else {
+      body.parentNode.insertBefore(bar, body);
+    }
+
+    // Attach click handlers
+    bar.querySelectorAll('.mp-period-lock-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        togglePeriodLock(btn.dataset.day, btn.dataset.period);
+      });
+    });
+  }
+
+  // ── Pairing action helpers ────────────────────────────────────
+  async function confirmPairing(pairingId) {
+    try {
+      const res = await fetch(`/matching/pairings/${pairingId}/status`, {
+        method: 'PATCH',
+        headers: { 'X-API-Key': API_KEY, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'confirmed' })
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      fetchAndRenderPairings(_currentSlot);
+    } catch (err) {
+      console.warn('[ConfirmPairing] failed:', err);
+    }
+  }
+
+  async function releasePairing(pairingId) {
+    if (!confirm('Release this pairing? This will delete the pairing record.')) return;
+    try {
+      const res = await fetch(`/matching/pairings/${pairingId}`, {
+        method: 'DELETE',
+        headers: { 'X-API-Key': API_KEY }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      fetchAndRenderPairings(_currentSlot);
+    } catch (err) {
+      console.warn('[ReleasePairing] failed:', err);
+    }
+  }
+
+  async function openReassignDropdown(pairingId, btnEl) {
+    // Close any existing dropdown
+    overlay.querySelectorAll('.mp-tt-reassign-dropdown').forEach(d => d.remove());
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'mp-tt-reassign-dropdown';
+    dropdown.innerHTML = '<div class="mp-timetable-loading" style="padding:8px"><i class="bi bi-arrow-repeat mp-spin"></i> Loading tutors…</div>';
+    btnEl.closest('td').style.position = 'relative';
+    btnEl.closest('td').appendChild(dropdown);
+
+    try {
+      const res = await fetch('/matching/tutors/utilisation', {
+        headers: { 'X-API-Key': API_KEY }
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const tutors = await res.json();
+
+      if (!tutors.length) {
+        dropdown.innerHTML = '<p style="padding:8px;margin:0;font-size:13px">No tutors available</p>';
+        return;
+      }
+
+      dropdown.innerHTML = `
+        <p class="mp-tt-reassign-dropdown__title">Reassign to:</p>
+        ${tutors.map(t => `
+          <button class="mp-tt-reassign-option" data-tutor-id="${t.tutor_id}" type="button">
+            <span class="mp-tt-reassign-option__name">${t.name}</span>
+            <span class="mp-tt-reassign-option__util">${t.utilisation.toFixed(0)}%</span>
+          </button>
+        `).join('')}
+      `;
+
+      dropdown.querySelectorAll('.mp-tt-reassign-option').forEach(opt => {
+        opt.addEventListener('click', async () => {
+          try {
+            const r = await fetch(`/matching/pairings/${pairingId}/reassign`, {
+              method: 'PATCH',
+              headers: { 'X-API-Key': API_KEY, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ tutor_id: opt.dataset.tutorId })
+            });
+            if (!r.ok) throw new Error(`HTTP ${r.status}`);
+            dropdown.remove();
+            fetchAndRenderPairings(_currentSlot);
+          } catch (err) {
+            console.warn('[Reassign] failed:', err);
+          }
+        });
+      });
+    } catch (err) {
+      dropdown.innerHTML = `<p style="padding:8px;margin:0;font-size:13px;color:var(--danger)">Failed to load tutors</p>`;
+    }
+
+    // Close dropdown on outside click
+    function closeOnOutside(e) {
+      if (!dropdown.contains(e.target) && e.target !== btnEl) {
+        dropdown.remove();
+        document.removeEventListener('click', closeOnOutside);
+      }
+    }
+    setTimeout(() => document.addEventListener('click', closeOnOutside), 0);
+  }
 
   // ── Open / close ──────────────────────────────────────────────
-  function openTimetable(slot = '') {
+  async function openTimetable(slot = '') {
     _currentSlot = slot;
     // Sync filter buttons
     filters.forEach(btn => {
@@ -1115,11 +1116,16 @@ function initTimetable() {
       ? `${dayNames[slot] || slot} Timetable`
       : 'All Timetables';
     overlay.classList.add('mp-timetable-overlay--visible');
+    await fetchPeriodLocks();
+    renderPeriodLockBar(slot);
     fetchAndRenderPairings(slot);
   }
 
   function closeTimetable() {
     overlay.classList.remove('mp-timetable-overlay--visible');
+    // Clean up period lock bar
+    const bar = overlay.querySelector('.mp-period-lock-bar');
+    if (bar) bar.remove();
   }
 
   openBtn?.addEventListener('click', () => openTimetable(''));
@@ -1138,7 +1144,6 @@ function initTimetable() {
   document.addEventListener('click', e => {
     const tile = e.target.closest('.mp-slot--filled');
     if (!tile) return;
-    // Shift cards don't carry day info — open all timetables
     openTimetable('');
   });
 
@@ -1146,7 +1151,6 @@ function initTimetable() {
   document.addEventListener('click', e => {
     const cell = e.target.closest('.mp-heat__cell[data-demand-tip]');
     if (!cell) return;
-    // Get the column index to determine day
     const row  = cell.closest('tr');
     if (!row) return;
     const cells = Array.from(row.querySelectorAll('td.mp-heat__cell'));
@@ -1185,7 +1189,7 @@ function initTimetable() {
     const groups = {};
     pairings.forEach(p => {
       const raw = (p.time_slot || '').trim();
-      const dayKey = raw.slice(0, 3);  // e.g. "Mon", "Sat"
+      const dayKey = raw.slice(0, 3);
       const normKey = dayKey.charAt(0).toUpperCase() + dayKey.slice(1).toLowerCase();
       if (!groups[normKey]) groups[normKey] = [];
       groups[normKey].push(p);
@@ -1197,7 +1201,6 @@ function initTimetable() {
     });
 
     body.innerHTML = sortedKeys.map(dayKey => {
-      // Sort pairings within day by time
       const dayPairings = groups[dayKey].sort((a, b) => a.time_slot.localeCompare(b.time_slot));
 
       const rows = dayPairings.map((p, idx) => {
@@ -1206,14 +1209,18 @@ function initTimetable() {
         const timeLabel = (p.time_slot || '').replace(/^[A-Za-z]+_/, '');
         const matchedDate = p.matched_at ? new Date(p.matched_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
         const band = idx % 2 === 0 ? 'even' : 'odd';
-        const isPending = (p.status || 'pending') === 'pending';
-        const statusCell = isPending
-          ? `<span class="mp-tt-status mp-tt-status--pending">⏳ Pending</span>
-             <button class="mp-tt-confirm-btn" data-pairing-id="${p.pairing_id}">Confirm</button>`
-          : `<span class="mp-tt-status mp-tt-status--confirmed">✓ Confirmed</span>`;
+        const status = p.status || 'standby';
+        const statusBadgeClass = status === 'confirmed' ? 'mp-tt-status-badge--confirmed' : 'mp-tt-status-badge--standby';
+        const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+
+        const confirmBtn = status === 'standby'
+          ? `<button class="mp-tt-action-btn mp-tt-action-btn--confirm" data-action="confirm" data-pairing-id="${p.pairing_id}" type="button" title="Confirm pairing"><i class="bi bi-check-lg"></i> Confirm</button>`
+          : '';
+        const editBtn = `<button class="mp-tt-action-btn mp-tt-action-btn--edit" data-action="edit" data-pairing-id="${p.pairing_id}" type="button" title="Reassign tutor"><i class="bi bi-pencil"></i> Edit</button>`;
+        const releaseBtn = `<button class="mp-tt-action-btn mp-tt-action-btn--release" data-action="release" data-pairing-id="${p.pairing_id}" type="button" title="Release pairing"><i class="bi bi-x-circle"></i> Release</button>`;
 
         return `
-          <tr class="mp-tt-row mp-tt-row--pair-${band}" id="mp-tt-row-${p.pairing_id}">
+          <tr class="mp-tt-row mp-tt-row--pair-${band}">
             <td class="mp-tt-cell mp-tt-cell--muted" style="width:60px">${timeLabel}</td>
             <td class="mp-tt-cell">
               <span class="mp-tt-avatar">${initials(p.student_name)}</span>
@@ -1229,7 +1236,12 @@ function initTimetable() {
               <span class="mp-tt-score mp-tt-score--${scoreClass}">${score}%</span>
             </td>
             <td class="mp-tt-cell mp-tt-cell--muted">${matchedDate}</td>
-            <td class="mp-tt-cell">${statusCell}</td>
+            <td class="mp-tt-cell">
+              <span class="mp-tt-status-badge ${statusBadgeClass}">${statusLabel}</span>
+            </td>
+            <td class="mp-tt-cell mp-tt-cell--actions">
+              ${confirmBtn}${editBtn}${releaseBtn}
+            </td>
           </tr>`;
       }).join('');
 
@@ -1243,37 +1255,31 @@ function initTimetable() {
           <table class="mp-tt-table">
             <thead>
               <tr>
-                <th>Time</th><th>Student</th><th>Level</th><th>Topic</th><th>Tutor</th><th>Match</th><th>Matched on</th><th>Status</th>
+                <th>Time</th><th>Student</th><th>Level</th><th>Topic</th><th>Tutor</th><th>Match</th><th>Matched on</th><th>Status</th><th>Actions</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
           </table>
         </div>`;
     }).join('');
+
+    // Attach action button handlers via event delegation on body
+    body.querySelectorAll('[data-action="confirm"]').forEach(btn => {
+      btn.addEventListener('click', () => confirmPairing(btn.dataset.pairingId));
+    });
+    body.querySelectorAll('[data-action="edit"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openReassignDropdown(btn.dataset.pairingId, btn);
+      });
+    });
+    body.querySelectorAll('[data-action="release"]').forEach(btn => {
+      btn.addEventListener('click', () => releasePairing(btn.dataset.pairingId));
+    });
   }
 
   function initials(name) {
     if (!name) return '?';
     return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
   }
-
-  // ── Confirm button handler ────────────────────────────────
-  body.addEventListener('click', async e => {
-    const btn = e.target.closest('.mp-tt-confirm-btn');
-    if (!btn) return;
-    const pairingId = btn.dataset.pairingId;
-    btn.disabled = true;
-    btn.textContent = 'Confirming…';
-    try {
-      const res = await fetch(`/matching/pairings/${pairingId}/confirm`, { method: 'PATCH' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      // Update the cell in-place
-      const cell = btn.closest('td');
-      cell.innerHTML = `<span class="mp-tt-status mp-tt-status--confirmed">✓ Confirmed</span>`;
-    } catch (err) {
-      btn.disabled = false;
-      btn.textContent = 'Confirm';
-      console.error('[Confirm pairing] failed:', err);
-    }
-  });
 }

@@ -115,7 +115,8 @@ class PairingRecord(BaseModel):
     satisfaction_score: float        # 0–100
     tutor_utilisation: float         # percentage
     matched_at: str                  # ISO-8601
-    status: str = "pending"          # "pending" | "confirmed"
+    status: Literal["available", "standby", "confirmed"] = "standby"
+    confirmed_at: str | None = None
 
     @field_validator("satisfaction_score")
     @classmethod
@@ -130,6 +131,28 @@ class PairingRecord(BaseModel):
         if v < 0.0:
             raise ValueError("tutor_utilisation must be >= 0")
         return v
+
+
+class PairingStatusUpdate(BaseModel):
+    status: Literal["confirmed"]
+
+
+class PairingReassign(BaseModel):
+    tutor_id: str
+
+
+class PeriodLock(BaseModel):
+    lock_id: str
+    day_of_week: str
+    period: Literal["AM", "PM", "EVE"]
+    locked_by: str
+    locked_at: str
+
+
+class PeriodLockCreate(BaseModel):
+    day_of_week: str
+    period: Literal["AM", "PM", "EVE"]
+    locked_by: str = "ops"
 
 
 class MatchingRunRequest(BaseModel):

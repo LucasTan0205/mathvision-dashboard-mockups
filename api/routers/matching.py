@@ -1,9 +1,10 @@
 """Matching router — student-tutor matching pipeline endpoints."""
 
-from datetime import date
+from datetime import date, datetime, timezone
 from typing import Optional
+from uuid import uuid4
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Response
 
 import threading
 
@@ -12,6 +13,10 @@ from api.models import (
     MatchingRunRequest,
     MatchingRunResponse,
     PairingRecord,
+    PairingReassign,
+    PairingStatusUpdate,
+    PeriodLock,
+    PeriodLockCreate,
     StudentProfile,
     TutorProfile,
     TutorUtilisation,
@@ -29,15 +34,6 @@ def _run_matching_async() -> None:
 
 router = APIRouter(prefix="/matching", tags=["matching"])
 
-
-def _normalise_slot(slot: str) -> str:
-    """Normalise availability slot to canonical form: Mon_09:00"""
-    parts = slot.split("_", 1)
-    if len(parts) != 2:
-        return slot
-    day, time = parts
-    return f"{day.capitalize()[:3]}_{time}"
-
 # In-memory job registry (populated by POST /matching/run)
 _jobs: dict[str, MatchingRunResponse] = {}
 
@@ -51,7 +47,6 @@ async def get_all_pairings(
     Optionally filter by time_slot exact match or day prefix (e.g. 'Mon', 'Tue').
     """
     return pairing_store.get_pairings_by_slot(time_slot)
-
 
 
 @router.post("/run", response_model=MatchingRunResponse, status_code=200)
@@ -74,7 +69,6 @@ async def get_matching_job(job_id: str) -> MatchingRunResponse:
 @router.post("/students", response_model=StudentProfile, status_code=201)
 async def create_student(student: StudentProfile) -> StudentProfile:
     """Persist a student profile and trigger re-matching in the background."""
-    student.availability_slots = [_normalise_slot(s) for s in student.availability_slots]
     pairing_store.write_student_profile(student)
     threading.Thread(target=_run_matching_async, daemon=True).start()
     return student
@@ -83,19 +77,9 @@ async def create_student(student: StudentProfile) -> StudentProfile:
 @router.post("/tutors", response_model=TutorProfile, status_code=201)
 async def create_tutor(tutor: TutorProfile) -> TutorProfile:
     """Persist a tutor profile and trigger re-matching in the background."""
-    tutor.availability_slots = [_normalise_slot(s) for s in tutor.availability_slots]
     pairing_store.write_tutor_profile(tutor)
     threading.Thread(target=_run_matching_async, daemon=True).start()
     return tutor
-
-
-@router.patch("/pairings/{pairing_id}/confirm", status_code=200)
-async def confirm_pairing_endpoint(pairing_id: str) -> dict:
-    """Confirm a pending pairing by ID."""
-    updated = pairing_store.confirm_pairing(pairing_id)
-    if not updated:
-        raise HTTPException(status_code=404, detail="Pairing not found")
-    return {"pairing_id": pairing_id, "status": "confirmed"}
 
 
 @router.get("/students/{student_id}", response_model=StudentProfile)
@@ -145,3 +129,81 @@ async def get_tutor(tutor_id: str) -> TutorProfile:
     if profile is None:
         raise HTTPException(status_code=404, detail="Tutor not found")
     return profile
+
+
+# ---------------------------------------------------------------------------
+# Pairing status / reassign / delete endpoints
+# ---------------------------------------------------------------------------
+
+
+@router.patch("/pairings/{pairing_id}/status", response_model=PairingRecord)
+async def update_pairing_status(
+    pairing_id: str, body: PairingStatusUpdate
+) -> PairingRecord:
+    """Transition a pairing's status (e.g. standby → confirmed)."""
+    try:
+        return pairing_store.update_pairing_status(pairing_id, body.status)
+    except ValueError as exc:
+        msg = str(exc)
+        if "not found" in msg.lower():
+            raise HTTPException(status_code=404, detail=msg)
+        raise HTTPException(status_code=409, detail=msg)
+
+
+@router.patch("/pairings/{pairing_id}/reassign", response_model=PairingRecord)
+async def reassign_pairing(
+    pairing_id: str, body: PairingReassign
+) -> PairingRecord:
+    """Reassign a pairing to a different tutor (resets status to standby)."""
+    try:
+        return pairing_store.reassign_pairing(pairing_id, body.tutor_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.delete("/pairings/{pairing_id}", status_code=204)
+async def delete_pairing(pairing_id: str) -> Response:
+    """Release (delete) a pairing."""
+    try:
+        pairing_store.delete_pairing(pairing_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    return Response(status_code=204)
+
+
+# ---------------------------------------------------------------------------
+# Period lock CRUD endpoints
+# ---------------------------------------------------------------------------
+
+
+@router.get("/period-locks", response_model=list[PeriodLock])
+async def get_period_locks(day: Optional[str] = None) -> list[PeriodLock]:
+    """Return period locks, optionally filtered by day_of_week."""
+    return pairing_store.get_period_locks(day)
+
+
+@router.post("/period-locks", response_model=PeriodLock, status_code=201)
+async def create_period_lock(body: PeriodLockCreate) -> PeriodLock:
+    """Create a new period lock."""
+    lock = PeriodLock(
+        lock_id=str(uuid4()),
+        day_of_week=body.day_of_week,
+        period=body.period,
+        locked_by=body.locked_by,
+        locked_at=datetime.now(timezone.utc).isoformat(),
+    )
+    try:
+        pairing_store.write_period_lock(lock)
+    except ValueError as exc:
+        raise HTTPException(status_code=409, detail=str(exc))
+    return lock
+
+
+@router.delete("/period-locks/{lock_id}", status_code=204)
+async def delete_period_lock(lock_id: str) -> Response:
+    """Remove a period lock."""
+    try:
+        pairing_store.delete_period_lock(lock_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    return Response(status_code=204)

@@ -10,8 +10,9 @@ Write/read helpers are added in tasks 2.2 and 2.3.
 import json
 import os
 import sqlite3
+from datetime import datetime, timezone
 
-from api.models import DailyStats, PairingRecord, StudentProfile, TutorProfile, TutorUtilisation
+from api.models import DailyStats, PairingRecord, PeriodLock, StudentProfile, TutorProfile, TutorUtilisation
 
 # ---------------------------------------------------------------------------
 # DB path
@@ -21,6 +22,16 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 _REPO_ROOT = os.path.abspath(os.path.join(_HERE, "..", ".."))
 _DEFAULT_DB = os.path.join(_REPO_ROOT, "analytics-engine", "data", "pairing_store.db")
 DB_PATH = os.environ.get("DB_PATH", _DEFAULT_DB)
+
+# ---------------------------------------------------------------------------
+# Status transition map
+# ---------------------------------------------------------------------------
+
+VALID_TRANSITIONS: dict[str, set[str]] = {
+    "standby": {"confirmed"},
+    "confirmed": set(),
+    "available": {"standby"},
+}
 
 # ---------------------------------------------------------------------------
 # Schema DDL
@@ -35,7 +46,8 @@ CREATE TABLE IF NOT EXISTS pairings (
     satisfaction_score REAL NOT NULL,
     tutor_utilisation  REAL NOT NULL,
     matched_at         TEXT NOT NULL,
-    status             TEXT NOT NULL DEFAULT 'pending'
+    status             TEXT NOT NULL DEFAULT 'standby',
+    confirmed_at       TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_pairings_student ON pairings(student_id);
@@ -75,6 +87,17 @@ CREATE TABLE IF NOT EXISTS tutor_profiles (
     availability_slots     TEXT NOT NULL,  -- JSON array
     max_students_per_slot  INTEGER NOT NULL DEFAULT 1
 );
+
+CREATE TABLE IF NOT EXISTS period_locks (
+    lock_id     TEXT PRIMARY KEY,
+    day_of_week TEXT NOT NULL,
+    period      TEXT NOT NULL CHECK(period IN ('AM','PM','EVE')),
+    locked_by   TEXT NOT NULL,
+    locked_at   TEXT NOT NULL,
+    UNIQUE(day_of_week, period)
+);
+
+CREATE INDEX IF NOT EXISTS idx_period_locks_day ON period_locks(day_of_week);
 """
 
 
@@ -94,12 +117,27 @@ def init_db(db_path: str = DB_PATH) -> None:
     Initialise the pairing store database.
 
     Creates all tables and indexes if they do not already exist.
-    Safe to call multiple times (idempotent).
+    Applies column migrations for existing databases (idempotent).
+    Safe to call multiple times.
     Called once at application startup from api/main.py.
     """
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     with get_connection(db_path) as conn:
         conn.executescript(_DDL)
+
+        # Migrate existing pairings table: add status column
+        try:
+            conn.execute(
+                "ALTER TABLE pairings ADD COLUMN status TEXT NOT NULL DEFAULT 'standby'"
+            )
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+
+        # Migrate existing pairings table: add confirmed_at column
+        try:
+            conn.execute("ALTER TABLE pairings ADD COLUMN confirmed_at TEXT")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
 
 
 def write_pairing(pairing: PairingRecord, db_path: str = DB_PATH) -> None:
@@ -110,8 +148,9 @@ def write_pairing(pairing: PairingRecord, db_path: str = DB_PATH) -> None:
                 """
                 INSERT OR REPLACE INTO pairings
                     (pairing_id, student_id, tutor_id, time_slot,
-                     satisfaction_score, tutor_utilisation, matched_at, status)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                     satisfaction_score, tutor_utilisation, matched_at,
+                     status, confirmed_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     pairing.pairing_id,
@@ -122,19 +161,9 @@ def write_pairing(pairing: PairingRecord, db_path: str = DB_PATH) -> None:
                     pairing.tutor_utilisation,
                     pairing.matched_at,
                     pairing.status,
+                    pairing.confirmed_at,
                 ),
             )
-
-
-def confirm_pairing(pairing_id: str, db_path: str = DB_PATH) -> bool:
-    """Set a pairing's status to 'confirmed'. Returns True if a row was updated."""
-    with get_connection(db_path) as conn:
-        with conn:
-            cursor = conn.execute(
-                "UPDATE pairings SET status = 'confirmed' WHERE pairing_id = ?",
-                (pairing_id,),
-            )
-    return cursor.rowcount > 0
 
 
 def write_student_profile(student: StudentProfile, db_path: str = DB_PATH) -> None:
@@ -192,6 +221,97 @@ def write_tutor_profile(tutor: TutorProfile, db_path: str = DB_PATH) -> None:
             )
 
 
+def classify_period(time_slot: str) -> str:
+    """Classify a time_slot string (e.g. 'Mon_09:00') into AM, PM, or EVE."""
+    time_part = time_slot.split("_")[1]  # "09:00"
+    hour = int(time_part.split(":")[0])
+    if hour < 12:
+        return "AM"
+    elif hour < 18:
+        return "PM"
+    else:
+        return "EVE"
+
+
+def get_pairing(pairing_id: str, db_path: str = DB_PATH) -> PairingRecord | None:
+    """Fetch a single pairing by ID. Returns None if not found."""
+    with get_connection(db_path) as conn:
+        row = conn.execute(
+            "SELECT * FROM pairings WHERE pairing_id = ?", (pairing_id,)
+        ).fetchone()
+    if row is None:
+        return None
+    return PairingRecord(**dict(row))
+
+
+def update_pairing_status(
+    pairing_id: str, new_status: str, db_path: str = DB_PATH
+) -> PairingRecord:
+    """
+    Validate the status transition and update the pairing.
+
+    Sets confirmed_at to current ISO-8601 timestamp when transitioning to 'confirmed'.
+    Raises ValueError if the pairing is not found or the transition is invalid.
+    """
+    record = get_pairing(pairing_id, db_path)
+    if record is None:
+        raise ValueError(f"Pairing not found: {pairing_id}")
+
+    current = record.status
+    allowed = VALID_TRANSITIONS.get(current, set())
+    if new_status not in allowed:
+        raise ValueError(
+            f"Invalid transition from '{current}' to '{new_status}'"
+        )
+
+    confirmed_at = record.confirmed_at
+    if new_status == "confirmed":
+        confirmed_at = datetime.now(timezone.utc).isoformat()
+
+    with get_connection(db_path) as conn:
+        with conn:
+            conn.execute(
+                "UPDATE pairings SET status = ?, confirmed_at = ? WHERE pairing_id = ?",
+                (new_status, confirmed_at, pairing_id),
+            )
+
+    return get_pairing(pairing_id, db_path)  # type: ignore[return-value]
+
+
+def reassign_pairing(
+    pairing_id: str, new_tutor_id: str, db_path: str = DB_PATH
+) -> PairingRecord:
+    """
+    Reassign a pairing to a different tutor.
+
+    Resets status to 'standby' and clears confirmed_at.
+    Raises ValueError if the pairing is not found.
+    """
+    record = get_pairing(pairing_id, db_path)
+    if record is None:
+        raise ValueError(f"Pairing not found: {pairing_id}")
+
+    with get_connection(db_path) as conn:
+        with conn:
+            conn.execute(
+                "UPDATE pairings SET tutor_id = ?, status = 'standby', confirmed_at = NULL WHERE pairing_id = ?",
+                (new_tutor_id, pairing_id),
+            )
+
+    return get_pairing(pairing_id, db_path)  # type: ignore[return-value]
+
+
+def delete_pairing(pairing_id: str, db_path: str = DB_PATH) -> None:
+    """Delete a pairing record. Raises ValueError if not found."""
+    with get_connection(db_path) as conn:
+        with conn:
+            cursor = conn.execute(
+                "DELETE FROM pairings WHERE pairing_id = ?", (pairing_id,)
+            )
+            if cursor.rowcount == 0:
+                raise ValueError(f"Pairing not found: {pairing_id}")
+
+
 def get_pairings_for_student(student_id: str, db_path: str = DB_PATH) -> list[PairingRecord]:
     """Return all PairingRecords for the given student_id."""
     with get_connection(db_path) as conn:
@@ -226,7 +346,7 @@ def get_pairings_by_slot(
             SELECT
                 p.pairing_id, p.student_id, p.tutor_id, p.time_slot,
                 p.satisfaction_score, p.tutor_utilisation, p.matched_at,
-                COALESCE(p.status, 'pending')    AS status,
+                p.status, p.confirmed_at,
                 COALESCE(sp.name, p.student_id) AS student_name,
                 COALESCE(tp.name, p.tutor_id)   AS tutor_name,
                 COALESCE(sp.curriculum, '')      AS curriculum,
@@ -373,6 +493,63 @@ def get_tutor_utilisation(tutor_id: str, db_path: str = DB_PATH) -> float:
         ).fetchone()["cnt"]
 
     return min((pairing_count / capacity) * 100.0, 100.0)
+
+
+def write_period_lock(lock: PeriodLock, db_path: str = DB_PATH) -> None:
+    """Insert a PeriodLock. Raises ValueError on duplicate (day_of_week + period)."""
+    with get_connection(db_path) as conn:
+        try:
+            with conn:
+                conn.execute(
+                    """
+                    INSERT INTO period_locks (lock_id, day_of_week, period, locked_by, locked_at)
+                    VALUES (?, ?, ?, ?, ?)
+                    """,
+                    (lock.lock_id, lock.day_of_week, lock.period, lock.locked_by, lock.locked_at),
+                )
+        except sqlite3.IntegrityError:
+            raise ValueError(
+                f"Period lock already exists for {lock.day_of_week} {lock.period}"
+            )
+
+
+def get_period_locks(day: str | None = None, db_path: str = DB_PATH) -> list[PeriodLock]:
+    """Return all period locks, optionally filtered by day_of_week."""
+    with get_connection(db_path) as conn:
+        if day is not None:
+            rows = conn.execute(
+                "SELECT * FROM period_locks WHERE day_of_week = ?", (day,)
+            ).fetchall()
+        else:
+            rows = conn.execute("SELECT * FROM period_locks").fetchall()
+    return [PeriodLock(**dict(row)) for row in rows]
+
+
+def delete_period_lock(lock_id: str, db_path: str = DB_PATH) -> None:
+    """Delete a period lock. Raises ValueError if not found."""
+    with get_connection(db_path) as conn:
+        with conn:
+            cursor = conn.execute(
+                "DELETE FROM period_locks WHERE lock_id = ?", (lock_id,)
+            )
+            if cursor.rowcount == 0:
+                raise ValueError(f"Period lock not found: {lock_id}")
+
+
+def is_slot_in_locked_period(time_slot: str, db_path: str = DB_PATH) -> bool:
+    """Check if a time slot falls within a locked period.
+
+    Extracts the day prefix and period (AM/PM/EVE) from the time_slot
+    using classify_period, then checks against active period locks.
+    """
+    day = time_slot.split("_")[0]
+    period = classify_period(time_slot)
+    with get_connection(db_path) as conn:
+        row = conn.execute(
+            "SELECT 1 FROM period_locks WHERE day_of_week = ? AND period = ? LIMIT 1",
+            (day, period),
+        ).fetchone()
+    return row is not None
 
 
 def get_all_tutor_utilisation(db_path: str = DB_PATH) -> list[TutorUtilisation]:

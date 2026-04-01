@@ -7,12 +7,17 @@ import pytest
 
 from api.models import PairingRecord, StudentProfile, TutorProfile
 from api.services.pairing_store import (
+    classify_period,
+    delete_pairing,
     get_all_tutor_profiles,
+    get_pairing,
     get_pairings_for_student,
     get_pairings_for_tutor,
     get_student_profile,
     get_tutor_profile,
     init_db,
+    reassign_pairing,
+    update_pairing_status,
     write_pairing,
     write_student_profile,
     write_tutor_profile,
@@ -281,3 +286,224 @@ def test_get_all_tutor_utilisation_statuses(db):
     assert by_id["t1"].utilisation_status == "Under-utilised"
     assert by_id["t2"].utilisation_status == "Appropriately-utilised"
     assert by_id["t3"].utilisation_status == "Over-utilised"
+
+
+# --- classify_period ---
+
+def test_classify_period_am():
+    assert classify_period("Mon_09:00") == "AM"
+    assert classify_period("Tue_00:00") == "AM"
+    assert classify_period("Wed_11:30") == "AM"
+
+
+def test_classify_period_pm():
+    assert classify_period("Mon_12:00") == "PM"
+    assert classify_period("Tue_15:00") == "PM"
+    assert classify_period("Wed_17:30") == "PM"
+
+
+def test_classify_period_eve():
+    assert classify_period("Mon_18:00") == "EVE"
+    assert classify_period("Tue_19:00") == "EVE"
+    assert classify_period("Wed_23:00") == "EVE"
+
+
+# --- get_pairing ---
+
+def test_get_pairing_found(db):
+    p = make_pairing(pairing_id="p1")
+    write_pairing(p, db)
+    result = get_pairing("p1", db)
+    assert result is not None
+    assert result.pairing_id == "p1"
+
+
+def test_get_pairing_not_found(db):
+    assert get_pairing("nonexistent", db) is None
+
+
+# --- update_pairing_status ---
+
+def test_update_pairing_status_standby_to_confirmed(db):
+    p = make_pairing(pairing_id="p1", status="standby")
+    write_pairing(p, db)
+    result = update_pairing_status("p1", "confirmed", db)
+    assert result.status == "confirmed"
+    assert result.confirmed_at is not None
+
+
+def test_update_pairing_status_invalid_transition(db):
+    p = make_pairing(pairing_id="p1", status="available")
+    write_pairing(p, db)
+    with pytest.raises(ValueError, match="Invalid transition"):
+        update_pairing_status("p1", "confirmed", db)
+
+
+def test_update_pairing_status_not_found(db):
+    with pytest.raises(ValueError, match="Pairing not found"):
+        update_pairing_status("nonexistent", "confirmed", db)
+
+
+def test_update_pairing_status_confirmed_no_forward(db):
+    p = make_pairing(pairing_id="p1", status="standby")
+    write_pairing(p, db)
+    update_pairing_status("p1", "confirmed", db)
+    with pytest.raises(ValueError, match="Invalid transition"):
+        update_pairing_status("p1", "confirmed", db)
+
+
+# --- reassign_pairing ---
+
+def test_reassign_pairing_updates_tutor(db):
+    p = make_pairing(pairing_id="p1", tutor_id="t1", status="confirmed")
+    write_pairing(p, db)
+    result = reassign_pairing("p1", "t2", db)
+    assert result.tutor_id == "t2"
+    assert result.status == "standby"
+    assert result.confirmed_at is None
+
+
+def test_reassign_pairing_not_found(db):
+    with pytest.raises(ValueError, match="Pairing not found"):
+        reassign_pairing("nonexistent", "t2", db)
+
+
+# --- delete_pairing ---
+
+def test_delete_pairing_removes_record(db):
+    p = make_pairing(pairing_id="p1")
+    write_pairing(p, db)
+    delete_pairing("p1", db)
+    assert get_pairing("p1", db) is None
+
+
+def test_delete_pairing_not_found(db):
+    with pytest.raises(ValueError, match="Pairing not found"):
+        delete_pairing("nonexistent", db)
+
+
+# --- write_pairing with status and confirmed_at ---
+
+def test_write_pairing_persists_status_and_confirmed_at(db):
+    p = make_pairing(pairing_id="p1", status="confirmed", confirmed_at="2024-01-01T12:00:00+00:00")
+    write_pairing(p, db)
+    result = get_pairing("p1", db)
+    assert result.status == "confirmed"
+    assert result.confirmed_at == "2024-01-01T12:00:00+00:00"
+
+
+def test_get_pairings_for_student_includes_status(db):
+    p = make_pairing(pairing_id="p1", status="confirmed")
+    write_pairing(p, db)
+    results = get_pairings_for_student("s1", db)
+    assert results[0].status == "confirmed"
+
+
+def test_get_pairings_for_tutor_includes_status(db):
+    p = make_pairing(pairing_id="p1", status="confirmed")
+    write_pairing(p, db)
+    results = get_pairings_for_tutor("t1", db)
+    assert results[0].status == "confirmed"
+
+
+# --- period lock CRUD ---
+
+from api.models import PeriodLock
+from api.services.pairing_store import (
+    delete_period_lock,
+    get_period_locks,
+    is_slot_in_locked_period,
+    write_period_lock,
+)
+
+
+def make_period_lock(**kwargs) -> PeriodLock:
+    defaults = dict(
+        lock_id="lock1",
+        day_of_week="Mon",
+        period="AM",
+        locked_by="ops",
+        locked_at="2024-06-01T10:00:00Z",
+    )
+    defaults.update(kwargs)
+    return PeriodLock(**defaults)
+
+
+# --- write_period_lock / get_period_locks ---
+
+def test_write_and_get_period_lock(db):
+    lock = make_period_lock()
+    write_period_lock(lock, db)
+    locks = get_period_locks(db_path=db)
+    assert len(locks) == 1
+    assert locks[0].lock_id == "lock1"
+    assert locks[0].day_of_week == "Mon"
+    assert locks[0].period == "AM"
+
+
+def test_write_period_lock_duplicate_raises(db):
+    lock1 = make_period_lock(lock_id="lock1", day_of_week="Mon", period="AM")
+    lock2 = make_period_lock(lock_id="lock2", day_of_week="Mon", period="AM")
+    write_period_lock(lock1, db)
+    with pytest.raises(ValueError, match="Period lock already exists"):
+        write_period_lock(lock2, db)
+
+
+def test_get_period_locks_filter_by_day(db):
+    write_period_lock(make_period_lock(lock_id="l1", day_of_week="Mon", period="AM"), db)
+    write_period_lock(make_period_lock(lock_id="l2", day_of_week="Tue", period="PM"), db)
+    locks = get_period_locks(day="Mon", db_path=db)
+    assert len(locks) == 1
+    assert locks[0].day_of_week == "Mon"
+
+
+def test_get_period_locks_no_filter_returns_all(db):
+    write_period_lock(make_period_lock(lock_id="l1", day_of_week="Mon", period="AM"), db)
+    write_period_lock(make_period_lock(lock_id="l2", day_of_week="Tue", period="PM"), db)
+    locks = get_period_locks(db_path=db)
+    assert len(locks) == 2
+
+
+def test_get_period_locks_empty(db):
+    assert get_period_locks(db_path=db) == []
+
+
+# --- delete_period_lock ---
+
+def test_delete_period_lock_removes_record(db):
+    lock = make_period_lock(lock_id="lock1")
+    write_period_lock(lock, db)
+    delete_period_lock("lock1", db)
+    assert get_period_locks(db_path=db) == []
+
+
+def test_delete_period_lock_not_found(db):
+    with pytest.raises(ValueError, match="Period lock not found"):
+        delete_period_lock("nonexistent", db)
+
+
+# --- is_slot_in_locked_period ---
+
+def test_is_slot_in_locked_period_true(db):
+    write_period_lock(make_period_lock(lock_id="l1", day_of_week="Mon", period="AM"), db)
+    assert is_slot_in_locked_period("Mon_09:00", db) is True
+
+
+def test_is_slot_in_locked_period_false_no_lock(db):
+    assert is_slot_in_locked_period("Mon_09:00", db) is False
+
+
+def test_is_slot_in_locked_period_false_different_day(db):
+    write_period_lock(make_period_lock(lock_id="l1", day_of_week="Tue", period="AM"), db)
+    assert is_slot_in_locked_period("Mon_09:00", db) is False
+
+
+def test_is_slot_in_locked_period_false_different_period(db):
+    write_period_lock(make_period_lock(lock_id="l1", day_of_week="Mon", period="PM"), db)
+    assert is_slot_in_locked_period("Mon_09:00", db) is False
+
+
+def test_is_slot_in_locked_period_eve(db):
+    write_period_lock(make_period_lock(lock_id="l1", day_of_week="Wed", period="EVE"), db)
+    assert is_slot_in_locked_period("Wed_19:00", db) is True
+    assert is_slot_in_locked_period("Wed_09:00", db) is False
