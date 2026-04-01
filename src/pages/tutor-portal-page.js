@@ -102,7 +102,7 @@ export function createTutorPortalContent() {
       <div class="tp-cal-header">
         <div>
           <div class="tp-page-title">My Profile</div>
-          <div class="tp-page-sub">Your tutor information and weekly availability.</div>
+          <div class="tp-page-sub">Your tutor information and preferences.</div>
         </div>
         <button class="tp-btn tp-btn--primary" id="tp-submit-btn" onclick="document.getElementById('tp-form').requestSubmit()">Save Profile</button>
       </div>
@@ -132,12 +132,6 @@ export function createTutorPortalContent() {
           <div class="tp-field-group"><label class="tp-label" for="tp-branch">Branch</label><select class="tp-input" id="tp-branch"><option value="">Select branch…</option><option value="Central">Central</option><option value="East">East</option><option value="West">West</option></select><div class="tp-field-error" id="err-branch"></div></div>
         </div>
 
-        <div class="tp-avail-section">
-          <div class="tp-psection-title">Weekly Availability</div>
-          <p class="tp-avail-sub">Click or drag to mark your available slots. Each slot = 30 minutes.</p>
-          <div class="tp-field-error" id="err-slots" style="margin-bottom:10px;"></div>
-          <div class="tp-tt-outer"><div class="tp-tt-grid" id="tp-tt-grid"></div></div>
-        </div>
       </form>
     </div>
 
@@ -148,33 +142,28 @@ export function createTutorPortalContent() {
           <div class="tp-page-title">Timetable</div>
           <div class="tp-page-sub" id="tp-week-range-sub"></div>
         </div>
-        <div class="tp-header-right" id="tp-tt-header-btns">
-          <button class="tp-btn tp-btn--outline" id="tp-set-avail-btn" onclick="tpEnterAvailMode()">Set Availability</button>
-          <button class="tp-btn tp-btn--purple" id="tp-submit-avail-btn" style="display:none;" onclick="tpOpenSubmitModal()">Submit →</button>
-          <button class="tp-btn tp-btn--outline" id="tp-cancel-avail-btn" style="display:none;" onclick="tpCancelAvailMode()">Cancel</button>
-        </div>
-      </div>
-      <div class="tp-info-banner" id="tp-avail-banner" style="display:none;">
-        <span class="tp-info-banner-icon">🟣</span>
-        <span>Availability mode — drag to select slots <strong>at least 7 days ahead</strong>. Columns within 7 days are locked.</span>
-      </div>
-      <div class="tp-sel-bar" id="tp-sel-bar">
-        <span>🟣</span>
-        <div class="tp-sel-bar-text"><strong id="tp-avail-count">0</strong> slot(s) selected — <span id="tp-sel-time"></span></div>
-        <button class="tp-btn tp-btn--purple" onclick="tpOpenSubmitModal()">Submit →</button>
       </div>
       <div class="tp-week-display" id="tp-week-display"></div>
       <div class="tp-legend">
-        <div class="tp-leg-item"><div class="tp-leg-dot" style="background:var(--purple-pale);border:1.5px dashed var(--purple-mid);"></div> Availability</div>
         <div class="tp-leg-item"><div class="tp-leg-dot" style="background:var(--green-dark);"></div> Confirmed</div>
-        <div class="tp-leg-item"><div class="tp-leg-dot" style="background:#5A6880;"></div> Standby</div>
-        <div class="tp-leg-item"><div class="tp-leg-dot" style="background:repeating-linear-gradient(45deg,#ddd,#ddd 2px,#eee 2px,#eee 5px);"></div> Locked</div>
+        <div class="tp-leg-item"><div class="tp-leg-dot" style="background:#5A6880;"></div> Pending Confirmation</div>
         <div class="tp-leg-item"><div class="tp-leg-dot" style="background:repeating-linear-gradient(45deg,#f0c0c0,#f0c0c0 2px,#fde8e8 2px,#fde8e8 5px);"></div> Period locked</div>
       </div>
       <div class="tp-tt-nav-wrap">
         <div class="tp-tt-side-btn" onclick="tpShiftWeek(-1)">‹</div>
         <div class="tp-tt-outer"><div class="tp-tt-grid" id="tp-tt-main-grid"></div></div>
         <div class="tp-tt-side-btn" onclick="tpShiftWeek(1)">›</div>
+      </div>
+
+      <div class="tp-avail-section" style="margin-top:32px;">
+        <div class="tp-psection-title">Weekly Availability</div>
+        <p class="tp-avail-sub">Click or drag to mark your available time slots. Each slot = 30 minutes. Press <strong>Save Availability</strong> when done.</p>
+        <div class="tp-field-error" id="err-slots" style="margin-bottom:10px;"></div>
+        <div class="tp-tt-outer"><div class="tp-tt-grid" id="tp-tt-grid"></div></div>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:10px;">
+          <button class="tp-btn tp-btn--primary" onclick="tpSaveAvailability()">Save Availability</button>
+          <span id="tp-avail-save-status" style="font-size:12px;color:var(--green-dark);display:none;">✓ Availability saved!</span>
+        </div>
       </div>
     </div>
 
@@ -343,7 +332,7 @@ export function initTutorPortal() {
     if (el) el.classList.add('active');
     document.getElementById('tp-breadcrumb').innerHTML = `Portal · <span>${PAGE_LABELS[page] || page}</span>`;
     if (page === 'history')   tpRenderHistory();
-    if (page === 'timetable') tpBuildGrid();
+    if (page === 'timetable') { tpBuildGrid(); buildAvailGrid(); }
     if (page === 'profile')   tpPopulateProfile();
   };
 
@@ -499,7 +488,6 @@ export function initTutorPortal() {
     if (!isNaN(minGrade)&&!isNaN(maxGrade)&&minGrade>=5&&maxGrade>=5&&minGrade>maxGrade) { setFieldError('max-grade','Max grade must be ≥ min grade.'); valid=false; }
     const branch = document.getElementById('tp-branch').value;
     if (!branch) { setFieldError('branch','Please select a branch.'); valid=false; } else clearFieldError('branch');
-    if (regSelectedSlots.size===0) { setFieldError('slots','Please select at least one availability slot.'); valid=false; } else clearFieldError('slots');
     return valid;
   }
 
@@ -546,6 +534,39 @@ export function initTutorPortal() {
     } finally { submitBtn.disabled = false; submitBtn.textContent = 'Save Profile'; }
   });
 
+  // ── Save availability (from timetable page) ───────────────────────────
+  window.tpSaveAvailability = async function() {
+    const statusEl = document.getElementById('tp-avail-save-status');
+    if (statusEl) statusEl.style.display = 'none';
+    const raw = localStorage.getItem('mv_tutor_profile');
+    const p = raw ? JSON.parse(raw) : {};
+    const name = p.name || document.getElementById('tp-name').value.trim();
+    if (!name) { tpShowToast('Save your profile first before setting availability.'); return; }
+    const payload = {
+      tutor_id: tutorId,
+      name,
+      tutor_type: p.tutor_type || document.getElementById('tp-tutor-type').value,
+      primary_curriculum: p.primary_curriculum || document.getElementById('tp-curriculum').value,
+      specialty_topic: p.specialty_topic || document.getElementById('tp-specialty').value,
+      years_experience: p.years_experience != null ? p.years_experience : parseInt(document.getElementById('tp-experience').value, 10) || 0,
+      preferred_min_grade: p.preferred_min_grade || parseInt(document.getElementById('tp-min-grade').value, 10) || 5,
+      preferred_max_grade: p.preferred_max_grade || parseInt(document.getElementById('tp-max-grade').value, 10) || 12,
+      branch: p.branch || document.getElementById('tp-branch').value,
+      availability_slots: Array.from(regSelectedSlots),
+    };
+    try {
+      const res = await fetch('/matching/tutors', { method:'POST', headers:{'Content-Type':'application/json','X-API-Key':''}, body:JSON.stringify(payload) });
+      if (res.ok) {
+        localStorage.setItem('mv_tutor_profile', JSON.stringify({ ...p, availability_slots: payload.availability_slots }));
+        if (statusEl) { statusEl.style.display = 'inline'; setTimeout(() => { statusEl.style.display = 'none'; }, 3000); }
+        tpShowToast('✓ Availability saved!');
+        pairingsLoaded = false;
+      } else {
+        tpShowToast('Failed to save availability. Try again.');
+      }
+    } catch { tpShowToast('Network error. Please try again.'); }
+  };
+
   // ── Main timetable grid ────────────────────────────────────────────────
   // ── Live pairings from API ─────────────────────────────────────────────
   let livePairings = {}; // { "MON_09:00": PairingRecord }
@@ -570,13 +591,13 @@ export function initTutorPortal() {
       if (pairingsRes.ok) {
         const records = await pairingsRes.json();
 
-        // Fetch student names for all unique student IDs
+        // Fetch full student profiles for all unique student IDs
         const studentIds = [...new Set(records.map(p => p.student_id))];
-        const studentNames = {};
+        const studentProfiles = {};
         await Promise.all(studentIds.map(async id => {
           try {
             const r = await fetch(`/matching/students/${id}`, { headers: { 'X-API-Key': '' } });
-            if (r.ok) { const s = await r.json(); studentNames[id] = s.name; }
+            if (r.ok) { const s = await r.json(); studentProfiles[id] = s; }
           } catch {}
         }));
 
@@ -584,7 +605,8 @@ export function initTutorPortal() {
         records.forEach(p => {
           const [day, time] = p.time_slot.split('_');
           const key = `${day.toUpperCase().slice(0,3)}_${time}`;
-          livePairings[key] = { ...p, student_name: studentNames[p.student_id] || p.student_id };
+          const profile = studentProfiles[p.student_id] || {};
+          livePairings[key] = { ...p, student_name: profile.name || p.student_id, student_profile: profile };
         });
       }
 
@@ -609,8 +631,6 @@ export function initTutorPortal() {
     grid.innerHTML = '';
     const dates = getWeekDates(weekOffset);
     const todayStr = new Date().toDateString();
-    const today = new Date(); today.setHours(0,0,0,0);
-    const cutoff = new Date(today); cutoff.setDate(today.getDate() + 7);
 
     const s = dates[0], e = dates[6];
     const weekRangeSub = document.getElementById('tp-week-range-sub');
@@ -624,11 +644,9 @@ export function initTutorPortal() {
     const blank = document.createElement('div'); blank.className = 'tp-hcell'; grid.appendChild(blank);
     dates.forEach((d, i) => {
       const isTd = d.toDateString() === todayStr;
-      const dClean = new Date(d); dClean.setHours(0,0,0,0);
-      const isLocked = availMode && dClean < cutoff;
       const hc = document.createElement('div');
-      hc.className = 'tp-hcell' + (isTd ? ' tp-hcell--today' : '') + (isLocked ? ' tp-hcell--locked' : '');
-      hc.innerHTML = `<span class="tp-day-num">${d.getDate()}${isTd ? '<span class="tp-today-pip"></span>' : ''}</span>${DAYS[i]}${isLocked ? '<span class="tp-locked-badge">Too soon</span>' : ''}`;
+      hc.className = 'tp-hcell' + (isTd ? ' tp-hcell--today' : '');
+      hc.innerHTML = `<span class="tp-day-num">${d.getDate()}${isTd ? '<span class="tp-today-pip"></span>' : ''}</span>${DAYS[i]}`;
       grid.appendChild(hc);
     });
 
@@ -641,24 +659,19 @@ export function initTutorPortal() {
 
       for (let col = 1; col <= 7; col++) {
         const sl = document.createElement('div');
-        const dClean = new Date(dates[col-1]); dClean.setHours(0,0,0,0);
-        const colLocked = availMode && dClean < cutoff;
-        sl.className = 'tp-slot' + (isHalf ? ' tp-slot--half' : '') + (colLocked ? ' tp-slot--locked' : '');
+        sl.className = 'tp-slot' + (isHalf ? ' tp-slot--half' : '');
         sl.dataset.col = col; sl.dataset.row = rowIdx;
 
-        // Real pairings on current week (offset 0), availability slots on future weeks
         const key = `${DAYS[col-1]}_${t}`;
-        const pairing = weekOffset === 0 && !isHalf ? livePairings[key] : null;
+        const pairing = !isHalf ? livePairings[key] : null;
         const slotPeriodLocked = isSlotPeriodLocked(key);
 
         if (slotPeriodLocked && !pairing) {
-          // Period-locked slot with no pairing — disable interaction
           sl.classList.add('tp-slot--period-locked');
         }
 
-        if (pairing) {
-          const status = pairing.status || 'confirmed';
-
+        if (pairing && (pairing.status === 'confirmed' || pairing.status === 'pending')) {
+          const status = pairing.status;
           if (status === 'confirmed') {
             sl.classList.add('tp-slot--confirmed', 'tp-slot--locked');
             const blk = document.createElement('div');
@@ -667,106 +680,60 @@ export function initTutorPortal() {
             blk.innerHTML = `<div class="tp-sb-label">${escapeHtml(pairing.student_name)}</div><div class="tp-sb-sub">${escapeHtml(t)}</div>`;
             blk.onclick = () => tpOpenPairingPopup(pairing, t);
             sl.appendChild(blk);
-          } else if (status === 'standby') {
-            sl.classList.add('tp-slot--standby');
-            const blk = document.createElement('div');
-            blk.className = 'tp-sess-block tp-sess-standby';
-            blk.style.height = '28px';
-            blk.style.background = '#5A6880';
-            blk.style.color = '#fff';
-            blk.innerHTML = `<div class="tp-sb-label" style="color:#fff;">${escapeHtml(pairing.student_name)}</div><div class="tp-sb-sub" style="color:#fff;">${escapeHtml(t)}</div>`;
-            blk.onclick = () => tpOpenPairingPopup(pairing, t);
-            sl.appendChild(blk);
           } else {
-            // "available" status — purple (existing behaviour)
-            sl.classList.add('tp-slot--confirmed');
+            sl.classList.add('tp-slot--pending');
             const blk = document.createElement('div');
-            blk.className = 'tp-sess-block tp-sess-availability';
+            blk.className = 'tp-sess-block tp-sess-pending';
             blk.style.height = '28px';
             blk.innerHTML = `<div class="tp-sb-label">${escapeHtml(pairing.student_name)}</div><div class="tp-sb-sub">${escapeHtml(t)}</div>`;
             blk.onclick = () => tpOpenPairingPopup(pairing, t);
             sl.appendChild(blk);
           }
-
-          // If period-locked, also add the period-locked class
-          if (slotPeriodLocked) {
-            sl.classList.add('tp-slot--period-locked');
-          }
-        } else {
-          // Submitted availability / standby from local SESSIONS array
-          const sessHere = SESSIONS.filter(s => s.weekOffset === weekOffset && s.day === col && s.startRow === rowIdx);
-          if (sessHere.length) {
-            sessHere.forEach(sess => {
-              const blk = document.createElement('div');
-              blk.className = 'tp-sess-block tp-sess-' + sess.type;
-              blk.style.height = (sess.span * 32 - 4) + 'px';
-              if (sess.type === 'standby') {
-                blk.innerHTML = `<div class="tp-sb-label">Standby</div><div class="tp-sb-sub">${TIMES[sess.startRow]}</div>`;
-              } else {
-                blk.innerHTML = `<div class="tp-sb-label">Available</div><div class="tp-sb-sub">${TIMES[sess.startRow]}</div>`;
-              }
-              blk.onclick = () => tpOpenSessPopup(sess, dates[col-1], sess.startRow);
-              sl.appendChild(blk);
-            });
-          } else if (availMode && !isHalf && !colLocked && !slotPeriodLocked) {
-            sl.addEventListener('mousedown', ev => {
-              ev.preventDefault();
-              ttSelecting = true; ttSelStart = {col:col-1, row:rowIdx}; ttSelEnd = {col:col-1, row:rowIdx};
-              tpRenderTtSelection();
-            });
-            sl.addEventListener('mouseenter', () => {
-              if (ttSelecting && ttSelStart.col === col-1) { ttSelEnd = {col:col-1, row:rowIdx}; tpRenderTtSelection(); }
-            });
-          }
+          if (slotPeriodLocked) sl.classList.add('tp-slot--period-locked');
         }
+
         grid.appendChild(sl);
       }
     });
-    tpRenderTtSelection();
   }
 
-  // Popup for a real API pairing (tutor view)
+  // Popup for a real API pairing (tutor view) — shows full student info
   function tpOpenPairingPopup(pairing, timeSlot) {
     const status = pairing.status || 'confirmed';
+    const sp = pairing.student_profile || {};
+    const initials = pairing.student_name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const matchedAt = pairing.matched_at
       ? new Date(pairing.matched_at).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' })
       : '—';
 
-    if (status === 'confirmed') {
-      document.getElementById('tp-pop-head').innerHTML = `<div class="tp-pop-label">Confirmed Session</div><div class="tp-pop-date">${escapeHtml(timeSlot)}</div><div class="tp-status-pill tp-sp-confirmed">✓ Confirmed</div>`;
-      document.getElementById('tp-pop-body').innerHTML = `
-        <div class="tp-detail-row"><div class="tp-detail-icon">🔒</div><div class="tp-detail-text"><strong>This slot is locked.</strong> Contact operations to make changes.</div></div>
-        <div class="tp-detail-row"><div class="tp-detail-icon">🕐</div><div class="tp-detail-text"><strong>${escapeHtml(timeSlot)}</strong></div></div>
-        <div class="tp-detail-row"><div class="tp-detail-icon">📅</div><div class="tp-detail-text">Matched ${escapeHtml(matchedAt)}</div></div>
-        <div class="tp-stu-card-pop">
-          <div class="tp-stu-card-top">
-            <div class="tp-stu-av">${escapeHtml(pairing.student_name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())}</div>
-            <div><div class="tp-stu-name">${escapeHtml(pairing.student_name)}</div><div class="tp-stu-meta">Student</div></div>
+    const isConfirmed = status === 'confirmed';
+    const statusLabel = isConfirmed ? '✓ Confirmed' : '⏳ Pending Confirmation';
+    const statusPill  = isConfirmed ? 'tp-sp-confirmed' : 'tp-sp-standby';
+    const sessionLabel = isConfirmed ? 'Confirmed Session' : 'Pending Session';
+
+    document.getElementById('tp-pop-head').innerHTML = `
+      <div class="tp-pop-label">${sessionLabel}</div>
+      <div class="tp-pop-date">${escapeHtml(timeSlot)}</div>
+      <div class="tp-status-pill ${statusPill}">${statusLabel}</div>`;
+
+    document.getElementById('tp-pop-body').innerHTML = `
+      <div class="tp-stu-card-pop" style="margin-bottom:14px;">
+        <div class="tp-stu-card-top">
+          <div class="tp-stu-av">${escapeHtml(initials)}</div>
+          <div>
+            <div class="tp-stu-name">${escapeHtml(pairing.student_name)}</div>
+            <div class="tp-stu-meta">Mathematics Student</div>
           </div>
-        </div>`;
-    } else if (status === 'standby') {
-      document.getElementById('tp-pop-head').innerHTML = `<div class="tp-pop-label">Standby Session</div><div class="tp-pop-date">${escapeHtml(timeSlot)}</div><div class="tp-status-pill tp-sp-standby">⏳ Standby</div>`;
-      document.getElementById('tp-pop-body').innerHTML = `
-        <div class="tp-detail-row"><div class="tp-detail-icon">🕐</div><div class="tp-detail-text"><strong>${escapeHtml(timeSlot)}</strong></div></div>
-        <div class="tp-detail-row"><div class="tp-detail-icon">📅</div><div class="tp-detail-text">Matched ${escapeHtml(matchedAt)}</div></div>
-        <div class="tp-stu-card-pop">
-          <div class="tp-stu-card-top">
-            <div class="tp-stu-av">${escapeHtml(pairing.student_name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())}</div>
-            <div><div class="tp-stu-name">${escapeHtml(pairing.student_name)}</div><div class="tp-stu-meta">Student</div></div>
-          </div>
-        </div>`;
-    } else {
-      document.getElementById('tp-pop-head').innerHTML = `<div class="tp-pop-label">Available Session</div><div class="tp-pop-date">${escapeHtml(timeSlot)}</div><div class="tp-status-pill tp-sp-availability">Available</div>`;
-      document.getElementById('tp-pop-body').innerHTML = `
-        <div class="tp-detail-row"><div class="tp-detail-icon">🕐</div><div class="tp-detail-text"><strong>${escapeHtml(timeSlot)}</strong></div></div>
-        <div class="tp-detail-row"><div class="tp-detail-icon">📅</div><div class="tp-detail-text">Matched ${escapeHtml(matchedAt)}</div></div>
-        <div class="tp-stu-card-pop">
-          <div class="tp-stu-card-top">
-            <div class="tp-stu-av">${escapeHtml(pairing.student_name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())}</div>
-            <div><div class="tp-stu-name">${escapeHtml(pairing.student_name)}</div><div class="tp-stu-meta">Student</div></div>
-          </div>
-        </div>`;
-    }
+        </div>
+      </div>
+      ${sp.curriculum ? `<div class="tp-detail-row"><div class="tp-detail-icon">📚</div><div class="tp-detail-text"><strong>Curriculum:</strong> ${escapeHtml(sp.curriculum)}</div></div>` : ''}
+      ${sp.grade_level ? `<div class="tp-detail-row"><div class="tp-detail-icon">🎓</div><div class="tp-detail-text"><strong>Grade Level:</strong> ${escapeHtml(String(sp.grade_level))}</div></div>` : ''}
+      ${sp.weak_topic ? `<div class="tp-detail-row"><div class="tp-detail-icon">🎯</div><div class="tp-detail-text"><strong>Focus Topic:</strong> ${escapeHtml(sp.weak_topic)}</div></div>` : ''}
+      ${sp.branch ? `<div class="tp-detail-row"><div class="tp-detail-icon">📍</div><div class="tp-detail-text"><strong>Branch:</strong> ${escapeHtml(sp.branch)}</div></div>` : ''}
+      <div class="tp-detail-row"><div class="tp-detail-icon">🕐</div><div class="tp-detail-text"><strong>Time slot:</strong> ${escapeHtml(timeSlot)}</div></div>
+      <div class="tp-detail-row"><div class="tp-detail-icon">📅</div><div class="tp-detail-text">Matched on ${escapeHtml(matchedAt)}</div></div>
+      ${isConfirmed ? `<div class="tp-detail-row"><div class="tp-detail-icon">🔒</div><div class="tp-detail-text">This slot is confirmed. Contact operations to make changes.</div></div>` : ''}`;
+
     document.getElementById('tp-sess-overlay').classList.add('open');
   }
 

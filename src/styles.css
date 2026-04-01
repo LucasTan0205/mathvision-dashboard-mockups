@@ -1388,6 +1388,90 @@ a {
    Manpower Management – Redesigned Components
    ═══════════════════════════════════════════════════════════ */
 
+/* ── Pending Confirmations Panel ───────────────────────── */
+
+.mp-pending-panel {
+  background: var(--card);
+  border: 1.5px solid #F0C070;
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+.mp-pending-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.mp-pending-panel__header .panel-label { color: #B07A00; }
+.mp-pending-panel__header .panel-title { margin: 0; }
+.mp-pending-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 99px;
+  background: #F0C070;
+  color: #7A5000;
+  font-size: 11px;
+  font-weight: 700;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.mp-pending-loading { color: var(--text-3); font-size: 13px; margin: 0; padding: 8px 0; }
+.mp-pending-empty   { color: var(--text-2); font-size: 13px; margin: 0; padding: 8px 0; }
+.mp-pending-table   { display: flex; flex-direction: column; gap: 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+.mp-pending-row {
+  display: grid;
+  grid-template-columns: 1.6fr 1.6fr 1fr 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  background: var(--card);
+}
+.mp-pending-row:last-child { border-bottom: none; }
+.mp-pending-row--head {
+  background: var(--cream-dark);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+}
+.mp-pending-row:not(.mp-pending-row--head):hover { background: var(--cream-dark); }
+.mp-pending-person { display: flex; align-items: center; gap: 8px; font-weight: 500; color: var(--text-1); }
+.mp-pending-av {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; flex-shrink: 0;
+}
+.mp-pending-av--student { background: #D6EBE0; color: var(--green-dark); }
+.mp-pending-av--tutor   { background: #E8E0F5; color: var(--purple); }
+.mp-pending-slot { color: var(--text-2); font-size: 12px; }
+.mp-pending-slot strong { color: var(--text-1); }
+.mp-pending-date { color: var(--text-3); font-size: 12px; }
+.mp-pending-confirm-btn {
+  border: none; border-radius: 8px; padding: 6px 14px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+  background: #2C4A3E; color: #fff;
+  transition: background .15s;
+}
+.mp-pending-confirm-btn:hover { background: #3a6052; }
+.mp-pending-confirm-btn:disabled { background: #C4BDB0; cursor: not-allowed; }
+.mp-pending-confirmed-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: 8px;
+  font-size: 12px; font-weight: 600;
+  background: #D6EBE0; color: #2C4A3E;
+}
+.mp-pending-row--confirmed { opacity: 0.72; }
+
 /* ── Section 1 – Alert Banner ──────────────────────────── */
 
 .mp-alert-banner {

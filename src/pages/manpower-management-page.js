@@ -3,6 +3,53 @@ import { Chart } from 'chart.js';
 import { sliceRecentRows, transformToChartData } from '/src/lib/mapping-quality-transform.js';
 
 const API_KEY = window.MATHVISION_API_KEY ?? 'dev-key';
+const PAIRING_CONFIRM_ENDPOINT_KEY = 'mathvision-pairing-confirm-endpoint';
+
+let pairingConfirmEndpoint = 'status';
+try {
+  const savedEndpoint = localStorage.getItem(PAIRING_CONFIRM_ENDPOINT_KEY);
+  if (savedEndpoint === 'status' || savedEndpoint === 'confirm') {
+    pairingConfirmEndpoint = savedEndpoint;
+  }
+} catch {
+  // no-op when localStorage is unavailable
+}
+
+function setPairingConfirmEndpoint(endpoint) {
+  pairingConfirmEndpoint = endpoint;
+  try {
+    localStorage.setItem(PAIRING_CONFIRM_ENDPOINT_KEY, endpoint);
+  } catch {
+    // no-op when storage is unavailable
+  }
+}
+
+async function confirmPairingCompat(pairingId) {
+  if (pairingConfirmEndpoint === 'confirm') {
+    return fetch(`/matching/pairings/${pairingId}/confirm`, {
+      method: 'PATCH',
+      headers: { 'X-API-Key': API_KEY }
+    });
+  }
+
+  const statusRes = await fetch(`/matching/pairings/${pairingId}/status`, {
+    method: 'PATCH',
+    headers: { 'X-API-Key': API_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status: 'confirmed' })
+  });
+
+  if (statusRes.status !== 404) {
+    if (statusRes.ok) setPairingConfirmEndpoint('status');
+    return statusRes;
+  }
+
+  const confirmRes = await fetch(`/matching/pairings/${pairingId}/confirm`, {
+    method: 'PATCH',
+    headers: { 'X-API-Key': API_KEY }
+  });
+  if (confirmRes.ok) setPairingConfirmEndpoint('confirm');
+  return confirmRes;
+}
 
 /* ── Data ───────────────────────────────────────────────── */
 
@@ -286,6 +333,21 @@ export function createManpowerManagementContent() {
   /* ── Assemble ─────────────────────────────────────────── */
 
   return `
+    <section class="mp-pending-panel" id="mp-pending-panel">
+      <div class="mp-pending-panel__header">
+        <div>
+          <p class="panel-label">Ops Action Required</p>
+          <h3 class="panel-title">Pending Lesson Confirmations <span class="mp-pending-count" id="mp-pending-count"></span></h3>
+        </div>
+        <button class="btn mp-btn mp-btn--primary" id="mp-confirm-all-btn" type="button" style="display:none;">
+          <i class="bi bi-check-all"></i> Confirm All
+        </button>
+      </div>
+      <div class="mp-pending-panel__body" id="mp-pending-body">
+        <p class="mp-pending-loading">Loading…</p>
+      </div>
+    </section>
+
     ${banner}
 
     <section class="mp-kpi-grid">${kpiCards}</section>
@@ -671,9 +733,199 @@ function initDemandPrediction() {
   }, DEMAND_POLL_MS);
 }
 
+async function initPendingConfirmations() {
+  const panel = document.getElementById('mp-pending-panel');
+  const body  = document.getElementById('mp-pending-body');
+  const count = document.getElementById('mp-pending-count');
+  const confirmAllBtn = document.getElementById('mp-confirm-all-btn');
+  if (!panel || !body) return;
+
+  async function confirmOne(pairingId) {
+    try {
+      const res = await confirmPairingCompat(pairingId);
+      return !!(res && res.ok);
+    } catch {
+      return false;
+    }
+  }
+
+  async function render() {
+    body.innerHTML = '<p class="mp-pending-loading">Loading…</p>';
+    try {
+      const res = await fetch('/matching/pairings', { headers: { 'X-API-Key': API_KEY } });
+      if (!res.ok) throw new Error();
+      const all = await res.json();
+      const pending   = all.filter(p => p.status === 'pending');
+      const confirmed = all.filter(p => p.status === 'confirmed');
+
+      // Deduplicate each group by student+tutor+day
+      function dedup(list) {
+        const seen = new Set();
+        return list.filter(p => {
+          const day = (p.time_slot || '').split('_')[0];
+          const key = `${p.student_id}|${p.tutor_id}|${day}`;
+          if (seen.has(key)) return false;
+          seen.add(key); return true;
+        });
+      }
+      const dedupedPending   = dedup(pending);
+      const dedupedConfirmed = dedup(confirmed);
+      const allRows = [...dedupedPending, ...dedupedConfirmed];
+
+      if (allRows.length === 0) {
+        count.textContent = '';
+        confirmAllBtn.style.display = 'none';
+        body.innerHTML = '<p class="mp-pending-empty"><i class="bi bi-check-circle" style="color:#2C4A3E;margin-right:6px;"></i>No lessons yet.</p>';
+        return;
+      }
+
+      count.textContent = dedupedPending.length || '';
+      confirmAllBtn.style.display = dedupedPending.length ? '' : 'none';
+
+      function rowHtml(p) {
+        const day     = (p.time_slot || '').split('_')[0];
+        const time    = (p.time_slot || '').split('_')[1] || '';
+        const matched = p.matched_at ? new Date(p.matched_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
+        const sInit   = (p.student_name || '?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        const tInit   = (p.tutor_name  || '?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        const isConf  = p.status === 'confirmed';
+        const action  = isConf
+          ? `<span class="mp-pending-confirmed-badge">✓ Confirmed</span>`
+          : `<button class="mp-pending-confirm-btn" data-student="${p.student_id}" data-tutor="${p.tutor_id}" data-day="${day}" type="button">Confirm</button>`;
+        return `
+          <div class="mp-pending-row${isConf ? ' mp-pending-row--confirmed' : ''}" data-student="${p.student_id}" data-tutor="${p.tutor_id}" data-day="${day}">
+            <span class="mp-pending-person"><span class="mp-pending-av mp-pending-av--student">${sInit}</span>${p.student_name || p.student_id}</span>
+            <span class="mp-pending-person"><span class="mp-pending-av mp-pending-av--tutor">${tInit}</span>${p.tutor_name || p.tutor_id}</span>
+            <span class="mp-pending-slot"><strong>${day}</strong> · ${time}</span>
+            <span class="mp-pending-date">${matched}</span>
+            <span>${action}</span>
+          </div>`;
+      }
+
+      body.innerHTML = `
+        <div class="mp-pending-table">
+          <div class="mp-pending-row mp-pending-row--head">
+            <span>Student</span><span>Tutor</span><span>Day &amp; Time</span><span>Matched</span><span>Status</span>
+          </div>
+          ${allRows.map(rowHtml).join('')}
+        </div>`;
+
+      // Wire confirm buttons — one representative ID per deduped row is enough
+      body.querySelectorAll('.mp-pending-confirm-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          btn.disabled = true; btn.textContent = 'Confirming…';
+          const { student, tutor, day } = btn.dataset;
+          // Pick one representative pairing ID for this student+tutor+day
+          const rep = all.find(p => p.status === 'pending' && p.student_id === student && p.tutor_id === tutor && (p.time_slot || '').startsWith(day));
+          if (!rep) {
+            btn.disabled = false;
+            btn.textContent = 'Confirm';
+            return;
+          }
+
+          const ok = await confirmOne(rep.pairing_id);
+          if (!ok) {
+            btn.disabled = false;
+            btn.textContent = 'Confirm';
+            return;
+          }
+
+          const row = btn.closest('.mp-pending-row');
+          if (row) row.classList.add('mp-pending-row--confirmed');
+          const actionCell = btn.parentElement;
+          if (actionCell) actionCell.innerHTML = '<span class="mp-pending-confirmed-badge">✓ Confirmed</span>';
+
+          const pendingCount = Number(count.textContent || '0');
+          const nextCount = Math.max(0, pendingCount - 1);
+          count.textContent = nextCount ? String(nextCount) : '';
+          confirmAllBtn.style.display = nextCount ? '' : 'none';
+        });
+      });
+
+      // Confirm All — one request per deduplicated pending row
+      confirmAllBtn.onclick = async () => {
+        const pendingButtons = [...body.querySelectorAll('.mp-pending-confirm-btn')];
+        if (!pendingButtons.length) return;
+
+        confirmAllBtn.disabled = true;
+        confirmAllBtn.textContent = 'Confirming…';
+
+        // Lock row-level buttons to avoid double submits while batch confirm runs.
+        pendingButtons.forEach((btn) => {
+          btn.disabled = true;
+          btn.textContent = 'Confirming…';
+        });
+
+        let successCount = 0;
+
+        // Preflight one request first so endpoint fallback can be cached before batch calls.
+        const [firstBtn, ...restButtons] = pendingButtons;
+        const firstRep = all.find(
+          (p) => p.status === 'pending'
+            && p.student_id === firstBtn.dataset.student
+            && p.tutor_id === firstBtn.dataset.tutor
+            && (p.time_slot || '').startsWith(firstBtn.dataset.day)
+        );
+
+        if (firstRep && await confirmOne(firstRep.pairing_id)) {
+          const row = firstBtn.closest('.mp-pending-row');
+          if (row) row.classList.add('mp-pending-row--confirmed');
+          const actionCell = firstBtn.parentElement;
+          if (actionCell) actionCell.innerHTML = '<span class="mp-pending-confirmed-badge">✓ Confirmed</span>';
+          successCount += 1;
+        } else {
+          firstBtn.disabled = false;
+          firstBtn.textContent = 'Confirm';
+        }
+
+        const confirmations = restButtons.map(async (btn) => {
+          const rep = all.find(
+            (p) => p.status === 'pending'
+              && p.student_id === btn.dataset.student
+              && p.tutor_id === btn.dataset.tutor
+              && (p.time_slot || '').startsWith(btn.dataset.day)
+          );
+
+          if (!rep || !await confirmOne(rep.pairing_id)) {
+            btn.disabled = false;
+            btn.textContent = 'Confirm';
+            return;
+          }
+
+          const row = btn.closest('.mp-pending-row');
+          if (row) row.classList.add('mp-pending-row--confirmed');
+          const actionCell = btn.parentElement;
+          if (actionCell) actionCell.innerHTML = '<span class="mp-pending-confirmed-badge">✓ Confirmed</span>';
+          successCount += 1;
+        });
+
+        await Promise.all(confirmations);
+
+        const pendingCount = Number(count.textContent || '0');
+        const nextCount = Math.max(0, pendingCount - successCount);
+        count.textContent = nextCount ? String(nextCount) : '';
+        confirmAllBtn.style.display = nextCount ? '' : 'none';
+
+        if (nextCount) {
+          confirmAllBtn.disabled = false;
+          confirmAllBtn.innerHTML = '<i class="bi bi-check-all"></i> Confirm All';
+        }
+      };
+
+    } catch {
+      body.innerHTML = '<p class="mp-pending-loading" style="color:var(--red);">Failed to load pending lessons.</p>';
+    }
+  }
+
+  render();
+}
+
 export function initManpowerManagementCharts() {
   /* Sparklines */
   kpis.forEach((k) => mountSparkline(k.id, k.data, k.tone));
+
+  /* Pending confirmations panel */
+  initPendingConfirmations();
 
   /* Peak Demand Prediction */
   initDemandPrediction();
@@ -1016,11 +1268,8 @@ function initTimetable() {
   // ── Pairing action helpers ────────────────────────────────────
   async function confirmPairing(pairingId) {
     try {
-      const res = await fetch(`/matching/pairings/${pairingId}/status`, {
-        method: 'PATCH',
-        headers: { 'X-API-Key': API_KEY, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'confirmed' })
-      });
+      const res = await confirmPairingCompat(pairingId);
+
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       fetchAndRenderPairings(_currentSlot);
     } catch (err) {
@@ -1209,11 +1458,11 @@ function initTimetable() {
         const timeLabel = (p.time_slot || '').replace(/^[A-Za-z]+_/, '');
         const matchedDate = p.matched_at ? new Date(p.matched_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
         const band = idx % 2 === 0 ? 'even' : 'odd';
-        const status = p.status || 'standby';
+        const status = p.status || 'pending';
         const statusBadgeClass = status === 'confirmed' ? 'mp-tt-status-badge--confirmed' : 'mp-tt-status-badge--standby';
-        const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+        const statusLabel = status === 'pending' ? 'Pending Confirmation' : status.charAt(0).toUpperCase() + status.slice(1);
 
-        const confirmBtn = status === 'standby'
+        const confirmBtn = status === 'pending'
           ? `<button class="mp-tt-action-btn mp-tt-action-btn--confirm" data-action="confirm" data-pairing-id="${p.pairing_id}" type="button" title="Confirm pairing"><i class="bi bi-check-lg"></i> Confirm</button>`
           : '';
         const editBtn = `<button class="mp-tt-action-btn mp-tt-action-btn--edit" data-action="edit" data-pairing-id="${p.pairing_id}" type="button" title="Reassign tutor"><i class="bi bi-pencil"></i> Edit</button>`;

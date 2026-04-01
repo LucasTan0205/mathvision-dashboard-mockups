@@ -28,9 +28,9 @@ DB_PATH = os.environ.get("DB_PATH", _DEFAULT_DB)
 # ---------------------------------------------------------------------------
 
 VALID_TRANSITIONS: dict[str, set[str]] = {
-    "standby": {"confirmed"},
+    "pending": {"confirmed"},
     "confirmed": set(),
-    "available": {"standby"},
+    "available": {"pending"},
 }
 
 # ---------------------------------------------------------------------------
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS pairings (
     satisfaction_score REAL NOT NULL,
     tutor_utilisation  REAL NOT NULL,
     matched_at         TEXT NOT NULL,
-    status             TEXT NOT NULL DEFAULT 'standby',
+    status             TEXT NOT NULL DEFAULT 'pending',
     confirmed_at       TEXT
 );
 
@@ -128,7 +128,7 @@ def init_db(db_path: str = DB_PATH) -> None:
         # Migrate existing pairings table: add status column
         try:
             conn.execute(
-                "ALTER TABLE pairings ADD COLUMN status TEXT NOT NULL DEFAULT 'standby'"
+                "ALTER TABLE pairings ADD COLUMN status TEXT NOT NULL DEFAULT 'pending'"
             )
         except sqlite3.OperationalError:
             pass  # Column already exists
@@ -294,7 +294,7 @@ def reassign_pairing(
     with get_connection(db_path) as conn:
         with conn:
             conn.execute(
-                "UPDATE pairings SET tutor_id = ?, status = 'standby', confirmed_at = NULL WHERE pairing_id = ?",
+                "UPDATE pairings SET tutor_id = ?, status = 'pending', confirmed_at = NULL WHERE pairing_id = ?",
                 (new_tutor_id, pairing_id),
             )
 

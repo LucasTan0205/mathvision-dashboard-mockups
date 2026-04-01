@@ -208,7 +208,7 @@ def run_matching(
                 satisfaction_score=sp.satisfaction_score,
                 tutor_utilisation=sp.tutor_utilisation,
                 matched_at=matched_at,
-                status="standby",
+                status="pending",
             )
             try:
                 write_pairing(record, db_path)

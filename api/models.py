@@ -115,7 +115,7 @@ class PairingRecord(BaseModel):
     satisfaction_score: float        # 0–100
     tutor_utilisation: float         # percentage
     matched_at: str                  # ISO-8601
-    status: Literal["available", "standby", "confirmed"] = "standby"
+    status: Literal["available", "pending", "confirmed"] = "pending"
     confirmed_at: str | None = None
 
     @field_validator("satisfaction_score")
