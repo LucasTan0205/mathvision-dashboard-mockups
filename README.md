@@ -7,7 +7,7 @@ Full-stack tutoring platform with automated student-tutor matching, standalone p
 - Frontend: Vite + vanilla JS + Bootstrap CDN
 - Backend: FastAPI + SQLite
 - Matching engine: Integer Programming via `pulp` (CBC solver)
-- Analytics: Jupyter notebooks (preprocessing + hybrid ML scoring)
+- Analytics: Jupyter notebooks (NLP preprocessing via sentence-transformers + logistic regression scoring)
 
 ## Project Structure
 
@@ -21,7 +21,7 @@ Full-stack tutoring platform with automated student-tutor matching, standalone p
 │   │   ├── jobs.py             # Analytics job runner
 │   │   └── matching.py         # Matching pipeline endpoints
 │   └── services/
-│       ├── hybrid_scorer.py    # Rule + ML hybrid scoring
+│       ├── hybrid_scorer.py    # Rule + ML hybrid scoring (60/40 weighting)
 │       ├── matching_service.py # Availability grouping + IP solver
 │       ├── pairing_store.py    # SQLite persistence layer
 │       └── job_runner.py       # Notebook execution
@@ -29,7 +29,12 @@ Full-stack tutoring platform with automated student-tutor matching, standalone p
 │   ├── pages/                  # Page content modules
 │   ├── entries/                # Vite entry points
 │   └── lib/                    # Chart helpers
-├── analytics-engine/           # Jupyter notebooks + data
+├── analytics-engine/           # Analytics engine
+│   ├── pre-processing/        # NLP preprocessing notebook
+│   ├── analytics/             # ML model + ranking notebook
+│   ├── data/raw/              # Raw CSVs (students, tutors, pairings)
+│   ├── data/pre-processed/    # Generated outputs (labels, metrics, rankings)
+│   └── spec/                  # Notebook specifications
 ├── student-portal.html         # Standalone student interface
 ├── tutor-portal.html           # Standalone tutor interface
 └── manpower-management.html    # Ops interface
@@ -106,11 +111,18 @@ GET  /matching/tutors/utilisation           # Tutor utilisation summary
 
 ## Analytics Pipeline
 
-The Ops dashboard includes a "Tutor-to-student mapping quality" graph fed by pre-processed CSV data. To regenerate it with new data:
+The analytics engine (`analytics-engine/`) processes historical session data through two notebooks run in sequence:
+
+1. **Preprocessing** (`pre-processing/mathvision_preprocessing.ipynb`) — converts raw tutor feedback text into pairing quality labels using pretrained NLP (sentence-transformers, all-MiniLM-L6-v2, 384-dim embeddings) with cosine similarity scoring against phrase banks
+2. **Analytics** (`analytics/mathvision_analytics.ipynb`) — trains a leakage-safe logistic regression model for pair-quality prediction, generates per-student tutor rankings (cold-start and warm-start), and produces daily mapping quality time series
+
+The Ops dashboard "Tutor-to-student mapping quality" graph is fed by the pre-processed CSV outputs. To regenerate with new data:
 
 1. Upload new student/tutor/pairing CSVs via the CSV Upload page
-2. Click "Run Analytics" in the Ops dashboard — this executes the preprocessing and analytics Jupyter notebooks
+2. Click "Run Analytics" in the Ops dashboard — this executes both notebooks
 3. The graph polls every 5 seconds and updates automatically
+
+See `analytics-engine/README.md` for full details on data, methods, and setup.
 
 ## Build
 

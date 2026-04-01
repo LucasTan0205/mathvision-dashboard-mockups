@@ -1,101 +1,89 @@
-# MathVision Matchmaking Pipeline (High-Level)
+# MathVision Analytics Engine
 
 ## Overview
-This project builds tutor-student recommendations in two stages:
-1. **Preprocessing**: Convert raw tutor feedback text into pairing-quality labels.
-2. **Analytics**: Train a leakage-safe pair-quality model, rank tutors per student, and support class-level assignment.
 
-Current notebooks:
-- `pre-processing/mathvision_preprocessing.ipynb`
-- `analytics/mathvision_analytics.ipynb`
+The analytics engine powers the data-driven components of the MathVision tutoring platform. It processes historical session records, evaluates pairing quality using NLP, trains predictive models for tutor ranking, and generates daily mapping quality scores for the Ops dashboard.
 
----
+## Data
 
-## Data Needed
-### Raw Inputs (`data/raw`)
-- `students.csv`
-  - `student_id`, `student_name`, `curriculum`, `grade_level`, `weak_topic`, `requested_slot`, `branch`
-- `tutors.csv`
-  - `tutor_id`, `tutor_name`, `tutor_type`, `primary_curriculum`, `specialty_topic`, `years_experience`, `rating`, `available_slots`, `preferred_min_grade`, `preferred_max_grade`, `past_success_rate`, `branch`
-- `pairings_raw.csv`
-  - `pairing_id`, `student_id`, `tutor_id`, `session_date`, `duration_hours`, `tutor_feedback_text`
+All data lives under `analytics-engine/data/`.
 
-### Preprocessed Outputs (`data/pre-processed`)
-- `pairings_labeled.csv` from preprocessing
-  - `pairing_id`, `student_id`, `tutor_id`, `lessons_count`, `total_hours`, `avg_feedback_score`, `positive_note_count`, `negative_note_count`, `good_pairing_label`
-- Analytics outputs
-  - `analytics_model_metrics.csv`
-  - `analytics_scenario_rankings.csv`
+### Raw inputs (`data/raw/`)
 
----
+| File | Description |
+|---|---|
+| `students.csv` | Student profiles — ID, name, curriculum, grade, weak topic, requested slot, branch |
+| `tutors.csv` | Tutor profiles — ID, name, type, curriculum, specialty, experience, rating, availability, grade range, past success rate, branch |
+| `pairings_raw.csv` | Historical session records — session date, topic covered, duration, and tutor feedback text |
 
-## End-to-End Flow
-1. Run preprocessing notebook:
-   - Clean text, TF-IDF vectorization, cosine similarity vs positive/negative phrase banks.
-   - Aggregate session-level scores to pairing-level.
-   - Generate `good_pairing_label` and write `pairings_labeled.csv`.
-   - Reminder: This could be replaced with NLP model (pre-trained RNN or throw it at the LLM and see what sticks)
-2. Run analytics notebook:
-   - Load `students.csv`, `tutors.csv`, `pairings_labeled.csv`.
-   - Engineer fit + tutor-quality features.
-   - Train leakage-safe logistic regression model.
-   - Generate per-student tutor rankings.
-   - Save metrics and scenario ranking outputs.
+### Pre-processed outputs (`data/pre-processed/`)
 
----
+| File | Produced by | Description |
+|---|---|---|
+| `pairings_labeled.csv` | Preprocessing notebook | Pairing-level aggregation with quality labels derived from NLP analysis |
+| `analytics_model_metrics.csv` | Analytics notebook | Logistic regression model performance metrics |
+| `analytics_scenario_rankings.csv` | Analytics notebook | Per-student tutor rankings under cold-start and warm-start scenarios |
+| `analytics_mapping_quality_timeseries.csv` | Analytics notebook | Daily mapping quality scores for dashboard visualisation |
 
-## Modeling Approach
-### Pair-Quality Prediction (per student-tutor pair)
-- **Cold-start model features**:
-  - `topic_match`, `curriculum_match`, `grade_gap`, `availability_match`, `same_branch`
-  - `tutor_rating`, `tutor_experience`, `past_success_rate`, `rule_score`, `tutor_type`
-- **Leakage-safe policy**:
-  - Do **not** train on pair-history fields used to derive labels (`avg_feedback_score`, `lessons_count`, note counts).
+## Notebooks
 
-### Ranking Modes
-- **Cold-start**: no prior history for that exact student-tutor pair.
-- **Warm-start**: prior pair exists; apply a small history-based re-ranking signal after base scoring.
+Run these in order. Each notebook is self-contained and reads from the data directory.
 
----
+### 1. Preprocessing — `pre-processing/mathvision_preprocessing.ipynb`
 
-## Class-Level Assignment (Whole Class, Not One Student) [Not Implemented yet]
-Pairwise ranking is not the final class allocation by itself. For a class/session, generate all feasible student-tutor pair scores, then assign globally with constraints.
+Converts raw tutor feedback text into pairing quality labels.
 
-### Choices for class-level assignation
-1. **Greedy heuristic [If no time]**
-   - Assign highest-score pairs first with capacity checks.
-   - Pros: simple, quick.
-   - Cons: may miss better global solution.
-2. **Greedy + local improvement [Balanced]**
-   - Start greedy, then swap/reassign to improve total score.
-   - Pros: better than pure greedy, still practical.
-   - Cons: still approximate.
-3. **Optimization (recommended for quality)[FIWB option]**
-   - Use max-weight bipartite matching / integer programming.
-   - Objective: maximize total assignment score.
-   - Constraints: tutor capacity, slot compatibility, min fit rules, optional fairness/load balance.
-   - Pros: best global assignment under constraints.
-   - Cons: more implementation complexity.
+**Methods:**
+- Pretrained NLP via `sentence-transformers` (all-MiniLM-L6-v2, 384-dim embeddings)
+- Cosine similarity scoring against positive/negative reference phrase banks
+- Session-level scores aggregated to pairing-level metrics
+- Binary quality labelling (`good_pairing_label`)
 
----
+**Input:** `data/raw/students.csv`, `data/raw/tutors.csv`, `data/raw/pairings_raw.csv`
+**Output:** `data/pre-processed/pairings_labeled.csv`
 
-## Technology and Techniques
-- **Language**: Python
-- **Environment**: Jupyter notebooks
-- **Core libraries**:
-  - `pandas`, `numpy`
-  - `scikit-learn` (TF-IDF, cosine similarity, logistic regression, preprocessing, metrics)
-  - `matplotlib` (evaluation plots)
-- **Techniques used**:
-  - Text preprocessing and phrase-bank similarity scoring
-  - Rule-based scoring + ML hybrid ranking
-  - Leakage-aware feature policy
-  - Cold-start vs warm-start ranking logic
-  - (Planned/optional) combinatorial assignment optimization for class-level pairing
+### 2. Analytics — `analytics/mathvision_analytics.ipynb`
 
----
+Trains a predictive model for tutor-student match quality and generates tutor rankings.
 
-## Suggested Next Step
-Add a dedicated **assignment layer** notebook/module that takes scored student-tutor pairs and solves class-level allocation using either:
-- a baseline greedy heuristic, and
-- an optimization solver for higher-quality global matching.
+**Methods:**
+- Leakage-safe feature engineering (excludes pair-history fields used to derive labels)
+- Logistic Regression for pair-quality prediction
+- Cold-start ranking (no prior history for the pair)
+- Warm-start ranking (prior pair exists, history-based re-ranking signal)
+
+**Features used:** `topic_match`, `curriculum_match`, `grade_gap`, `availability_match`, `same_branch`, `tutor_rating`, `tutor_experience`, `past_success_rate`, `rule_score`, `tutor_type`
+
+**Input:** `data/raw/students.csv`, `data/raw/tutors.csv`, `data/pre-processed/pairings_labeled.csv`
+**Output:** `data/pre-processed/analytics_model_metrics.csv`, `data/pre-processed/analytics_scenario_rankings.csv`, `data/pre-processed/analytics_mapping_quality_timeseries.csv`
+
+## Matching Engine
+
+The matching engine runs as a backend service (`api/services/`) and is not a notebook, but it consumes the analytics outputs.
+
+**Methods:**
+- Hybrid scoring: rule-based match score (curriculum, grade, topic, branch, rating) + predicted success probability, weighted 60/40
+- Integer Programming optimisation via PuLP/CBC solver for whole-class assignment
+- Tutor utilisation as a tie-breaker (under-utilised tutors preferred)
+
+**Key files:**
+- `api/services/hybrid_scorer.py` — rule-based + ML hybrid scoring
+- `api/services/matching_service.py` — availability grouping + IP solver
+
+## Specs
+
+Detailed specifications for each notebook are in `spec/`:
+- `mathvision_preprocessing_spec.md`
+- `mathvision_analytics_spec.md`
+
+## Setup
+
+```bash
+cd analytics-engine
+python3 -m venv .venv
+source .venv/bin/activate
+pip install pandas numpy scikit-learn sentence-transformers matplotlib jupyter ipykernel
+python -m ipykernel install --user --name=analytics-engine
+```
+
+Then open any notebook and select the `analytics-engine` kernel.
