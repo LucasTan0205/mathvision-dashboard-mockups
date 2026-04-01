@@ -3426,6 +3426,19 @@ select.si-field__input {
 .mp-tt-score--ok   { background: #f5ead6; color: var(--warm, #bc6c25); }
 .mp-tt-score--low  { background: #f5ddd6; color: var(--danger, #b85743); }
 
+/* Pending confirmations panel */
+.mp-confirm-panel { margin-bottom: 24px; }
+.mp-confirm-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.mp-confirm-badge--pending { background: #FEF3DC; color: #7A5010; }
+.mp-confirm-badge--clear   { background: #dbece4; color: #134d3b; }
+
 /* Pairing status */
 .mp-tt-status {
   display: inline-flex;

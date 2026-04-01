@@ -283,9 +283,31 @@ export function createManpowerManagementContent() {
       <div id="utilisationPanel"></div>
     </section>`;
 
+  /* Section 0 – Pending Lesson Confirmations */
+  const pendingConfirmations = `
+    <section class="shell-card mp-confirm-panel" id="mp-confirm-panel">
+      <div class="shell-card__header">
+        <div>
+          <p class="panel-label">Action required</p>
+          <h3 class="panel-title">Pending Lesson Confirmations</h3>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="btn mp-btn mp-btn--primary" id="mp-confirm-all-btn" type="button" style="display:none;">
+            <i class="bi bi-check2-all"></i> Confirm All
+          </button>
+          <span class="mp-confirm-badge" id="mp-confirm-count">Loading…</span>
+        </div>
+      </div>
+      <div id="mp-confirm-body">
+        <div class="mp-timetable-loading"><i class="bi bi-arrow-repeat mp-spin"></i> Loading pending lessons…</div>
+      </div>
+    </section>`;
+
   /* ── Assemble ─────────────────────────────────────────── */
 
   return `
+    ${pendingConfirmations}
+
     ${banner}
 
     <section class="mp-kpi-grid">${kpiCards}</section>
@@ -912,6 +934,134 @@ export function initManpowerManagementCharts() {
   initPairingGraph();
   initUtilisationPanel();
   initTimetable();
+  initPendingConfirmations();
+}
+
+/* ── Pending Lesson Confirmations panel ──────────────────────────── */
+
+function initPendingConfirmations() {
+  const body      = document.getElementById('mp-confirm-body');
+  const badge     = document.getElementById('mp-confirm-count');
+  const confirmAllBtn = document.getElementById('mp-confirm-all-btn');
+  if (!body) return;
+
+  async function fetchAndRender() {
+    try {
+      const res = await fetch('/matching/pairings', { headers: { 'X-API-Key': API_KEY } });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const all = await res.json();
+      const pending = all.filter(p => (p.status || 'pending') === 'pending');
+
+      // Deduplicate by student+tutor+day (show one row per unique pairing, not per 30-min slot)
+      const seen = new Set();
+      const deduped = pending.filter(p => {
+        const day = (p.time_slot || '').slice(0, 3);
+        const key = `${p.student_id}_${p.tutor_id}_${day}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+      badge.textContent = deduped.length > 0 ? `${deduped.length} pending` : '✓ All confirmed';
+      badge.className = 'mp-confirm-badge ' + (deduped.length > 0 ? 'mp-confirm-badge--pending' : 'mp-confirm-badge--clear');
+      if (confirmAllBtn) confirmAllBtn.style.display = deduped.length > 0 ? '' : 'none';
+
+      if (deduped.length === 0) {
+        body.innerHTML = '<p class="mp-timetable-empty">No pending lessons — all matched sessions have been confirmed.</p>';
+        return;
+      }
+
+      const DAY_FULL = { Mon:'Monday', Tue:'Tuesday', Wed:'Wednesday', Thu:'Thursday', Fri:'Friday', Sat:'Saturday', Sun:'Sunday' };
+
+      function initials(name) {
+        if (!name) return '?';
+        return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      }
+
+      body.innerHTML = `
+        <table class="mp-tt-table">
+          <thead>
+            <tr><th>Day</th><th>Student</th><th>Level</th><th>Topic</th><th>Tutor</th><th>Match</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            ${deduped.map(p => {
+              const day = (p.time_slot || '').slice(0, 3);
+              const dayLabel = DAY_FULL[day] || day;
+              const score = Math.round(p.satisfaction_score);
+              const scoreClass = score >= 75 ? 'good' : score >= 50 ? 'ok' : 'low';
+              return `
+                <tr id="mp-pc-row-${p.pairing_id}">
+                  <td class="mp-tt-cell mp-tt-cell--muted">${dayLabel}</td>
+                  <td class="mp-tt-cell">
+                    <span class="mp-tt-avatar">${initials(p.student_name)}</span>
+                    <span class="mp-tt-name">${p.student_name || p.student_id}</span>
+                  </td>
+                  <td class="mp-tt-cell mp-tt-cell--muted">${p.curriculum || '—'} · Gr ${p.grade_level || '—'}</td>
+                  <td class="mp-tt-cell mp-tt-cell--muted">${p.weak_topic || '—'}</td>
+                  <td class="mp-tt-cell">
+                    <span class="mp-tt-avatar mp-tt-avatar--tutor">${initials(p.tutor_name)}</span>
+                    <span class="mp-tt-name">${p.tutor_name || p.tutor_id}</span>
+                  </td>
+                  <td class="mp-tt-cell"><span class="mp-tt-score mp-tt-score--${scoreClass}">${score}%</span></td>
+                  <td class="mp-tt-cell">
+                    <button class="mp-tt-confirm-btn" data-pairing-id="${p.pairing_id}" data-student-id="${p.student_id}" data-tutor-id="${p.tutor_id}" data-day="${day}">Confirm</button>
+                  </td>
+                </tr>`;
+            }).join('')}
+          </tbody>
+        </table>`;
+    } catch (err) {
+      console.warn('[PendingConfirmations] fetch failed:', err);
+      body.innerHTML = '<p class="mp-timetable-empty">Could not load pending lessons.</p>';
+    }
+  }
+
+  // Confirm button — confirms ALL slots for the same student+tutor+day
+  body.addEventListener('click', async e => {
+    const btn = e.target.closest('.mp-tt-confirm-btn');
+    if (!btn) return;
+    btn.disabled = true;
+    btn.textContent = 'Confirming…';
+
+    const { pairingId, studentId, tutorId, day } = {
+      pairingId: btn.dataset.pairingId,
+      studentId: btn.dataset.studentId,
+      tutorId:   btn.dataset.tutorId,
+      day:       btn.dataset.day,
+    };
+
+    try {
+      // Fetch all pairings for this student to find sibling slots (same student+tutor+day)
+      const res = await fetch(`/matching/students/${studentId}/pairings`);
+      const all = res.ok ? await res.json() : [];
+      const siblings = all.filter(p =>
+        p.tutor_id === tutorId &&
+        (p.time_slot || '').slice(0, 3) === day &&
+        (p.status || 'pending') === 'pending'
+      );
+
+      // Confirm all sibling slots in parallel
+      const targets = siblings.length > 0 ? siblings.map(p => p.pairing_id) : [pairingId];
+      await Promise.all(targets.map(id =>
+        fetch(`/matching/pairings/${id}/confirm`, { method: 'PATCH' })
+      ));
+
+      // Remove the row and refresh the count
+      document.getElementById(`mp-pc-row-${pairingId}`)?.remove();
+      const remaining = body.querySelectorAll('.mp-tt-confirm-btn').length;
+      badge.textContent = remaining > 0 ? `${remaining} pending` : '✓ All confirmed';
+      if (remaining === 0) {
+        badge.className = 'mp-confirm-badge mp-confirm-badge--clear';
+        body.innerHTML = '<p class="mp-timetable-empty">No pending lessons — all matched sessions have been confirmed.</p>';
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Confirm';
+      console.error('[PendingConfirmations] confirm failed:', err);
+    }
+  });
+
+  fetchAndRender();
 }
 
 /* ── Timetable modal ─────────────────────────────────────────────── */
