@@ -39,6 +39,11 @@ s.textContent = `
 .tp-sess-availability{background:var(--purple-pale);border:1.5px dashed var(--purple-mid);}
 .tp-sess-availability .tp-sb-label{color:var(--purple);}
 .tp-sess-availability .tp-sb-sub{color:var(--purple-mid);opacity:.75;}
+.tp-slot--confirmed{background:rgba(44,74,62,.1)!important;}
+.tp-slot--pending{background:rgba(180,120,20,.07)!important;}
+.tp-sess-pending{background:#B47A14;}
+.tp-sess-pending .tp-sb-label{color:rgba(255,255,255,.95);}
+.tp-sess-pending .tp-sb-sub{color:rgba(255,255,255,.65);}
 .tp-sess-confirmed{background:var(--green-dark);}
 .tp-sess-confirmed .tp-sb-label{color:rgba(255,255,255,.95);}
 .tp-sess-confirmed .tp-sb-sub{color:rgba(255,255,255,.65);}

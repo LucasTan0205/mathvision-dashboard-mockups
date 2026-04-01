@@ -34,7 +34,8 @@ CREATE TABLE IF NOT EXISTS pairings (
     time_slot          TEXT NOT NULL,
     satisfaction_score REAL NOT NULL,
     tutor_utilisation  REAL NOT NULL,
-    matched_at         TEXT NOT NULL
+    matched_at         TEXT NOT NULL,
+    status             TEXT NOT NULL DEFAULT 'pending'
 );
 
 CREATE INDEX IF NOT EXISTS idx_pairings_student ON pairings(student_id);
@@ -109,8 +110,8 @@ def write_pairing(pairing: PairingRecord, db_path: str = DB_PATH) -> None:
                 """
                 INSERT OR REPLACE INTO pairings
                     (pairing_id, student_id, tutor_id, time_slot,
-                     satisfaction_score, tutor_utilisation, matched_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                     satisfaction_score, tutor_utilisation, matched_at, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     pairing.pairing_id,
@@ -120,8 +121,20 @@ def write_pairing(pairing: PairingRecord, db_path: str = DB_PATH) -> None:
                     pairing.satisfaction_score,
                     pairing.tutor_utilisation,
                     pairing.matched_at,
+                    pairing.status,
                 ),
             )
+
+
+def confirm_pairing(pairing_id: str, db_path: str = DB_PATH) -> bool:
+    """Set a pairing's status to 'confirmed'. Returns True if a row was updated."""
+    with get_connection(db_path) as conn:
+        with conn:
+            cursor = conn.execute(
+                "UPDATE pairings SET status = 'confirmed' WHERE pairing_id = ?",
+                (pairing_id,),
+            )
+    return cursor.rowcount > 0
 
 
 def write_student_profile(student: StudentProfile, db_path: str = DB_PATH) -> None:
@@ -213,6 +226,7 @@ def get_pairings_by_slot(
             SELECT
                 p.pairing_id, p.student_id, p.tutor_id, p.time_slot,
                 p.satisfaction_score, p.tutor_utilisation, p.matched_at,
+                COALESCE(p.status, 'pending')    AS status,
                 COALESCE(sp.name, p.student_id) AS student_name,
                 COALESCE(tp.name, p.tutor_id)   AS tutor_name,
                 COALESCE(sp.curriculum, '')      AS curriculum,

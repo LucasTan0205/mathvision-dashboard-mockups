@@ -330,7 +330,7 @@ export function initTutorPortal() {
     if (el) el.classList.add('active');
     document.getElementById('tp-breadcrumb').innerHTML = `Portal · <span>${PAGE_LABELS[page] || page}</span>`;
     if (page === 'history')   tpRenderHistory();
-    if (page === 'timetable') tpBuildGrid();
+    if (page === 'timetable') { pairingsLoaded = false; pairingsError = false; tpBuildGrid(); }
     if (page === 'profile')   tpPopulateProfile();
   };
 
@@ -628,9 +628,10 @@ export function initTutorPortal() {
         const pairing = weekOffset === 0 && !isHalf ? livePairings[key] : null;
 
         if (pairing) {
-          sl.classList.add('tp-slot--confirmed');
+          const isConfirmed = pairing.status === 'confirmed';
+          sl.classList.add(isConfirmed ? 'tp-slot--confirmed' : 'tp-slot--pending');
           const blk = document.createElement('div');
-          blk.className = 'tp-sess-block tp-sess-confirmed';
+          blk.className = isConfirmed ? 'tp-sess-block tp-sess-confirmed' : 'tp-sess-block tp-sess-pending';
           blk.style.height = '28px';
           blk.innerHTML = `<div class="tp-sb-label">${escapeHtml(pairing.student_name)}</div><div class="tp-sb-sub">${escapeHtml(t)}</div>`;
           blk.onclick = () => tpOpenPairingPopup(pairing, t);
@@ -673,7 +674,8 @@ export function initTutorPortal() {
     const matchedAt = pairing.matched_at
       ? new Date(pairing.matched_at).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' })
       : '—';
-    document.getElementById('tp-pop-head').innerHTML = `<div class="tp-pop-label">Confirmed Session</div><div class="tp-pop-date">${escapeHtml(timeSlot)}</div><div class="tp-status-pill tp-sp-confirmed">✓ Confirmed</div>`;
+    const _isConfirmed = pairing.status === 'confirmed';
+    document.getElementById('tp-pop-head').innerHTML = `<div class="tp-pop-label">${_isConfirmed ? 'Confirmed Session' : 'Pending Session'}</div><div class="tp-pop-date">${escapeHtml(timeSlot)}</div><div class="tp-status-pill ${_isConfirmed ? 'tp-sp-confirmed' : 'tp-sp-pending'}">${_isConfirmed ? '✓ Confirmed' : '⏳ Pending Confirmation'}</div>`;
     document.getElementById('tp-pop-body').innerHTML = `
       <div class="tp-detail-row"><div class="tp-detail-icon">🕐</div><div class="tp-detail-text"><strong>${escapeHtml(timeSlot)}</strong></div></div>
       <div class="tp-detail-row"><div class="tp-detail-icon">📅</div><div class="tp-detail-text">Matched ${escapeHtml(matchedAt)}</div></div>

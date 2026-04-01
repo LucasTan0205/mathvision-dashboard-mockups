@@ -115,6 +115,7 @@ class PairingRecord(BaseModel):
     satisfaction_score: float        # 0–100
     tutor_utilisation: float         # percentage
     matched_at: str                  # ISO-8601
+    status: str = "pending"          # "pending" | "confirmed"
 
     @field_validator("satisfaction_score")
     @classmethod

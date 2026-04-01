@@ -333,7 +333,7 @@ export function initStudentPortal() {
     if (el) el.classList.add('active');
     document.getElementById('sp-breadcrumb-page').textContent = PAGE_LABELS[page] || page;
     if (page === 'history') spRenderHistory();
-    if (page === 'timetable') spBuildMainGrid();
+    if (page === 'timetable') { pairingsLoaded = false; pairingsError = false; spBuildMainGrid(); }
     if (page === 'profile') spPopulateProfile();
   };
 
@@ -530,7 +530,7 @@ export function initStudentPortal() {
       livePairings = {};
       records.forEach(p => {
         const [day, time] = p.time_slot.split('_');
-        const key = `${day.toUpperCase().slice(0,3)}_${time}`;
+        const key = `${day.toUpperCase().slice(0,3)}_${time}`;  // normalise to MON_09:00 for grid lookup
         livePairings[key] = { ...p, tutor_name: tutorNames[p.tutor_id] || p.tutor_id };
       });
       pairingsLoaded = true;
@@ -596,9 +596,10 @@ export function initStudentPortal() {
           const key = `${d}_${t}`;
           const pairing = livePairings[key];
           if (pairing && !isHalf) {
-            cell.classList.add('sp-slot--confirmed');
+            const isConfirmed = pairing.status === 'confirmed';
+            cell.classList.add(isConfirmed ? 'sp-slot--confirmed' : 'sp-slot--pending');
             const block = document.createElement('div');
-            block.className = 'sp-sess-block';
+            block.className = isConfirmed ? 'sp-sess-block' : 'sp-sess-block sp-sess-block--pending';
             block.style.height = '28px';
             block.innerHTML = `<div class="sp-sess-time">${escapeHtml(t)}</div><div class="sp-sess-tutor">${escapeHtml(pairing.tutor_name)}</div>`;
             block.addEventListener('click', ev => { ev.stopPropagation(); spOpenPairingPopup(pairing, t); });
@@ -635,9 +636,10 @@ export function initStudentPortal() {
     const matchedAt = pairing.matched_at
       ? new Date(pairing.matched_at).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' })
       : '—';
-    document.getElementById('sp-pop-head').innerHTML = `<div class="sp-pop-label">Confirmed Session</div><div class="sp-pop-date">${escapeHtml(timeSlot)}</div>`;
+    const _isConfirmed = pairing.status === 'confirmed';
+    document.getElementById('sp-pop-head').innerHTML = `<div class="sp-pop-label">${_isConfirmed ? 'Confirmed Session' : 'Pending Session'}</div><div class="sp-pop-date">${escapeHtml(timeSlot)}</div>`;
     document.getElementById('sp-pop-body').innerHTML = `
-      <span class="sp-status-pill sp-sp-confirmed">✓ Confirmed</span>
+      <span class="sp-status-pill ${_isConfirmed ? 'sp-sp-confirmed' : 'sp-sp-pending'}">${_isConfirmed ? '✓ Confirmed' : '⏳ Pending Confirmation'}</span>
       <div class="sp-time-card"><div class="sp-time-icon">🕐</div><div><div class="sp-time-val">${escapeHtml(timeSlot)}</div><div class="sp-time-sub">Matched ${escapeHtml(matchedAt)}</div></div></div>
       <div class="sp-pop-label">Your Tutor</div>
       <div class="sp-tutor-card">

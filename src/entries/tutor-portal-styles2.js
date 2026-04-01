@@ -14,6 +14,7 @@ s2.textContent = `
 .tp-pop-date{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;line-height:1.2;margin-bottom:14px;}
 .tp-status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:14px;}
 .tp-sp-confirmed{background:var(--green-pale);color:var(--green-dark);}
+.tp-sp-pending{background:#FEF3DC;color:#7A5010;}
 .tp-sp-availability{background:var(--purple-pale);color:var(--purple);}
 .tp-sp-standby{background:#E8EBF0;color:var(--slate);}
 .tp-detail-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}

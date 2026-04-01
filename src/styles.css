@@ -3426,6 +3426,36 @@ select.si-field__input {
 .mp-tt-score--ok   { background: #f5ead6; color: var(--warm, #bc6c25); }
 .mp-tt-score--low  { background: #f5ddd6; color: var(--danger, #b85743); }
 
+/* Pairing status */
+.mp-tt-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.mp-tt-status--pending   { background: #FEF3DC; color: #7A5010; }
+.mp-tt-status--confirmed { background: #dbece4; color: #134d3b; }
+.mp-tt-confirm-btn {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1.5px solid #1D9E75;
+  border-radius: 20px;
+  background: #fff;
+  color: #1D9E75;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.mp-tt-confirm-btn:hover:not(:disabled) { background: #1D9E75; color: #fff; }
+.mp-tt-confirm-btn:disabled { opacity: 0.5; cursor: default; }
+
 /* Clickable shift tiles */
 .mp-slot--filled {
   cursor: pointer;

@@ -113,8 +113,11 @@ style2.textContent = `
 .sp-slot--selected::after{content:'';position:absolute;inset:1px;border:1.5px solid var(--green-dark);border-radius:3px;pointer-events:none;}
 
 /* SESSION BLOCKS */
+.sp-slot--confirmed{background:rgba(44,74,62,.1)!important;}
+.sp-slot--pending{background:rgba(180,120,20,.07)!important;}
 .sp-sess-block{position:absolute;left:3px;right:3px;top:2px;border-radius:6px;padding:4px 7px;cursor:pointer;z-index:2;background:var(--green-dark);transition:opacity .15s;}
 .sp-sess-block:hover{opacity:.82;}
+.sp-sess-block--pending{background:#B47A14;}
 .sp-sess-pending{background:rgba(44,74,62,.14);border:1.5px dashed var(--green-dark);}
 .sp-sess-pending .sp-sess-time{color:var(--green-mid);}
 .sp-sess-pending .sp-sess-tutor{color:var(--text-3);}

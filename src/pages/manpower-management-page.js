@@ -1031,9 +1031,14 @@ function initTimetable() {
         const timeLabel = (p.time_slot || '').replace(/^[A-Za-z]+_/, '');
         const matchedDate = p.matched_at ? new Date(p.matched_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
         const band = idx % 2 === 0 ? 'even' : 'odd';
+        const isPending = (p.status || 'pending') === 'pending';
+        const statusCell = isPending
+          ? `<span class="mp-tt-status mp-tt-status--pending">⏳ Pending</span>
+             <button class="mp-tt-confirm-btn" data-pairing-id="${p.pairing_id}">Confirm</button>`
+          : `<span class="mp-tt-status mp-tt-status--confirmed">✓ Confirmed</span>`;
 
         return `
-          <tr class="mp-tt-row mp-tt-row--pair-${band}">
+          <tr class="mp-tt-row mp-tt-row--pair-${band}" id="mp-tt-row-${p.pairing_id}">
             <td class="mp-tt-cell mp-tt-cell--muted" style="width:60px">${timeLabel}</td>
             <td class="mp-tt-cell">
               <span class="mp-tt-avatar">${initials(p.student_name)}</span>
@@ -1049,6 +1054,7 @@ function initTimetable() {
               <span class="mp-tt-score mp-tt-score--${scoreClass}">${score}%</span>
             </td>
             <td class="mp-tt-cell mp-tt-cell--muted">${matchedDate}</td>
+            <td class="mp-tt-cell">${statusCell}</td>
           </tr>`;
       }).join('');
 
@@ -1062,7 +1068,7 @@ function initTimetable() {
           <table class="mp-tt-table">
             <thead>
               <tr>
-                <th>Time</th><th>Student</th><th>Level</th><th>Topic</th><th>Tutor</th><th>Match</th><th>Matched on</th>
+                <th>Time</th><th>Student</th><th>Level</th><th>Topic</th><th>Tutor</th><th>Match</th><th>Matched on</th><th>Status</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -1075,4 +1081,24 @@ function initTimetable() {
     if (!name) return '?';
     return name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
   }
+
+  // ── Confirm button handler ────────────────────────────────
+  body.addEventListener('click', async e => {
+    const btn = e.target.closest('.mp-tt-confirm-btn');
+    if (!btn) return;
+    const pairingId = btn.dataset.pairingId;
+    btn.disabled = true;
+    btn.textContent = 'Confirming…';
+    try {
+      const res = await fetch(`/matching/pairings/${pairingId}/confirm`, { method: 'PATCH' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      // Update the cell in-place
+      const cell = btn.closest('td');
+      cell.innerHTML = `<span class="mp-tt-status mp-tt-status--confirmed">✓ Confirmed</span>`;
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Confirm';
+      console.error('[Confirm pairing] failed:', err);
+    }
+  });
 }
