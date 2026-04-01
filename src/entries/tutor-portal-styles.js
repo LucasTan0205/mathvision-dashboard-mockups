@@ -27,6 +27,8 @@ s.textContent = `
 .tp-slot{height:32px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;transition:background .08s;}
 .tp-slot--half{border-bottom:1px dashed #E8E0CE;}
 .tp-slot--locked{cursor:not-allowed!important;background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,.028) 4px,rgba(0,0,0,.028) 8px)!important;}
+.tp-slot--period-locked{cursor:not-allowed!important;background:repeating-linear-gradient(45deg,#f0c0c0,#f0c0c0 2px,#fde8e8 2px,#fde8e8 5px)!important;pointer-events:none;}
+.tp-slot--standby{}
 .tp-slot--selecting{background:rgba(91,61,138,.18)!important;}
 .tp-slot--selected{background:rgba(91,61,138,.18)!important;}
 .tp-slot--selected::after{content:'';position:absolute;inset:1px;border:1.5px solid var(--purple);border-radius:3px;pointer-events:none;}

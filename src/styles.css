@@ -3448,3 +3448,161 @@ select.si-field__input {
   display: inline-block;
   animation: mp-spin 0.8s linear infinite;
 }
+
+/* ── Status badges (timetable modal) ─────────────────────── */
+.mp-tt-status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.mp-tt-status-badge--standby {
+  background: #5A6880;
+  color: #fff;
+}
+.mp-tt-status-badge--confirmed {
+  background: var(--accent, #1D9E75);
+  color: #fff;
+}
+
+/* ── Action buttons (timetable modal) ────────────────────── */
+.mp-tt-cell--actions {
+  white-space: nowrap;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.mp-tt-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border: 1px solid var(--surface-soft, #e0e0e0);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.mp-tt-action-btn:hover {
+  background: var(--surface-soft, #f5f5f5);
+}
+.mp-tt-action-btn--confirm {
+  color: var(--accent, #1D9E75);
+  border-color: var(--accent, #1D9E75);
+}
+.mp-tt-action-btn--confirm:hover {
+  background: var(--accent-soft, #dbece4);
+}
+.mp-tt-action-btn--edit {
+  color: var(--warm, #bc6c25);
+  border-color: var(--warm, #bc6c25);
+}
+.mp-tt-action-btn--edit:hover {
+  background: #f5ead6;
+}
+.mp-tt-action-btn--release {
+  color: var(--danger, #b85743);
+  border-color: var(--danger, #b85743);
+}
+.mp-tt-action-btn--release:hover {
+  background: #f5ddd6;
+}
+
+/* ── Reassign dropdown ───────────────────────────────────── */
+.mp-tt-reassign-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 100;
+  min-width: 200px;
+  max-height: 240px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--surface-soft, #e0e0e0);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  padding: 4px 0;
+}
+.mp-tt-reassign-dropdown__title {
+  padding: 6px 12px 4px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted-strong, #666);
+}
+.mp-tt-reassign-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 6px 12px;
+  border: none;
+  background: none;
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+}
+.mp-tt-reassign-option:hover {
+  background: var(--accent-soft, #dbece4);
+}
+.mp-tt-reassign-option__name {
+  flex: 1;
+}
+.mp-tt-reassign-option__util {
+  font-size: 11px;
+  color: var(--muted-strong, #666);
+  margin-left: 8px;
+}
+
+/* ── Period lock bar ─────────────────────────────────────── */
+.mp-period-lock-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--surface-soft, #f5f5f5);
+  border-bottom: 1px solid #e0e0e0;
+}
+.mp-period-lock-bar__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted-strong, #666);
+  margin-right: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.mp-period-lock-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border: 1px solid var(--surface-soft, #e0e0e0);
+  border-radius: 6px;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  color: var(--muted-strong, #666);
+}
+.mp-period-lock-btn:hover {
+  border-color: var(--accent, #1D9E75);
+  color: var(--accent, #1D9E75);
+}
+.mp-period-lock-btn--active {
+  background: var(--accent, #1D9E75);
+  border-color: var(--accent, #1D9E75);
+  color: #fff;
+}
+.mp-period-lock-btn--active:hover {
+  background: var(--accent-strong, #134d3b);
+  border-color: var(--accent-strong, #134d3b);
+  color: #fff;
+}

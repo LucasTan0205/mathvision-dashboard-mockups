@@ -32,6 +32,18 @@ function slotToTime(s) {
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
 }
 
+/**
+ * Classify a time slot string into AM, PM, or EVE.
+ * e.g. "Mon_09:00" → "AM", "Mon_14:00" → "PM", "Mon_18:00" → "EVE"
+ */
+export function classifyPeriod(timeSlot) {
+  const timePart = timeSlot.split('_')[1]; // "09:00"
+  const hour = parseInt(timePart.split(':')[0], 10);
+  if (hour < 12) return 'AM';
+  if (hour < 18) return 'PM';
+  return 'EVE';
+}
+
 function formatRange(s, n) { return `${slotToTime(s)} – ${slotToTime(s + n)}`; }
 
 function getWeekDates(offset = 0) {
@@ -198,8 +210,10 @@ export function createStudentPortalContent() {
       <div class="sp-legend">
         <div class="sp-leg-item"><div class="sp-leg-dot" style="background:rgba(44,74,62,.15);border:1.5px solid var(--green-dark);"></div> Selecting</div>
         <div class="sp-leg-item"><div class="sp-leg-dot" style="background:rgba(44,74,62,.14);border:1.5px dashed var(--green-dark);"></div> Pending</div>
+        <div class="sp-leg-item"><div class="sp-leg-dot" style="background:#5A6880;"></div> Standby</div>
         <div class="sp-leg-item"><div class="sp-leg-dot" style="background:var(--green-dark);"></div> Confirmed</div>
         <div class="sp-leg-item"><div class="sp-leg-dot" style="background:repeating-linear-gradient(45deg,#ddd,#ddd 2px,#eee 2px,#eee 5px);"></div> Not bookable</div>
+        <div class="sp-leg-item"><div class="sp-leg-dot" style="background:repeating-linear-gradient(45deg,rgba(90,104,128,.25),rgba(90,104,128,.25) 2px,transparent 2px,transparent 5px);border:1.5px solid #5A6880;"></div> Period locked</div>
       </div>
       <div class="sp-tt-nav-wrap">
         <div class="sp-tt-side-btn" onclick="spChangeWeek(-1)">‹</div>
@@ -505,30 +519,50 @@ export function initStudentPortal() {
   // ── Main timetable grid ────────────────────────────────────────────────
   // Live pairings fetched from API (keyed by slotKey "DAY_HH:MM")
   let livePairings = {}; // { "MON_09:00": PairingRecord, ... }
+  let periodLocks = []; // Array of { day_of_week, period, ... }
   let pairingsLoaded = false;
+
+  /** Check if a slot key (e.g. "MON_09:00") falls within a locked period */
+  function isSlotPeriodLocked(slotKey) {
+    const period = classifyPeriod(slotKey);
+    const day = slotKey.split('_')[0]; // "MON"
+    // period_locks use short day names like "Mon", "Tue" etc.
+    const dayNorm = day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
+    return periodLocks.some(l => l.day_of_week === dayNorm && l.period === period);
+  }
 
   async function spLoadPairings() {
     try {
-      const res = await fetch(`/matching/students/${studentId}/pairings`, { headers: { 'X-API-Key': '' } });
-      if (!res.ok) return;
-      const records = await res.json();
+      const [pairingsRes, locksRes] = await Promise.all([
+        fetch(`/matching/students/${studentId}/pairings`, { headers: { 'X-API-Key': '' } }),
+        fetch('/matching/period-locks', { headers: { 'X-API-Key': '' } })
+      ]);
 
-      // Fetch tutor names for all unique tutor IDs
-      const tutorIds = [...new Set(records.map(p => p.tutor_id))];
-      const tutorNames = {};
-      await Promise.all(tutorIds.map(async id => {
-        try {
-          const r = await fetch(`/matching/tutors/${id}`, { headers: { 'X-API-Key': '' } });
-          if (r.ok) { const t = await r.json(); tutorNames[id] = t.name; }
-        } catch {}
-      }));
+      if (pairingsRes.ok) {
+        const records = await pairingsRes.json();
 
-      livePairings = {};
-      records.forEach(p => {
-        const [day, time] = p.time_slot.split('_');
-        const key = `${day.toUpperCase().slice(0,3)}_${time}`;
-        livePairings[key] = { ...p, tutor_name: tutorNames[p.tutor_id] || p.tutor_id };
-      });
+        // Fetch tutor names for all unique tutor IDs
+        const tutorIds = [...new Set(records.map(p => p.tutor_id))];
+        const tutorNames = {};
+        await Promise.all(tutorIds.map(async id => {
+          try {
+            const r = await fetch(`/matching/tutors/${id}`, { headers: { 'X-API-Key': '' } });
+            if (r.ok) { const t = await r.json(); tutorNames[id] = t.name; }
+          } catch {}
+        }));
+
+        livePairings = {};
+        records.forEach(p => {
+          const [day, time] = p.time_slot.split('_');
+          const key = `${day.toUpperCase().slice(0,3)}_${time}`;
+          livePairings[key] = { ...p, tutor_name: tutorNames[p.tutor_id] || p.tutor_id };
+        });
+      }
+
+      if (locksRes.ok) {
+        periodLocks = await locksRes.json();
+      }
+
       pairingsLoaded = true;
     } catch { }
   }
@@ -580,22 +614,62 @@ export function initStudentPortal() {
         cell.dataset.col = col; cell.dataset.row = row;
 
         if (weekOffset === 0) {
-          // Show real matched sessions
+          // Show real matched sessions with status-based colour coding
           const key = `${d}_${t}`;
           const pairing = livePairings[key];
+          const slotPeriodLocked = isSlotPeriodLocked(key);
+
+          if (slotPeriodLocked && !pairing) {
+            // Period-locked slot with no pairing — show hatched overlay, disable interaction
+            cell.classList.add('sp-slot--period-locked');
+          }
+
           if (pairing && !isHalf) {
-            cell.classList.add('sp-slot--confirmed');
-            const block = document.createElement('div');
-            block.className = 'sp-sess-block';
-            block.style.height = '28px';
-            block.innerHTML = `<div class="sp-sess-time">${escapeHtml(t)}</div><div class="sp-sess-tutor">${escapeHtml(pairing.tutor_name)}</div>`;
-            block.addEventListener('click', ev => { ev.stopPropagation(); spOpenPairingPopup(pairing, t); });
-            cell.appendChild(block);
+            const status = pairing.status || 'confirmed';
+
+            if (status === 'confirmed') {
+              cell.classList.add('sp-slot--confirmed', 'sp-slot--locked');
+              const block = document.createElement('div');
+              block.className = 'sp-sess-block';
+              block.style.height = '28px';
+              block.innerHTML = `<div class="sp-sess-time">${escapeHtml(t)}</div><div class="sp-sess-tutor">${escapeHtml(pairing.tutor_name)}</div>`;
+              block.addEventListener('click', ev => { ev.stopPropagation(); spOpenPairingPopup(pairing, t); });
+              cell.appendChild(block);
+            } else if (status === 'standby') {
+              cell.classList.add('sp-slot--standby');
+              const block = document.createElement('div');
+              block.className = 'sp-sess-block sp-sess-standby';
+              block.style.height = '28px';
+              block.style.background = '#5A6880';
+              block.style.color = '#fff';
+              block.innerHTML = `<div class="sp-sess-time" style="color:#fff;">${escapeHtml(t)}</div><div class="sp-sess-tutor" style="color:#fff;">${escapeHtml(pairing.tutor_name)}</div>`;
+              block.addEventListener('click', ev => { ev.stopPropagation(); spOpenPairingPopup(pairing, t); });
+              cell.appendChild(block);
+            } else {
+              // "available" status — purple (existing behaviour)
+              cell.classList.add('sp-slot--confirmed');
+              const block = document.createElement('div');
+              block.className = 'sp-sess-block';
+              block.style.height = '28px';
+              block.innerHTML = `<div class="sp-sess-time">${escapeHtml(t)}</div><div class="sp-sess-tutor">${escapeHtml(pairing.tutor_name)}</div>`;
+              block.addEventListener('click', ev => { ev.stopPropagation(); spOpenPairingPopup(pairing, t); });
+              cell.appendChild(block);
+            }
+
+            // If period-locked, also add the period-locked class
+            if (slotPeriodLocked) {
+              cell.classList.add('sp-slot--period-locked');
+            }
           }
         } else {
           // Future weeks — booking UI
           const pending = SESSIONS.find(s => s.weekOffset === weekOffset && s.col === col && row >= s.startSlot && row < s.startSlot + s.spanSlots);
-          if (pending) {
+          const futureKey = `${d}_${t}`;
+          const slotPeriodLocked = isSlotPeriodLocked(futureKey);
+
+          if (slotPeriodLocked) {
+            cell.classList.add('sp-slot--period-locked');
+          } else if (pending) {
             if (row === pending.startSlot) {
               const block = document.createElement('div');
               block.className = 'sp-sess-block sp-sess-pending';
@@ -620,17 +694,38 @@ export function initStudentPortal() {
 
   // Popup for a real API pairing
   function spOpenPairingPopup(pairing, timeSlot) {
+    const status = pairing.status || 'confirmed';
     const matchedAt = pairing.matched_at
       ? new Date(pairing.matched_at).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' })
       : '—';
-    document.getElementById('sp-pop-head').innerHTML = `<div class="sp-pop-label">Confirmed Session</div><div class="sp-pop-date">${escapeHtml(timeSlot)}</div>`;
+
+    let pillHtml = '';
+    let headerLabel = 'Session Details';
+    if (status === 'confirmed') {
+      pillHtml = '<span class="sp-status-pill sp-sp-confirmed">✓ Confirmed</span>';
+      headerLabel = 'Confirmed Session';
+    } else if (status === 'standby') {
+      pillHtml = '<span class="sp-status-pill" style="background:#5A6880;color:#fff;">⏳ Standby</span>';
+      headerLabel = 'Standby Session';
+    } else {
+      pillHtml = '<span class="sp-status-pill sp-sp-pending">Available</span>';
+      headerLabel = 'Available Session';
+    }
+
+    let lockNotice = '';
+    if (status === 'confirmed') {
+      lockNotice = '<div class="sp-info-box" style="margin-bottom:14px;background:#fff3cd;border:1px solid #ffc107;color:#856404;">🔒 This slot is locked. Contact operations to make changes.</div>';
+    }
+
+    document.getElementById('sp-pop-head').innerHTML = `<div class="sp-pop-label">${headerLabel}</div><div class="sp-pop-date">${escapeHtml(timeSlot)}</div>`;
     document.getElementById('sp-pop-body').innerHTML = `
-      <span class="sp-status-pill sp-sp-confirmed">✓ Confirmed</span>
+      ${pillHtml}
+      ${lockNotice}
       <div class="sp-time-card"><div class="sp-time-icon">🕐</div><div><div class="sp-time-val">${escapeHtml(timeSlot)}</div><div class="sp-time-sub">Matched ${escapeHtml(matchedAt)}</div></div></div>
       <div class="sp-pop-label">Your Tutor</div>
       <div class="sp-tutor-card">
         <div class="sp-tutor-av">${escapeHtml(pairing.tutor_name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())}</div>
-        <div><div class="sp-tutor-name">${escapeHtml(pairing.tutor_name)}</div><div class="sp-tutor-badge">✓ Assigned</div></div>
+        <div><div class="sp-tutor-name">${escapeHtml(pairing.tutor_name)}</div><div class="sp-tutor-badge">${status === 'confirmed' ? '✓ Assigned' : '⏳ Pending'}</div></div>
       </div>`;
     document.getElementById('sp-sess-overlay').classList.add('open');
   }
