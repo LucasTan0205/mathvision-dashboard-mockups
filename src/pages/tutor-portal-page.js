@@ -29,6 +29,18 @@ function getWeekDates(off = 0) {
   return Array.from({ length: 7 }, (_, i) => { const d = new Date(mon); d.setDate(mon.getDate() + i); return d; });
 }
 
+/**
+ * Classify a time slot string into AM, PM, or EVE.
+ * e.g. "MON_09:00" → "AM", "MON_14:00" → "PM", "MON_18:00" → "EVE"
+ */
+export function classifyPeriod(timeSlot) {
+  const timePart = timeSlot.split('_')[1]; // "09:00"
+  const hour = parseInt(timePart.split(':')[0], 10);
+  if (hour < 12) return 'AM';
+  if (hour < 18) return 'PM';
+  return 'EVE';
+}
+
 export function createTutorPortalContent() {
   return `
 <div id="tp-root">
@@ -157,6 +169,7 @@ export function createTutorPortalContent() {
         <div class="tp-leg-item"><div class="tp-leg-dot" style="background:var(--green-dark);"></div> Confirmed</div>
         <div class="tp-leg-item"><div class="tp-leg-dot" style="background:#5A6880;"></div> Standby</div>
         <div class="tp-leg-item"><div class="tp-leg-dot" style="background:repeating-linear-gradient(45deg,#ddd,#ddd 2px,#eee 2px,#eee 5px);"></div> Locked</div>
+        <div class="tp-leg-item"><div class="tp-leg-dot" style="background:repeating-linear-gradient(45deg,#f0c0c0,#f0c0c0 2px,#fde8e8 2px,#fde8e8 5px);"></div> Period locked</div>
       </div>
       <div class="tp-tt-nav-wrap">
         <div class="tp-tt-side-btn" onclick="tpShiftWeek(-1)">‹</div>
@@ -536,30 +549,49 @@ export function initTutorPortal() {
   // ── Main timetable grid ────────────────────────────────────────────────
   // ── Live pairings from API ─────────────────────────────────────────────
   let livePairings = {}; // { "MON_09:00": PairingRecord }
+  let periodLocks = []; // Array of { day_of_week, period, ... }
   let pairingsLoaded = false;
+
+  /** Check if a slot key (e.g. "MON_09:00") falls within a locked period */
+  function isSlotPeriodLocked(slotKey) {
+    const period = classifyPeriod(slotKey);
+    const day = slotKey.split('_')[0]; // "MON"
+    const dayNorm = day.charAt(0).toUpperCase() + day.slice(1).toLowerCase();
+    return periodLocks.some(l => l.day_of_week === dayNorm && l.period === period);
+  }
 
   async function tpLoadPairings() {
     try {
-      const res = await fetch(`/matching/tutors/${tutorId}/pairings`, { headers: { 'X-API-Key': '' } });
-      if (!res.ok) return;
-      const records = await res.json();
+      const [pairingsRes, locksRes] = await Promise.all([
+        fetch(`/matching/tutors/${tutorId}/pairings`, { headers: { 'X-API-Key': '' } }),
+        fetch('/matching/period-locks', { headers: { 'X-API-Key': '' } })
+      ]);
 
-      // Fetch student names for all unique student IDs
-      const studentIds = [...new Set(records.map(p => p.student_id))];
-      const studentNames = {};
-      await Promise.all(studentIds.map(async id => {
-        try {
-          const r = await fetch(`/matching/students/${id}`, { headers: { 'X-API-Key': '' } });
-          if (r.ok) { const s = await r.json(); studentNames[id] = s.name; }
-        } catch {}
-      }));
+      if (pairingsRes.ok) {
+        const records = await pairingsRes.json();
 
-      livePairings = {};
-      records.forEach(p => {
-        const [day, time] = p.time_slot.split('_');
-        const key = `${day.toUpperCase().slice(0,3)}_${time}`;
-        livePairings[key] = { ...p, student_name: studentNames[p.student_id] || p.student_id };
-      });
+        // Fetch student names for all unique student IDs
+        const studentIds = [...new Set(records.map(p => p.student_id))];
+        const studentNames = {};
+        await Promise.all(studentIds.map(async id => {
+          try {
+            const r = await fetch(`/matching/students/${id}`, { headers: { 'X-API-Key': '' } });
+            if (r.ok) { const s = await r.json(); studentNames[id] = s.name; }
+          } catch {}
+        }));
+
+        livePairings = {};
+        records.forEach(p => {
+          const [day, time] = p.time_slot.split('_');
+          const key = `${day.toUpperCase().slice(0,3)}_${time}`;
+          livePairings[key] = { ...p, student_name: studentNames[p.student_id] || p.student_id };
+        });
+      }
+
+      if (locksRes.ok) {
+        periodLocks = await locksRes.json();
+      }
+
       pairingsLoaded = true;
     } catch { }
   }
@@ -617,15 +649,49 @@ export function initTutorPortal() {
         // Real pairings on current week (offset 0), availability slots on future weeks
         const key = `${DAYS[col-1]}_${t}`;
         const pairing = weekOffset === 0 && !isHalf ? livePairings[key] : null;
+        const slotPeriodLocked = isSlotPeriodLocked(key);
+
+        if (slotPeriodLocked && !pairing) {
+          // Period-locked slot with no pairing — disable interaction
+          sl.classList.add('tp-slot--period-locked');
+        }
 
         if (pairing) {
-          sl.classList.add('tp-slot--confirmed');
-          const blk = document.createElement('div');
-          blk.className = 'tp-sess-block tp-sess-confirmed';
-          blk.style.height = '28px';
-          blk.innerHTML = `<div class="tp-sb-label">${escapeHtml(pairing.student_name)}</div><div class="tp-sb-sub">${escapeHtml(t)}</div>`;
-          blk.onclick = () => tpOpenPairingPopup(pairing, t);
-          sl.appendChild(blk);
+          const status = pairing.status || 'confirmed';
+
+          if (status === 'confirmed') {
+            sl.classList.add('tp-slot--confirmed', 'tp-slot--locked');
+            const blk = document.createElement('div');
+            blk.className = 'tp-sess-block tp-sess-confirmed';
+            blk.style.height = '28px';
+            blk.innerHTML = `<div class="tp-sb-label">${escapeHtml(pairing.student_name)}</div><div class="tp-sb-sub">${escapeHtml(t)}</div>`;
+            blk.onclick = () => tpOpenPairingPopup(pairing, t);
+            sl.appendChild(blk);
+          } else if (status === 'standby') {
+            sl.classList.add('tp-slot--standby');
+            const blk = document.createElement('div');
+            blk.className = 'tp-sess-block tp-sess-standby';
+            blk.style.height = '28px';
+            blk.style.background = '#5A6880';
+            blk.style.color = '#fff';
+            blk.innerHTML = `<div class="tp-sb-label" style="color:#fff;">${escapeHtml(pairing.student_name)}</div><div class="tp-sb-sub" style="color:#fff;">${escapeHtml(t)}</div>`;
+            blk.onclick = () => tpOpenPairingPopup(pairing, t);
+            sl.appendChild(blk);
+          } else {
+            // "available" status — purple (existing behaviour)
+            sl.classList.add('tp-slot--confirmed');
+            const blk = document.createElement('div');
+            blk.className = 'tp-sess-block tp-sess-availability';
+            blk.style.height = '28px';
+            blk.innerHTML = `<div class="tp-sb-label">${escapeHtml(pairing.student_name)}</div><div class="tp-sb-sub">${escapeHtml(t)}</div>`;
+            blk.onclick = () => tpOpenPairingPopup(pairing, t);
+            sl.appendChild(blk);
+          }
+
+          // If period-locked, also add the period-locked class
+          if (slotPeriodLocked) {
+            sl.classList.add('tp-slot--period-locked');
+          }
         } else {
           // Submitted availability / standby from local SESSIONS array
           const sessHere = SESSIONS.filter(s => s.weekOffset === weekOffset && s.day === col && s.startRow === rowIdx);
@@ -642,7 +708,7 @@ export function initTutorPortal() {
               blk.onclick = () => tpOpenSessPopup(sess, dates[col-1], sess.startRow);
               sl.appendChild(blk);
             });
-          } else if (availMode && !isHalf && !colLocked) {
+          } else if (availMode && !isHalf && !colLocked && !slotPeriodLocked) {
             sl.addEventListener('mousedown', ev => {
               ev.preventDefault();
               ttSelecting = true; ttSelStart = {col:col-1, row:rowIdx}; ttSelEnd = {col:col-1, row:rowIdx};
@@ -661,19 +727,46 @@ export function initTutorPortal() {
 
   // Popup for a real API pairing (tutor view)
   function tpOpenPairingPopup(pairing, timeSlot) {
+    const status = pairing.status || 'confirmed';
     const matchedAt = pairing.matched_at
       ? new Date(pairing.matched_at).toLocaleDateString(undefined, { month:'short', day:'numeric', year:'numeric' })
       : '—';
-    document.getElementById('tp-pop-head').innerHTML = `<div class="tp-pop-label">Confirmed Session</div><div class="tp-pop-date">${escapeHtml(timeSlot)}</div><div class="tp-status-pill tp-sp-confirmed">✓ Confirmed</div>`;
-    document.getElementById('tp-pop-body').innerHTML = `
-      <div class="tp-detail-row"><div class="tp-detail-icon">🕐</div><div class="tp-detail-text"><strong>${escapeHtml(timeSlot)}</strong></div></div>
-      <div class="tp-detail-row"><div class="tp-detail-icon">📅</div><div class="tp-detail-text">Matched ${escapeHtml(matchedAt)}</div></div>
-      <div class="tp-stu-card-pop">
-        <div class="tp-stu-card-top">
-          <div class="tp-stu-av">${escapeHtml(pairing.student_name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())}</div>
-          <div><div class="tp-stu-name">${escapeHtml(pairing.student_name)}</div><div class="tp-stu-meta">Student</div></div>
-        </div>
-      </div>`;
+
+    if (status === 'confirmed') {
+      document.getElementById('tp-pop-head').innerHTML = `<div class="tp-pop-label">Confirmed Session</div><div class="tp-pop-date">${escapeHtml(timeSlot)}</div><div class="tp-status-pill tp-sp-confirmed">✓ Confirmed</div>`;
+      document.getElementById('tp-pop-body').innerHTML = `
+        <div class="tp-detail-row"><div class="tp-detail-icon">🔒</div><div class="tp-detail-text"><strong>This slot is locked.</strong> Contact operations to make changes.</div></div>
+        <div class="tp-detail-row"><div class="tp-detail-icon">🕐</div><div class="tp-detail-text"><strong>${escapeHtml(timeSlot)}</strong></div></div>
+        <div class="tp-detail-row"><div class="tp-detail-icon">📅</div><div class="tp-detail-text">Matched ${escapeHtml(matchedAt)}</div></div>
+        <div class="tp-stu-card-pop">
+          <div class="tp-stu-card-top">
+            <div class="tp-stu-av">${escapeHtml(pairing.student_name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())}</div>
+            <div><div class="tp-stu-name">${escapeHtml(pairing.student_name)}</div><div class="tp-stu-meta">Student</div></div>
+          </div>
+        </div>`;
+    } else if (status === 'standby') {
+      document.getElementById('tp-pop-head').innerHTML = `<div class="tp-pop-label">Standby Session</div><div class="tp-pop-date">${escapeHtml(timeSlot)}</div><div class="tp-status-pill tp-sp-standby">⏳ Standby</div>`;
+      document.getElementById('tp-pop-body').innerHTML = `
+        <div class="tp-detail-row"><div class="tp-detail-icon">🕐</div><div class="tp-detail-text"><strong>${escapeHtml(timeSlot)}</strong></div></div>
+        <div class="tp-detail-row"><div class="tp-detail-icon">📅</div><div class="tp-detail-text">Matched ${escapeHtml(matchedAt)}</div></div>
+        <div class="tp-stu-card-pop">
+          <div class="tp-stu-card-top">
+            <div class="tp-stu-av">${escapeHtml(pairing.student_name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())}</div>
+            <div><div class="tp-stu-name">${escapeHtml(pairing.student_name)}</div><div class="tp-stu-meta">Student</div></div>
+          </div>
+        </div>`;
+    } else {
+      document.getElementById('tp-pop-head').innerHTML = `<div class="tp-pop-label">Available Session</div><div class="tp-pop-date">${escapeHtml(timeSlot)}</div><div class="tp-status-pill tp-sp-availability">Available</div>`;
+      document.getElementById('tp-pop-body').innerHTML = `
+        <div class="tp-detail-row"><div class="tp-detail-icon">🕐</div><div class="tp-detail-text"><strong>${escapeHtml(timeSlot)}</strong></div></div>
+        <div class="tp-detail-row"><div class="tp-detail-icon">📅</div><div class="tp-detail-text">Matched ${escapeHtml(matchedAt)}</div></div>
+        <div class="tp-stu-card-pop">
+          <div class="tp-stu-card-top">
+            <div class="tp-stu-av">${escapeHtml(pairing.student_name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase())}</div>
+            <div><div class="tp-stu-name">${escapeHtml(pairing.student_name)}</div><div class="tp-stu-meta">Student</div></div>
+          </div>
+        </div>`;
+    }
     document.getElementById('tp-sess-overlay').classList.add('open');
   }
 
