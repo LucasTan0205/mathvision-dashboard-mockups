@@ -1052,12 +1052,37 @@ function initPendingConfirmations() {
       badge.textContent = remaining > 0 ? `${remaining} pending` : '✓ All confirmed';
       if (remaining === 0) {
         badge.className = 'mp-confirm-badge mp-confirm-badge--clear';
+        if (confirmAllBtn) confirmAllBtn.style.display = 'none';
         body.innerHTML = '<p class="mp-timetable-empty">No pending lessons — all matched sessions have been confirmed.</p>';
       }
     } catch (err) {
       btn.disabled = false;
       btn.textContent = 'Confirm';
       console.error('[PendingConfirmations] confirm failed:', err);
+    }
+  });
+
+  // Confirm All button
+  confirmAllBtn?.addEventListener('click', async () => {
+    const allBtns = [...body.querySelectorAll('.mp-tt-confirm-btn:not(:disabled)')];
+    if (allBtns.length === 0) return;
+    confirmAllBtn.disabled = true;
+    confirmAllBtn.innerHTML = '<i class="bi bi-arrow-repeat mp-spin"></i> Confirming…';
+
+    // Collect all unique pairing IDs from the individual confirm buttons
+    const pairingIds = allBtns.map(b => b.dataset.pairingId);
+    try {
+      await Promise.all(pairingIds.map(id =>
+        fetch(`/matching/pairings/${id}/confirm`, { method: 'PATCH' })
+      ));
+      badge.textContent = '✓ All confirmed';
+      badge.className = 'mp-confirm-badge mp-confirm-badge--clear';
+      confirmAllBtn.style.display = 'none';
+      body.innerHTML = '<p class="mp-timetable-empty">No pending lessons — all matched sessions have been confirmed.</p>';
+    } catch (err) {
+      confirmAllBtn.disabled = false;
+      confirmAllBtn.innerHTML = '<i class="bi bi-check2-all"></i> Confirm All';
+      console.error('[PendingConfirmations] confirm all failed:', err);
     }
   });
 
